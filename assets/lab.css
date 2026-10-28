@@ -219,3 +219,4 @@ span.g-rel { color: var(--muted); }
 .sec-head a, .lede a { color: var(--accent); }
 .g-lablink { font-family: var(--body); font-size: .8rem; font-weight: 500; color: var(--accent); margin-left: 10px; text-decoration: none; }
 .g-lablink:hover { text-decoration: underline; }
+.explainer { width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid var(--rule); background: var(--surface); box-shadow: 0 6px 22px rgba(20,30,50,.08); }
