@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public Policy and Growth Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.policies { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.pol { text-align: left; border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; height: 100%; }
+.pol b { font-size: .9rem; }
+.pol span { font-size: .78rem; color: var(--muted); }
+.pol[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.pol[aria-pressed="true"] b { color: var(--accent); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); font-weight: 600; }
+.row-ctl { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.row-ctl .k { font-size: .86rem; font-weight: 500; margin-right: 6px; }
+@media (max-width: 860px) { .policies { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 460px) { .policies { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 5 · Topic 5.7</span>
+  <h1>Public Policy and Growth Study Lab</h1>
+  <p class="lede">Some policies only push aggregate demand. Others build the economy's capacity to produce, which is what long-run growth means. Turn policies on and off, then flip between the short run and the long run to see which effect lasts.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Policy workbench</h2>
+    <p>The economy starts in long-run equilibrium at full employment. Dashed grey lines show the starting curves. Solid lines show the curves after the policies you pick.</p>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Or pick policies yourself</div>
+      <div class="policies" id="policies"></div>
+    </div>
+    <div class="row-ctl">
+      <div><span class="k">View</span>
+        <span class="seg" role="group" aria-label="Time frame">
+          <button type="button" id="v-sr" aria-pressed="true">Short run</button><button type="button" id="v-lr" aria-pressed="false">Long run</button>
+        </span>
+      </div>
+      <div><span class="k">Fiscal policies paid for by</span>
+        <span class="seg" role="group" aria-label="Financing">
+          <button type="button" id="f-def" aria-pressed="true">Borrowing (deficit)</button><button type="button" id="f-bal" aria-pressed="false">Cuts elsewhere (no new borrowing)</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small id="view-note">short run</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD-AS graph"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Where the effect comes from <small>size of each shift</small></h3>
+      <svg class="chart" id="bars" role="img" aria-label="Bar chart of short-run demand and long-run capacity effects for each selected policy"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">AD / demand push</span><span class="l-srpc">SRAS</span><span class="l-lrpc">LRAS / capacity</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real GDP, short run</div><div class="v" id="r-sr">+0.0%</div></div>
+    <div class="stat"><div class="k">Potential GDP, long run</div><div class="v" id="r-lr">+0.0%</div></div>
+    <div class="stat"><div class="k" id="r-p-k">Price level, short run</div><div class="v" id="r-p">100.0</div></div>
+    <div class="stat"><div class="k">Main channel</div><div class="v" id="r-ch"><span class="pill lr">None yet</span></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Growth</span><h3>Growth means more capacity</h3><p>Long-run economic growth is an increase in potential output. On the graphs, LRAS shifts right and the production possibilities curve shifts outward. Pushing AD past potential is not growth.</p></div>
+    <div class="card"><span class="tag">Human capital</span><h3>Education and training</h3><p>Spending on schools, job training, and health makes each worker more productive. It raises AD a little now and shifts LRAS right later.</p></div>
+    <div class="card"><span class="tag">Physical capital</span><h3>Infrastructure and investment</h3><p>Roads, ports, broadband, and private machinery let workers produce more. An investment tax credit encourages firms to buy capital, which adds to AD now and to capacity later.</p></div>
+    <div class="card"><span class="tag">Technology</span><h3>R&amp;D and patents</h3><p>Subsidies for research and patent protection reward new ideas. Better technology raises productivity, so the same inputs make more output.</p></div>
+    <div class="card"><span class="tag">Supply side</span><h3>Supply-side fiscal policy</h3><p>Supply-side economists argue that lower marginal tax rates and lighter regulation increase incentives to work, save, and invest, shifting aggregate supply right. Economists disagree about how large these effects are.</p></div>
+    <div class="card"><span class="tag">Laffer curve</span><h3>Tax rates and tax revenue</h3><p>The Laffer curve shows that revenue is zero at a 0% tax rate and also at a 100% rate, so it peaks somewhere in between. If rates are above the peak, a cut could raise revenue. Economists disagree about where the economy sits on the curve.</p></div>
+    <div class="card"><span class="tag">Link to 5.5</span><h3>Crowding out can slow growth</h3><p>When the government borrows, it raises the real interest rate in the loanable funds market. Private investment falls, the capital stock grows more slowly, and long-run growth is lower than it would have been.</p></div>
+    <div class="card"><span class="tag">Link to 5.6</span><h3>Capital accumulation</h3><p>Growth comes from more and better capital, more skilled labor, and better technology. Policy helps growth when it adds to one of these, not when it only adds spending.</p></div>
+    <div class="card"><span class="tag">Demand side</span><h3>Stabilization is not growth</h3><p>Expansionary monetary policy and spending at full employment raise output only for a while. In the long run the economy returns to potential, and the only lasting effect is a higher price level.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Policy effects at a glance</h2>
+    <p>Ask two questions about any policy: does it shift AD now, and does it add to the economy's productive capacity later?</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Policy</th><th>Short run</th><th>Long run growth</th></tr></thead>
+    <tbody>
+      <tr><td>Spending on education and job training</td><td><b>AD shifts right</b> (government spending)</td><td><span class="lshift">LRAS shifts right</span>: more human capital</td></tr>
+      <tr><td>Infrastructure spending</td><td><b>AD shifts right</b></td><td><span class="lshift">LRAS shifts right</span>: more public capital</td></tr>
+      <tr><td>R&amp;D subsidies, patent protection</td><td>Small AD effect</td><td><span class="lshift">LRAS shifts right</span>: better technology</td></tr>
+      <tr><td>Investment tax credit</td><td><b>AD shifts right</b> (investment rises)</td><td><span class="lshift">LRAS shifts right</span>: more physical capital</td></tr>
+      <tr><td>Lower marginal tax rates (supply side)</td><td><b>AD shifts right</b> and <span class="shift">SRAS may shift right</span></td><td><span class="lshift">LRAS shifts right</span> if incentives to work, save, and invest rise</td></tr>
+      <tr><td>Reducing costly regulation</td><td><span class="shift">SRAS shifts right</span></td><td><span class="lshift">LRAS shifts right</span>: lower production costs</td></tr>
+      <tr><td>Deficit-financed spending at full employment</td><td><b>AD shifts right</b>, real interest rate rises</td><td>Crowding out lowers investment, so growth is slower than it would have been</td></tr>
+      <tr><td>Expansionary monetary policy</td><td><b>AD shifts right</b></td><td>No change in LRAS; only the price level is higher</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Answering it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Moves that earn points</h3>
+      <ul>
+        <li>Name the channel: human capital, physical capital, or technology. Then say LRAS shifts right.</li>
+        <li>Show growth by shifting LRAS right (label it LRAS₂) or shifting the PPC outward.</li>
+        <li>For a deficit-financed policy, connect the steps: government borrowing, higher real interest rate, less private investment, slower growth.</li>
+        <li>When AD and AS both shift right, real GDP rises but the price level change is <b>indeterminate</b> unless the question gives sizes.</li>
+        <li>Answer the time frame asked. "Short run" means AD and SRAS. "Long run" means LRAS.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Calling any increase in real GDP "growth". A move along a fixed LRAS is a short-run boom, not growth.</li>
+        <li>Saying expansionary monetary policy raises long-run output. It raises only the price level in the long run.</li>
+        <li>Forgetting that government spending on education or infrastructure also shifts AD in the short run.</li>
+        <li>Claiming tax cuts always raise revenue. The Laffer curve says that happens only if rates start above the revenue-maximizing rate.</li>
+        <li>Shifting LRAS left for crowding out when the question asks about growth. Say growth is slower, or LRAS shifts right by less.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button type="button" id="quiz-reset">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // a: short-run AD push, s: short-run SRAS shift right, L: long-run LRAS shift (% of potential GDP)
+  var POL = [
+    { id: "edu",   name: "Education & job training", note: "Human capital", a: 0.5,  s: 0,    L: 3,   fiscal: true },
+    { id: "infra", name: "Infrastructure",           note: "Public capital", a: 1,    s: 0,    L: 3,   fiscal: true },
+    { id: "rd",    name: "R&D subsidies, patents",   note: "Technology", a: 0.25, s: 0,    L: 2.5, fiscal: true },
+    { id: "itc",   name: "Investment tax credit",    note: "Private capital", a: 1,    s: 0,    L: 3,   fiscal: true },
+    { id: "tax",   name: "Lower marginal tax rates", note: "Supply-side incentives", a: 0.75, s: 0.5,  L: 2,   fiscal: true },
+    { id: "reg",   name: "Reduce costly regulation", note: "Lower production costs", a: 0,    s: 0.75, L: 1.5, fiscal: false },
+    { id: "def",   name: "More spending at full employment", note: "Consumption-type spending", a: 1.5, s: 0, L: 0, fiscal: true },
+    { id: "mon",   name: "Expansionary monetary policy", note: "Fed lowers interest rates", a: 1.5, s: 0, L: 0, fiscal: false }
+  ];
+  var CROWD = 0.4; // capacity lost per unit of borrowed fiscal stimulus
+  var on = {}, view = "sr", deficit = true;
+
+  function model() {
+    var a = 0, s = 0, L = 0, co = 0, list = [];
+    POL.forEach(function (p) {
+      if (!on[p.id]) return;
+      var c = deficit && p.fiscal ? CROWD * p.a : 0;
+      a += p.a; s += p.s; L += p.L; co += c;
+      list.push({ p: p, c: c });
+    });
+    L -= co;
+    var Ysr = 100 + 2 * (a + s), Psr = 110 + 2 * a - 2 * s;
+    var Yf = 100 + L, Plr = 110 + 4 * a - L;
+    return { a: a, s: s, L: L, co: co, list: list, Ysr: Ysr, Psr: Psr, Yf: Yf, Plr: Plr };
+  }
+
+  var svgA = document.getElementById("adas"), svgB = document.getElementById("bars");
+  function AD(a) { return function (y) { return 110 + 4 * a - (y - 100); }; }
+  function SRAS(s, Yf) { return function (y) { return 110 - 4 * s + (y - Yf); }; }
+  function idx(P) { return P / 110 * 100; }
+
+  function drawADAS(m) {
+    var F = Lab.frame(svgA, { x: [86, 116], y: [88, 136], xLabel: "Real GDP", yLabel: "Price level",
+      xTicks: [90, 95, 100, 105, 110, 115], yTicks: [95, 105, 115, 125, 135] });
+    var moved = m.list.length > 0;
+    if (moved) {
+      Lab.fn(F, AD(0), "var(--ghost)", 2, "6 5", 2);
+      Lab.fn(F, SRAS(0, 100), "var(--ghost)", 2, "6 5", 2);
+      if (view === "lr" && Math.abs(m.L) > 0.01) Lab.vline(F, 100, "var(--ghost)", 2, "6 5");
+    }
+    if (view === "sr") {
+      Lab.vline(F, 100, "var(--lrpc)", 3);
+      Lab.fn(F, SRAS(m.s, 100), "var(--srpc)", 3, null, 2);
+      Lab.fn(F, AD(m.a), "var(--accent)", 3, null, 2);
+      Lab.dot(F, m.Ysr, m.Psr, "var(--ink)", true, moved ? "Y₁" : "Y₀", moved ? "P₁" : "P₀");
+      Lab.tag(F, 100.4, 133, "LRAS", "var(--lrpc)");
+      Lab.tag(F, 115, SRAS(m.s, 100)(115) - 2.5, "SRAS", "var(--srpc)", "end");
+      Lab.tag(F, 115, AD(m.a)(115) + 2, "AD", "var(--accent)", "end");
+      if (moved && m.a > 0.01) Lab.arrow(F, 104, AD(0)(104), 104 + 2 * m.a * 0.8, AD(0)(104), "var(--accent)");
+    } else {
+      // long run: SRAS has adjusted so the economy sits on the new LRAS
+      var sr = function (y) { return m.Plr + (y - m.Yf); };
+      Lab.vline(F, m.Yf, "var(--lrpc)", 3);
+      Lab.fn(F, sr, "var(--srpc)", 3, null, 2);
+      Lab.fn(F, AD(m.a), "var(--accent)", 3, null, 2);
+      Lab.dot(F, m.Yf, m.Plr, "var(--ink)", true, moved ? "Y₂" : "Y₀", moved ? "P₂" : "P₀");
+      Lab.tag(F, m.Yf + 0.4, 133, "LRAS" + (Math.abs(m.L) > 0.01 ? "₂" : ""), "var(--lrpc)");
+      Lab.tag(F, 115, sr(115) - 2.5, "SRAS", "var(--srpc)", "end");
+      Lab.tag(F, 115, AD(m.a)(115) + 2, "AD", "var(--accent)", "end");
+      if (Math.abs(m.L) > 0.3) Lab.arrow(F, 100, 92, m.Yf, 92, "var(--lrpc)");
+    }
+  }
+
+  function drawBars(m) {
+    var rows = m.list.length ? m.list : [];
+    var n = Math.max(rows.length, 1);
+    var H = Math.max(330, 80 + n * 72);
+    svgB.setAttribute("viewBox", "0 0 440 " + H);
+    var F = Lab.frame(svgB, { x: [-1, 6], y: [0, n], height: H, xLabel: "Size of shift (model units)", yLabel: "",
+      xTicks: [-1, 0, 1, 2, 3, 4, 5, 6], fmtX: function (v) { return v; } });
+    Lab.el("text", { x: F.W - F.M.r, y: F.M.t + 12, "text-anchor": "end", style: "fill:var(--muted)" }, svgB, "Blue: demand now · Green: capacity later · Red: crowded out");
+    Lab.vline(F, 0, "var(--ink)", 1.5);
+    if (!rows.length) {
+      Lab.el("text", { x: 240, y: H / 2 - 10, "text-anchor": "middle", style: "fill:var(--muted)" }, svgB, "Pick a policy to see its effects");
+      return;
+    }
+    rows.forEach(function (r, i) {
+      var y = n - i - 0.5;
+      var d = r.p.a * 2; // AD push shown on same scale as real GDP effect
+      var cap = r.p.L - r.c;
+      Lab.rect(F, 0, y - 0.02, d, y + 0.16, "var(--accent)", 0.85);
+      Lab.rect(F, 0, y - 0.38, cap, y - 0.2, "var(--lrpc)", 0.85);
+      if (r.c > 0) Lab.rect(F, cap, y - 0.38, r.p.L, y - 0.2, "var(--bad)", 0.3);
+      Lab.el("text", { x: F.sx(0) + 4, y: F.sy(y + 0.24), style: "fill:var(--ink); font-weight:600" }, svgB, r.p.name);
+    });
+  }
+
+  function story(m) {
+    if (!m.list.length) return "<p><b>No policies selected.</b> The economy is in long-run equilibrium at full employment. Pick a scenario or turn on a policy above.</p>";
+    var names = m.list.map(function (r) { return r.p.name; }).join("; ");
+    var out = "<p><b>Policies on:</b> " + names + ".</p><ul>";
+    // Short run
+    var sr = "<b>Short run:</b> ";
+    if (m.a > 0.01 && m.s > 0.01) sr += "AD and SRAS both shift right, so real GDP rises by " + Lab.fmt(m.Ysr - 100) + "%. On the AP exam, the price level change is indeterminate when both curves shift right; in this model it moves to " + Lab.fmt(idx(m.Psr)) + ".";
+    else if (m.a > 0.01) sr += "AD shifts right, so real GDP rises " + Lab.fmt(m.Ysr - 100) + "% and the price level rises to " + Lab.fmt(idx(m.Psr)) + ". The economy is now above full employment because capacity has not caught up yet.";
+    else if (m.s > 0.01) sr += "SRAS shifts right, so real GDP rises " + Lab.fmt(m.Ysr - 100) + "% and the price level falls to " + Lab.fmt(idx(m.Psr)) + ".";
+    out += "<li>" + sr + "</li>";
+    // Long run
+    var lr = "<b>Long run:</b> ";
+    var growth = m.list.filter(function (r) { return r.p.L > 0; }).map(function (r) { return r.p.note.toLowerCase(); });
+    if (m.L > 0.05) lr += "LRAS shifts right by " + Lab.fmt(m.L) + "% because of " + growth.join(", ") + ". This is real economic growth: potential GDP is higher for good.";
+      if (m.a > 0.01) lr += " Because AD and LRAS both shifted right, the AP answer for the long-run price level is indeterminate; in this model it ends at " + Lab.fmt(idx(m.Plr)) + ".";
+    else if (m.L < -0.05) lr += "Potential GDP ends " + Lab.fmt(-m.L) + "% lower than it would have been. Borrowing crowded out private investment, so the capital stock grew more slowly.";
+    else lr += "LRAS does not move. Once wages and prices adjust, real GDP returns to the starting potential and the only lasting change is a higher price level (" + Lab.fmt(idx(m.Plr)) + ").";
+    out += "<li>" + lr + "</li>";
+    if (m.co > 0.01) out += "<li><b>Crowding out:</b> paying for fiscal policies by borrowing raises the real interest rate and lowers private investment. That cost " + Lab.fmt(m.co) + " points of potential GDP here. Switch to “Cuts elsewhere” to compare.</li>";
+    out += "</ul>";
+    var verdict;
+    if (m.L > 0.5 && m.a > 0.01) verdict = "<b>Which effect lasts?</b> The demand boost fades, but the capacity gain stays. That is why these count as growth policies.";
+    else if (m.L > 0.5) verdict = "<b>Which effect lasts?</b> This works almost entirely on the supply side, so the gain in output is lasting.";
+    else if (m.a > 0.01) verdict = "<b>Which effect lasts?</b> Only the demand effect is present, and it fades. This is stabilization policy, not growth policy.";
+    else verdict = "";
+    if (verdict) out += "<p>" + verdict + "</p>";
+    return out;
+  }
+
+  function render() {
+    var m = model();
+    drawADAS(m); drawBars(m);
+    document.getElementById("view-note").textContent = view === "sr" ? "short run" : "long run, after wages and prices adjust";
+    document.getElementById("r-sr").textContent = (m.Ysr - 100 >= 0 ? "+" : "−") + Lab.fmt(Math.abs(m.Ysr - 100)) + "%";
+    document.getElementById("r-lr").textContent = (m.L >= 0 ? "+" : "−") + Lab.fmt(Math.abs(m.L)) + "%";
+    document.getElementById("r-p-k").textContent = "Price level, " + (view === "sr" ? "short run" : "long run");
+    document.getElementById("r-p").textContent = Lab.fmt(idx(view === "sr" ? m.Psr : m.Plr));
+    var ch;
+    if (!m.list.length) ch = '<span class="pill lr">None yet</span>';
+    else if (m.L > 0.3 && m.a > 0.01) ch = '<span class="pill lr">Demand + capacity</span>';
+    else if (m.L > 0.3) ch = '<span class="pill lr">Supply side</span>';
+    else ch = '<span class="pill infl">Demand only</span>';
+    document.getElementById("r-ch").innerHTML = ch;
+    document.getElementById("story").innerHTML = story(m);
+    document.querySelectorAll(".pol").forEach(function (b) { b.setAttribute("aria-pressed", on[b.dataset.id] ? "true" : "false"); });
+    document.getElementById("v-sr").setAttribute("aria-pressed", view === "sr");
+    document.getElementById("v-lr").setAttribute("aria-pressed", view === "lr");
+    document.getElementById("f-def").setAttribute("aria-pressed", deficit);
+    document.getElementById("f-bal").setAttribute("aria-pressed", !deficit);
+  }
+
+  var pw = document.getElementById("policies");
+  POL.forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "pol"; b.dataset.id = p.id;
+    b.innerHTML = "<b></b><span></span>";
+    b.querySelector("b").textContent = p.name; b.querySelector("span").textContent = p.note;
+    b.addEventListener("click", function () { on[p.id] = !on[p.id]; render(); });
+    pw.appendChild(b);
+  });
+
+  var SCEN = [
+    ["Build human capital", ["edu"], "sr"],
+    ["Infrastructure push", ["infra"], "sr"],
+    ["Supply-side tax cut", ["tax"], "sr"],
+    ["Growth package", ["edu", "rd", "itc"], "lr"],
+    ["Borrow to spend at full employment", ["def"], "lr"],
+    ["Monetary stimulus only", ["mon"], "lr"]
+  ];
+  var sc = document.getElementById("scenarios");
+  SCEN.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { on = {}; x[1].forEach(function (k) { on[k] = true; }); view = x[2]; deficit = true; render(); });
+    sc.appendChild(b);
+  });
+  var clr = document.createElement("button"); clr.type = "button"; clr.textContent = "Clear all";
+  clr.addEventListener("click", function () { on = {}; view = "sr"; deficit = true; render(); });
+  sc.appendChild(clr);
+
+  document.getElementById("v-sr").addEventListener("click", function () { view = "sr"; render(); });
+  document.getElementById("v-lr").addEventListener("click", function () { view = "lr"; render(); });
+  document.getElementById("f-def").addEventListener("click", function () { deficit = true; render(); });
+  document.getElementById("f-bal").addEventListener("click", function () { deficit = false; render(); });
+
+  render();
+
+  var Q = [
+    { s: "Which of the following policies is most likely to increase long-run economic growth?", o: ["An increase in transfer payments", "A decrease in the reserve requirement", "Government subsidies for worker training programs", "An open-market purchase of bonds by the central bank"], c: 2, w: "Worker training builds human capital, which raises productivity and shifts LRAS right. The other choices mainly shift AD, so their effects on output fade in the long run." },
+    { s: "The government introduces an investment tax credit. Which of the following best describes the effects?", o: ["AD shifts left in the short run; LRAS shifts left in the long run", "AD shifts right in the short run; LRAS shifts right in the long run", "AD does not change; LRAS shifts left in the long run", "AD shifts right in the short run; LRAS does not change"], c: 1, w: "Higher investment spending adds to AD right away. The new machines and equipment add to the capital stock, which raises potential output and shifts LRAS right." },
+    { s: "Supply-side economists argue that a decrease in marginal income tax rates will:", o: ["Decrease aggregate supply by lowering government revenue", "Increase incentives to work, save, and invest, shifting aggregate supply right", "Affect only aggregate demand, not aggregate supply", "Raise the natural rate of unemployment"], c: 1, w: "The supply-side view is that people keep more of each extra dollar earned, so they work, save, and invest more. That shifts aggregate supply right. Economists disagree about how big this effect is." },
+    { s: "The economy is at full employment and the central bank increases the money supply. In the long run:", o: ["Real GDP rises and the price level is unchanged", "Real GDP and the price level both rise", "Real GDP is unchanged and the price level rises", "Real GDP falls and the price level rises"], c: 2, w: "Monetary policy shifts AD, not LRAS. After wages and prices adjust, output returns to potential and only the price level is higher." },
+    { s: "Large government budget deficits at full employment can slow long-run growth because they:", o: ["Lower the real interest rate and reduce saving", "Raise the real interest rate and reduce private investment", "Decrease aggregate demand", "Increase the natural rate of unemployment directly"], c: 1, w: "Government borrowing raises the demand for loanable funds, which raises the real interest rate. Private investment falls, so the capital stock grows more slowly. This is crowding out." },
+    { s: "Which of the following will shift the long-run aggregate supply curve to the right?", o: ["An increase in consumer wealth", "A decrease in the money supply", "An increase in government purchases of office supplies", "An improvement in the education and skills of the labor force"], c: 3, w: "A more skilled labor force is more human capital, which raises potential output. The other choices shift AD or have no effect on long-run capacity." },
+    { s: "The Laffer curve suggests that a decrease in income tax rates will increase total tax revenue if:", o: ["Tax rates were initially above the rate that maximizes revenue", "Tax rates were initially very low", "The government is running a budget surplus", "The economy is in a recession"], c: 0, w: "Revenue is zero at a 0% rate and at a 100% rate, so it peaks in between. A rate cut raises revenue only if the starting rate was above that peak." },
+    { s: "Government funding for basic research leads to a new production technology. How will this affect the production possibilities curve (PPC) and long-run aggregate supply (LRAS)?", o: ["PPC shifts outward; LRAS shifts right", "PPC shifts inward; LRAS shifts left", "Movement along the PPC; LRAS shifts right", "PPC shifts outward; LRAS does not change"], c: 0, w: "Better technology lets the economy produce more with the same resources. Both the PPC and LRAS show this as an increase in productive capacity." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("5.7");
+})();
+</script>
+</body>
+</html>

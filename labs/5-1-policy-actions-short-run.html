@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Policy Mix Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.start-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.start-row .tag { margin-right: 4px; }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: 600; }
+.matrix td, .matrix th { text-align: center; }
+.matrix td:first-child, .matrix th:first-child { text-align: left; }
+.indet { color: var(--c4); font-weight: 700; }
+.mult { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.mult input[type="number"] { font: inherit; width: 100%; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+@media (max-width: 860px) { .mult { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 5 · Topic 5.1</span>
+  <h1>The Policy Mix Study Lab</h1>
+  <p class="lede">Congress controls fiscal policy (government spending and taxes). The Federal Reserve controls monetary policy (the money supply and interest rates). Both can shift aggregate demand. Set each policy below and watch what happens to real GDP, the price level, and the interest rate when they work together or against each other.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Linked graphs</h2>
+    <p>Pick where the economy starts, then set fiscal and monetary policy. Dashed grey lines show the curves before any policy action.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD-AS graph"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Money market <small>nominal interest rate vs. quantity of money</small></h3>
+      <svg class="chart" id="mm" role="img" aria-label="Money market graph"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">AD / Money demand</span><span class="l-srpc">SRAS</span><span class="l-lrpc">LRAS / Money supply</span><span class="l-ghost">Before policy</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div class="start-row">
+      <span class="tag">Starting economy</span>
+      <div class="seg scenarios" id="start" role="group" aria-label="Starting economy">
+        <button type="button" data-d="-1.5">Recessionary gap</button>
+        <button type="button" data-d="0">Full employment</button>
+        <button type="button" data-d="1.5">Inflationary gap</button>
+      </div>
+    </div>
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-f">Fiscal policy (Congress) <output id="o-f"></output></label>
+        <input type="range" id="s-f" min="-2" max="2" step="0.25">
+        <span class="hint">Left = contractionary (cut G, raise taxes). Right = expansionary (raise G, cut taxes).</span>
+      </div>
+      <div class="ctl">
+        <label for="s-m">Monetary policy (the Fed) <output id="o-m"></output></label>
+        <input type="range" id="s-m" min="-2" max="2" step="0.25">
+        <span class="hint">Left = contractionary (sell bonds). Right = expansionary (buy bonds).</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Remove all policy</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real GDP vs. full employment</div><div class="v" id="r-y">0.0</div></div>
+    <div class="stat"><div class="k">Price level</div><div class="v" id="r-p">110.0</div></div>
+    <div class="stat"><div class="k">Nominal interest rate</div><div class="v" id="r-i">4.0%</div></div>
+    <div class="stat"><div class="k">Output gap</div><div class="v" id="r-gap"><span class="pill lr">None</span></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Fiscal</span><h3>Fiscal policy</h3><p>Changes in government spending (G) and taxes (T), set by Congress and the President. Expansionary fiscal policy raises G or cuts T to shift AD right. Contractionary does the reverse.</p></div>
+    <div class="card"><span class="tag">Monetary</span><h3>The Fed's tools</h3><p>Expansionary: buy bonds, lower the discount rate, lower the reserve requirement, lower interest on reserves. Contractionary: the opposite of each. Open market operations are the tool AP questions use most.</p></div>
+    <div class="card"><span class="tag">Transmission</span><h3>How monetary policy reaches AD</h3><p>Fed buys bonds → money supply rises → interest rate falls → investment and interest-sensitive consumption rise → AD shifts right.</p></div>
+    <div class="card"><span class="tag">Fiscal → rates</span><h3>Why fiscal expansion raises rates</h3><p>Higher spending raises income, so people want to hold more money for transactions. Money demand shifts right, and the nominal interest rate rises. Government borrowing pushes the same way.</p></div>
+    <div class="card"><span class="tag">Multipliers</span><h3>Spending vs. tax multiplier</h3><p>Spending multiplier = 1 / MPS. Tax multiplier = −MPC / MPS. A tax cut has a smaller effect than the same increase in G, because people save part of a tax cut before spending any of it.</p></div>
+    <div class="card"><span class="tag">Indeterminate</span><h3>When policies conflict</h3><p>If one policy pushes AD right and the other pushes it left, you cannot tell what happens to real GDP and the price level without knowing which is bigger. On the exam, the answer is "indeterminate."</p></div>
+  </div>
+</section>
+
+<!-- MATRIX -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. The policy-mix matrix</h2>
+    <p>Each cell shows the short-run effect on real GDP and the price level (Y, P) and on the nominal interest rate (i). A <span class="indet">?</span> means the effect is indeterminate.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table class="matrix">
+    <thead><tr><th>Fiscal ↓ / Monetary →</th><th>Expansionary (buy bonds)</th><th>No change</th><th>Contractionary (sell bonds)</th></tr></thead>
+    <tbody>
+      <tr><td><b>Expansionary</b> (G↑ or T↓)</td><td>Y↑ P↑ · i <span class="indet">?</span></td><td>Y↑ P↑ · i↑</td><td>Y <span class="indet">?</span> P <span class="indet">?</span> · i↑</td></tr>
+      <tr><td><b>No change</b></td><td>Y↑ P↑ · i↓</td><td>No change</td><td>Y↓ P↓ · i↑</td></tr>
+      <tr><td><b>Contractionary</b> (G↓ or T↑)</td><td>Y <span class="indet">?</span> P <span class="indet">?</span> · i↓</td><td>Y↓ P↓ · i↓</td><td>Y↓ P↓ · i <span class="indet">?</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="color:var(--muted); max-width:70ch;">Notice the pattern. When both policies point the same way, the AD effect is certain and the interest rate is the question mark. When they point opposite ways, the interest rate is certain and the AD effect is the question mark.</p>
+</section>
+
+<!-- MULTIPLIER -->
+<section aria-labelledby="mult-h">
+  <div class="sec-head">
+    <h2 id="mult-h">4. Sizing the policy: multiplier calculator</h2>
+    <p>FRQs often ask for the minimum change in government spending or taxes needed to close a gap. Enter the gap and the MPC.</p>
+  </div>
+  <div class="card mult">
+    <div style="display:grid; gap:14px;">
+      <div class="ctl">
+        <label for="c-gap">Size of the output gap ($ billions)</label>
+        <input type="number" id="c-gap" value="200" min="1" step="10">
+      </div>
+      <div class="ctl">
+        <label for="c-mpc">Marginal propensity to consume (MPC) <output id="o-mpc"></output></label>
+        <input type="range" id="c-mpc" min="0.5" max="0.95" step="0.05" value="0.8">
+        <span class="hint">MPS = 1 − MPC</span>
+      </div>
+    </div>
+    <div class="calc" id="calc" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">5. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Money market: vertical axis <b>Nominal interest rate</b>, horizontal axis <b>Quantity of money</b>.</li>
+        <li>Draw MS vertical (the Fed sets it) and MD sloping downward. Label the equilibrium rate i₁.</li>
+        <li>Show an open market purchase as MS shifting right to MS₂, with the new, lower rate i₂.</li>
+        <li>On the AD–AS graph, label the new AD₂, new price level PL₂, and new output Y₂.</li>
+        <li>If the question gives conflicting policies, write the word <b>indeterminate</b> and explain which way each policy pushes.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Saying expansionary fiscal policy lowers interest rates. It raises them.</li>
+        <li>Saying the Fed changes taxes or spending. The Fed only does monetary policy.</li>
+        <li>Drawing the money supply curve sloping upward. In the AP money market, MS is vertical.</li>
+        <li>Using the whole gap as the change in G. Divide the gap by the multiplier first.</li>
+        <li>Forgetting the tax multiplier is smaller (and negative): a tax cut must be larger than a spending increase to close the same gap.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">6. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var S = { d0: -1.5, f: 0, m: 0 };
+
+  // ---------- Model ----------
+  // AD shift a = starting position + fiscal + monetary. SRAS and LRAS fixed (Yf = 100).
+  // Money market: MS at Q = 5 + m; MD shifts right with fiscal expansion. i = 4 + 0.6f - 0.8m.
+  function model(s) {
+    var a = s.d0 + s.f + s.m;
+    var Y = 100 + 2 * a, P = 110 + 2 * a;
+    var Qs = 5 + s.m;
+    var i = 4 + 0.6 * s.f - 0.8 * s.m;
+    return { a: a, Y: Y, P: P, gap: Y - 100, Qs: Qs, i: i };
+  }
+
+  var svgA = document.getElementById("adas"), svgM = document.getElementById("mm");
+
+  function drawADAS(m, s) {
+    var F = Lab.frame(svgA, { x: [84, 116], y: [80, 140], xLabel: "Real GDP (Y)", yLabel: "Price level (PL)",
+      xTicks: [88, 92, 96, 100, 104, 108, 112], yTicks: [90, 100, 110, 120, 130],
+      fmtX: function (v) { return v === 100 ? "Yf" : ""; } });
+    var AD = function (a) { return function (y) { return 110 + 4 * a - (y - 100); }; };
+    var SRAS = function (y) { return 110 + (y - 100); };
+    var moved = Math.abs(s.f) > 1e-9 || Math.abs(s.m) > 1e-9;
+    if (moved) Lab.fn(F, AD(s.d0), "var(--ghost)", 2, "6 5");
+    Lab.vline(F, 100, "var(--lrpc)", 3);
+    Lab.fn(F, SRAS, "var(--srpc)", 3);
+    Lab.fn(F, AD(m.a), "var(--accent)", 3);
+    if (moved) {
+      var y0 = 100 + 2 * s.d0;
+      var pA = AD(s.d0)(y0 - 6); Lab.arrow(F, y0 - 6, pA, y0 - 6 + 4 * (m.a - s.d0), pA, "var(--accent)");
+    }
+    Lab.dot(F, m.Y, m.P, "var(--ink)", true);
+    Lab.tag(F, 100.6, 137, "LRAS", "var(--lrpc)");
+    Lab.tag(F, 110, SRAS(110) + 5, "SRAS", "var(--srpc)", "end");
+    Lab.tag(F, 114, AD(m.a)(114) + 2, "AD", "var(--accent)", "end");
+  }
+
+  function drawMM(m, s) {
+    var F = Lab.frame(svgM, { x: [0, 10], y: [0, 8], xLabel: "Quantity of money", yLabel: "Nominal interest rate (%)",
+      xTicks: [2, 4, 6, 8], yTicks: [0, 2, 4, 6, 8],
+      fmtY: function (v) { return v + "%"; } });
+    var MD = function (f) { return function (q) { return 4 + 0.6 * f - 0.8 * (q - 5); }; };
+    if (Math.abs(s.m) > 1e-9) Lab.vline(F, 5, "var(--ghost)", 2, "6 5");
+    if (Math.abs(s.f) > 1e-9) Lab.fn(F, MD(0), "var(--ghost)", 2, "6 5");
+    Lab.vline(F, m.Qs, "var(--lrpc)", 3);
+    Lab.fn(F, MD(s.f), "var(--accent)", 3);
+    Lab.dot(F, m.Qs, m.i, "var(--ink)", true);
+    Lab.tag(F, m.Qs + 0.15, 7.6, "MS", "var(--lrpc)");
+    Lab.tag(F, 9.7, MD(s.f)(9.7) + 0.35, "MD", "var(--accent)", "end");
+    if (Math.abs(s.m) > 1e-9) Lab.arrow(F, 5, 6.6, m.Qs, 6.6, "var(--lrpc)");
+  }
+
+  // ---------- Narrative ----------
+  function sgn(v) { return v > 1e-9 ? 1 : v < -1e-9 ? -1 : 0; }
+  function story(m, s) {
+    var fs = sgn(s.f), ms = sgn(s.m), out = [];
+    var lead;
+    if (m.gap > 0.3) lead = "<b>Inflationary gap.</b> Real GDP is above full employment and the price level is high.";
+    else if (m.gap < -0.3) lead = "<b>Recessionary gap.</b> Real GDP is below full employment and unemployment is above the natural rate.";
+    else lead = "<b>At full employment.</b> Real GDP equals full-employment output.";
+
+    if (fs > 0) out.push("<b>Expansionary fiscal policy</b> (more government spending or lower taxes) shifts AD right. Higher income raises money demand, so the interest rate rises.");
+    if (fs < 0) out.push("<b>Contractionary fiscal policy</b> (less government spending or higher taxes) shifts AD left. Lower income reduces money demand, so the interest rate falls.");
+    if (ms > 0) out.push("<b>Expansionary monetary policy:</b> the Fed buys bonds (or lowers the discount rate, the reserve requirement, or interest on reserves). The money supply shifts right, the interest rate falls, investment rises, and AD shifts right.");
+    if (ms < 0) out.push("<b>Contractionary monetary policy:</b> the Fed sells bonds (or raises the discount rate, the reserve requirement, or interest on reserves). The money supply shifts left, the interest rate rises, investment falls, and AD shifts left.");
+
+    var mix = "";
+    if (fs !== 0 && ms !== 0) {
+      if (fs === ms) {
+        mix = "<b>Both policies push AD " + (fs > 0 ? "right" : "left") + "</b>, so real GDP and the price level definitely " + (fs > 0 ? "rise" : "fall") + ". The interest rate is <b>indeterminate</b>: fiscal policy pushes it " + (fs > 0 ? "up" : "down") + " while monetary policy pushes it " + (fs > 0 ? "down" : "up") + ".";
+      } else {
+        mix = "<b>The policies pull AD in opposite directions</b>, so the change in real GDP and the price level is <b>indeterminate</b> unless you know which policy is larger. The interest rate definitely " + (fs > 0 ? "rises" : "falls") + ", because both policies push it that way. (The sliders give this model sizes, so it shows one possible outcome.)";
+      }
+    }
+    var fix = "";
+    if (sgn(s.d0) !== 0 && (fs !== 0 || ms !== 0)) {
+      if (Math.abs(m.gap) <= 0.3) fix = "The policy closed the gap: the economy is back at full employment.";
+      else if (sgn(m.gap) === sgn(s.d0) && Math.abs(m.gap) < Math.abs(2 * s.d0)) fix = "The policy moves the economy toward full employment but has not closed the gap yet.";
+      else if (sgn(m.gap) !== sgn(s.d0)) fix = "The policy overshot: the economy went past full employment into the opposite gap.";
+      else fix = "This policy pushes the economy <b>further from</b> full employment. To close " + (s.d0 < 0 ? "a recessionary gap, use expansionary policy." : "an inflationary gap, use contractionary policy.");
+    } else if (fs === 0 && ms === 0 && s.d0 !== 0) {
+      fix = "To close this gap, use " + (s.d0 < 0 ? "<b>expansionary</b>" : "<b>contractionary</b>") + " fiscal or monetary policy. Move a slider to try it.";
+    }
+    var html = "<p>" + lead + "</p>";
+    if (out.length) html += "<ul>" + out.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    if (mix) html += "<p>" + mix + "</p>";
+    if (fix) html += "<p>" + fix + "</p>";
+    return html;
+  }
+
+  function stance(v) { return Math.abs(v) < 1e-9 ? "none" : (v > 0 ? "expansionary " : "contractionary ") + Math.abs(v); }
+
+  function render() {
+    var m = model(S);
+    document.getElementById("s-f").value = S.f;
+    document.getElementById("s-m").value = S.m;
+    document.getElementById("o-f").textContent = stance(S.f);
+    document.getElementById("o-m").textContent = stance(S.m);
+    document.querySelectorAll("#start button").forEach(function (b) { b.setAttribute("aria-pressed", String(parseFloat(b.dataset.d) === S.d0)); });
+    drawADAS(m, S); drawMM(m, S);
+    document.getElementById("r-y").textContent = (m.gap > 0.05 ? "+" : "") + Lab.fmt(m.gap);
+    document.getElementById("r-p").textContent = Lab.fmt(m.P);
+    document.getElementById("r-i").textContent = Lab.fmt(m.i) + "%";
+    document.getElementById("r-gap").innerHTML = m.gap > 0.3 ? '<span class="pill infl">Inflationary</span>' : m.gap < -0.3 ? '<span class="pill rec">Recessionary</span>' : '<span class="pill lr">None</span>';
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+
+  document.getElementById("s-f").addEventListener("input", function (e) { S.f = parseFloat(e.target.value); render(); });
+  document.getElementById("s-m").addEventListener("input", function (e) { S.m = parseFloat(e.target.value); render(); });
+  document.querySelectorAll("#start button").forEach(function (b) {
+    b.addEventListener("click", function () { S.d0 = parseFloat(b.dataset.d); S.f = 0; S.m = 0; render(); });
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { S.f = 0; S.m = 0; render(); });
+
+  var scen = [
+    ["Recession: expansionary fiscal", { d0: -1.5, f: 1.5, m: 0 }],
+    ["Recession: Fed buys bonds", { d0: -1.5, f: 0, m: 1.5 }],
+    ["Inflation: contractionary fiscal", { d0: 1.5, f: -1.5, m: 0 }],
+    ["Inflation: Fed sells bonds", { d0: 1.5, f: 0, m: -1.5 }],
+    ["Both expansionary", { d0: -1.5, f: 0.75, m: 0.75 }],
+    ["Spend more + Fed sells bonds", { d0: 0, f: 1, m: -1 }],
+    ["Raise taxes + Fed buys bonds", { d0: 0, f: -1, m: 1 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, x[1]); render(); });
+    sc.appendChild(b);
+  });
+
+  render();
+
+  // ---------- Multiplier calculator ----------
+  function money(v) { return "$" + (Math.round(v * 10) / 10).toLocaleString(undefined, { maximumFractionDigits: 1 }) + "B"; }
+  function calc() {
+    var gap = Math.max(0, parseFloat(document.getElementById("c-gap").value) || 0);
+    var mpc = parseFloat(document.getElementById("c-mpc").value), mps = 1 - mpc;
+    document.getElementById("o-mpc").textContent = mpc.toFixed(2);
+    var sm = 1 / mps, tm = mpc / mps;
+    document.getElementById("calc").innerHTML =
+      '<div class="row"><span>Spending multiplier = 1 / ' + mps.toFixed(2) + '</span><span>' + Lab.fmt(sm, 2) + '</span></div>' +
+      '<div class="row"><span>Tax multiplier = −' + mpc.toFixed(2) + ' / ' + mps.toFixed(2) + '</span><span>−' + Lab.fmt(tm, 2) + '</span></div>' +
+      '<div class="row"><span>Change in G needed = ' + money(gap) + ' ÷ ' + Lab.fmt(sm, 2) + '</span><span>' + money(gap / sm) + '</span></div>' +
+      '<div class="row"><span>Change in taxes needed = ' + money(gap) + ' ÷ ' + Lab.fmt(tm, 2) + '</span><span>' + money(gap / tm) + '</span></div>' +
+      '<p style="color:var(--muted); font-size:.9rem; margin-top:6px;">For a recessionary gap, raise G or cut taxes by these amounts. For an inflationary gap, cut G or raise taxes. The tax change is always larger, because the tax multiplier is smaller.</p>';
+  }
+  document.getElementById("c-gap").addEventListener("input", calc);
+  document.getElementById("c-mpc").addEventListener("input", calc);
+  calc();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The economy is in a recession. Which policy combination will definitely increase real GDP?", o: ["An increase in taxes and an open market purchase of bonds", "An increase in government spending and an open market purchase of bonds", "A decrease in government spending and an open market sale of bonds", "An increase in government spending and an open market sale of bonds"], c: 1, w: "Higher government spending and a bond purchase both shift AD right, so real GDP definitely rises. The other combinations either shrink AD or pull it in opposite directions." },
+    { s: "Congress increases government spending while the Fed sells government bonds. Which of the following is certain?", o: ["Real GDP will increase", "The price level will decrease", "The nominal interest rate will increase", "The nominal interest rate will decrease"], c: 2, w: "Both policies raise the interest rate: fiscal expansion increases money demand, and the bond sale decreases the money supply. Their effects on AD conflict, so real GDP and the price level are indeterminate." },
+    { s: "Congress cuts personal income taxes and the Fed buys bonds. The effect on the nominal interest rate is:", o: ["An increase", "A decrease", "No change", "Indeterminate"], c: 3, w: "The tax cut pushes the rate up through higher money demand, while the bond purchase pushes it down. Without knowing magnitudes, the result is indeterminate. Real GDP definitely rises." },
+    { s: "Which of the following is an expansionary monetary policy action?", o: ["Raising the reserve requirement", "Raising interest on reserves", "Lowering the discount rate", "Selling Treasury bonds on the open market"], c: 2, w: "Lowering the discount rate makes it cheaper for banks to borrow from the Fed, which increases the money supply. The other three are contractionary." },
+    { s: "The MPC is 0.8 and the economy has a recessionary gap of $400 billion. What is the minimum increase in government spending needed to close the gap?", o: ["$80 billion", "$100 billion", "$320 billion", "$400 billion"], c: 0, w: "The spending multiplier is 1 / 0.2 = 5. Divide the gap by the multiplier: $400 billion ÷ 5 = $80 billion." },
+    { s: "If the MPC is 0.75, the tax multiplier is:", o: ["−4", "−3", "3", "4"], c: 1, w: "Tax multiplier = −MPC / MPS = −0.75 / 0.25 = −3. Its absolute value is one less than the spending multiplier of 4." },
+    { s: "To reduce inflation, the Fed sells bonds. In the money market, this causes:", o: ["Money demand to shift right and the interest rate to rise", "Money supply to shift left and the interest rate to rise", "Money supply to shift right and the interest rate to fall", "Money demand to shift left and the interest rate to fall"], c: 1, w: "A bond sale pulls reserves out of banks, shifting the vertical money supply curve left. The equilibrium nominal interest rate rises, which lowers investment and AD." },
+    { s: "Why does expansionary fiscal policy tend to raise the nominal interest rate in the money market?", o: ["It shifts the money supply curve left", "Higher income increases the demand for money", "It forces the Fed to sell bonds", "It lowers the price level"], c: 1, w: "Expansionary fiscal policy raises income and the price level, so households and firms want to hold more money for transactions. Money demand shifts right and the rate rises." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+
+  Lab.nav("5.1");
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Economic Growth Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.controls.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sub { display: grid; gap: 6px; margin-top: 8px; }
+.sub h3 { font-size: 1.2rem; }
+.sub p { color: var(--muted); max-width: 70ch; }
+@media (max-width: 860px) { .controls.three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .controls.three { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 5 · Topic 5.6</span>
+  <h1>The Economic Growth Study Lab</h1>
+  <p class="lede">Economic growth means the economy can produce more than before. On a graph, the production possibilities curve (PPC) shifts outward and long-run aggregate supply (LRAS) shifts right. Use the sliders to change what drives growth and watch both graphs respond together.</p>
+</header>
+
+<!-- LAB 1: PPC + AD-AS -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. What shifts potential output</h2>
+    <p>Dashed grey lines show where the economy started. Solid lines show where it is now. Potential real GDP starts at an index of 100.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Production possibilities curve <small>capital vs. consumer goods</small></h3>
+      <svg class="chart" id="ppc" role="img" aria-label="Production possibilities curve"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD-AS graph with LRAS"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-lrpc">PPC / LRAS</span><span class="l-srpc">SRAS</span><span class="l-ad">AD</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <label for="s-k">Physical capital <output id="o-k"></output></label>
+        <input type="range" id="s-k" min="-1" max="1" step="0.25">
+        <span class="hint">Factories, machines, tools</span>
+      </div>
+      <div class="ctl">
+        <label for="s-h">Human capital <output id="o-h"></output></label>
+        <input type="range" id="s-h" min="-1" max="1" step="0.25">
+        <span class="hint">Education, skills, training</span>
+      </div>
+      <div class="ctl">
+        <label for="s-t">Technology <output id="o-t"></output></label>
+        <input type="range" id="s-t" min="-1" max="1" step="0.25">
+        <span class="hint">Better ways to produce</span>
+      </div>
+      <div class="ctl">
+        <label for="s-r">Resources and labor force <output id="o-r"></output></label>
+        <input type="range" id="s-r" min="-1" max="1" step="0.25">
+        <span class="hint">Land, raw materials, workers</span>
+      </div>
+    </div>
+    <div class="controls" style="grid-template-columns: minmax(0, 1fr);">
+      <div class="ctl" style="max-width: 420px;">
+        <label for="s-slump">Spending slump (AD falls) <output id="o-slump"></output></label>
+        <input type="range" id="s-slump" min="0" max="4" step="1">
+        <span class="hint">Not a growth factor. Shows the difference between a recession and a change in capacity.</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Potential real GDP (LRAS)</div><div class="v" id="r-yf">100.0</div></div>
+    <div class="stat"><div class="k">Actual real GDP</div><div class="v" id="r-y">100.0</div></div>
+    <div class="stat"><div class="k">Price level</div><div class="v" id="r-p">100.0</div></div>
+    <div class="stat"><div class="k">Status</div><div class="v" id="r-status"><span class="pill lr">At potential</span></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <!-- LAB 2: capital vs consumer choice -->
+  <div class="sub">
+    <h3>Today's choice, tomorrow's PPC</h3>
+    <p>Two countries start with the same PPC. Country A puts most of its output into consumer goods. Country B gives up some consumer goods now to build more capital goods. Move the sliders to see whose PPC grows more over the next 20 years.</p>
+  </div>
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Two countries, same starting PPC <small>20 years later</small></h3>
+      <svg class="chart" id="two" role="img" aria-label="Two countries PPC comparison"></svg>
+      <div class="legend"><span class="l-lrpc">PPC today</span><span class="l-c3">Country A later</span><span class="l-c4">Country B later</span></div>
+    </div>
+    <div class="card" style="display:grid; gap:14px; align-content:start;">
+      <div class="ctl">
+        <label for="s-a">Country A: share of output to capital goods <output id="o-a"></output></label>
+        <input type="range" id="s-a" min="0.1" max="0.6" step="0.05">
+      </div>
+      <div class="ctl">
+        <label for="s-b">Country B: share of output to capital goods <output id="o-b"></output></label>
+        <input type="range" id="s-b" min="0.1" max="0.6" step="0.05">
+      </div>
+      <div class="calc" id="two-calc"></div>
+      <p id="two-story" style="font-size:.95rem;"></p>
+    </div>
+  </div>
+
+  <!-- LAB 3: compounding -->
+  <div class="sub">
+    <h3>Small growth rates add up: the Rule of 70</h3>
+    <p>Both economies start with real GDP per capita of $20,000 (a made-up example). Change the growth rates and the year marker. The Rule of 70 says an amount doubles in about 70 ÷ (growth rate in percent) years.</p>
+  </div>
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Real GDP per capita over time <small>hypothetical</small></h3>
+      <svg class="chart" id="comp" role="img" aria-label="Compounding growth comparison"></svg>
+      <div class="legend"><span class="l-c3">Economy 1</span><span class="l-c4">Economy 2</span></div>
+    </div>
+    <div class="card" style="display:grid; gap:14px; align-content:start;">
+      <div class="ctl">
+        <label for="s-g1">Economy 1 growth rate <output id="o-g1"></output></label>
+        <input type="range" id="s-g1" min="0" max="7" step="0.5">
+      </div>
+      <div class="ctl">
+        <label for="s-g2">Economy 2 growth rate <output id="o-g2"></output></label>
+        <input type="range" id="s-g2" min="0" max="7" step="0.5">
+      </div>
+      <div class="ctl">
+        <label for="s-yr">Year marker <output id="o-yr"></output></label>
+        <input type="range" id="s-yr" min="0" max="70" step="1">
+      </div>
+      <div class="calc" id="comp-calc"></div>
+    </div>
+  </div>
+
+  <!-- LAB 4: business cycle vs trend -->
+  <div class="sub">
+    <h3>Business cycle vs. long-run trend</h3>
+    <p>Actual real GDP rises and falls with the business cycle. Potential GDP is the smooth trend underneath. Growth policy is about raising the trend line, not about smoothing the bumps.</p>
+  </div>
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Actual and potential real GDP <small>over 20 years</small></h3>
+      <svg class="chart" id="cycle" role="img" aria-label="Business cycle around potential GDP trend"></svg>
+      <div class="legend"><span class="l-lrpc">Potential GDP (trend)</span><span class="l-ad">Actual real GDP</span></div>
+    </div>
+    <div class="card" style="display:grid; gap:14px; align-content:start;">
+      <div class="ctl">
+        <label for="s-tg">Trend growth rate <output id="o-tg"></output></label>
+        <input type="range" id="s-tg" min="0" max="5" step="0.5">
+        <span class="hint">Set by capital, skills, technology, resources</span>
+      </div>
+      <div class="ctl">
+        <label for="s-amp">Size of the business cycle <output id="o-amp"></output></label>
+        <input type="range" id="s-amp" min="0" max="8" step="1">
+        <span class="hint">How far actual GDP swings above and below the trend</span>
+      </div>
+      <p id="cycle-story" style="font-size:.95rem;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Economic growth</h3><p>An increase in potential output over time. The best measure is the percentage change in real GDP per capita, because it adjusts for both inflation and population.</p></div>
+    <div class="card"><span class="tag">Key driver</span><h3>Productivity</h3><p>Output per worker per hour. Living standards rise mainly when each worker can produce more, thanks to more capital, more skills, or better technology.</p></div>
+    <div class="card"><span class="tag">Graphs</span><h3>PPC out, LRAS right</h3><p>Growth shifts the PPC outward and the LRAS curve to the right. Both mean the same thing: the economy can now produce more at full employment.</p></div>
+    <div class="card"><span class="tag">Not growth</span><h3>A point inside the PPC</h3><p>Moving from a point inside the PPC to a point on it means putting idle workers and machines back to work. Output rises, but capacity did not change, so the PPC does not shift.</p></div>
+    <div class="card"><span class="tag">Trade-off</span><h3>Capital goods today</h3><p>Producing more capital goods now means fewer consumer goods now. The payoff is a larger outward shift of the PPC in the future.</p></div>
+    <div class="card"><span class="tag">Math</span><h3>Rule of 70</h3><p>Doubling time ≈ 70 ÷ growth rate. At 2% growth, real GDP per capita doubles in about 35 years. At 7%, it doubles in about 10 years.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Determinants of growth</h2>
+    <p>Each determinant raises what the economy can produce, so each one shows up the same way on both graphs.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Determinant</th><th>PPC</th><th>LRAS</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>More physical capital</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Shifts right</span></td><td>Firms build new factories and buy better machines</td></tr>
+      <tr><td>More human capital</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Shifts right</span></td><td>More workers finish college or job-training programs</td></tr>
+      <tr><td>Better technology</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Shifts right</span></td><td>A new process lets each worker produce more per hour</td></tr>
+      <tr><td>More natural resources</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Shifts right</span></td><td>Discovery of a new mineral deposit</td></tr>
+      <tr><td>Larger labor force</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Shifts right</span></td><td>Population growth or immigration adds workers</td></tr>
+      <tr><td>Loss of capital or resources</td><td><span class="shift">Shifts inward</span></td><td><span class="shift">Shifts left</span></td><td>A natural disaster or war destroys factories and roads</td></tr>
+      <tr><td>Lower unemployment (recovery)</td><td><b>Movement from inside toward the curve</b></td><td><b>No shift</b></td><td>Idle workers are rehired after a recession</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>PPC: label both axes with the goods, such as <b>Capital goods</b> and <b>Consumer goods</b>. Draw the curve bowed outward.</li>
+        <li>Show growth by drawing a second PPC outside the first and labeling it PPC₂.</li>
+        <li>AD–AS: vertical axis <b>Price level</b>, horizontal axis <b>Real GDP</b>. Draw LRAS vertical at full-employment output, labeled Y<sub>f</sub>.</li>
+        <li>For growth, shift LRAS right and label the new full-employment output Y<sub>f2</sub>. If the question says SRAS also shifts, draw it too.</li>
+        <li>Mark each equilibrium with its price level and real GDP on the axes.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting AD to show growth. Growth is a change in capacity, so it moves LRAS.</li>
+        <li>Calling a move from inside the PPC to the curve "growth." That is a recovery from unemployment.</li>
+        <li>Using nominal GDP or total GDP. Growth in living standards is measured with <b>real GDP per capita</b>.</li>
+        <li>Dividing 70 by a decimal. Use the percent: 70 ÷ 2, not 70 ÷ 0.02.</li>
+        <li>Forgetting the trade-off. More capital goods today means fewer consumer goods today.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var fmt = Lab.fmt;
+
+  // ---------- Lab 1: PPC + AD-AS ----------
+  var BASE = { k: 0, h: 0, t: 0, r: 0, slump: 0 };
+  var S = Object.assign({}, BASE);
+  var THETA = 0.6; // where the economy sits along its PPC
+
+  function model(s) {
+    var g = 1 + 0.08 * s.k + 0.08 * s.h + 0.10 * s.t + 0.06 * s.r;
+    var Yf = 100 * g;
+    var a = -5 * s.slump;                 // AD shift
+    var P0 = 100 - 0.8 * (Yf - 100);      // long-run price level with starting AD
+    var Y = Yf + a / 1.6;
+    var P = P0 + 0.8 * (Y - Yf);
+    return { g: g, Yf: Yf, a: a, P0: P0, Y: Y, P: P, u: Y / Yf };
+  }
+
+  function ppcPts(R) { var p = []; for (var i = 0; i <= 40; i++) { var t = i / 40 * Math.PI / 2; p.push([R * Math.cos(t), R * Math.sin(t)]); } return p; }
+
+  var svgPPC = document.getElementById("ppc"), svgAD = document.getElementById("adas");
+
+  function drawPPC(m) {
+    var F = Lab.frame(svgPPC, { x: [0, 150], y: [0, 150], xLabel: "Consumer goods", yLabel: "Capital goods",
+      xTicks: [25, 50, 75, 100, 125, 150], yTicks: [25, 50, 75, 100, 125, 150] });
+    var moved = Math.abs(m.g - 1) > 1e-9;
+    if (moved) Lab.line(F, ppcPts(100), "var(--ghost)", 2, "6 5");
+    Lab.line(F, ppcPts(100 * m.g), "var(--lrpc)", 3);
+    if (moved) {
+      var t = 0.95;
+      Lab.arrow(F, 100 * Math.cos(t), 100 * Math.sin(t), 100 * m.g * Math.cos(t), 100 * m.g * Math.sin(t), m.g > 1 ? "var(--lrpc)" : "var(--bad)");
+    }
+    var R = 100 * m.g * m.u;
+    var px = R * Math.cos(THETA), py = R * Math.sin(THETA);
+    Lab.dot(F, px, py, "var(--ink)", false);
+    Lab.tag(F, px + 4, py + 6, m.u < 0.995 ? "Inside: idle resources" : "On the PPC", "var(--ink)");
+    Lab.tag(F, 100 * m.g * Math.cos(1.25) + 3, 100 * m.g * Math.sin(1.25) + 3, moved ? "PPC₂" : "PPC", "var(--lrpc)");
+    if (moved) Lab.tag(F, 100 * Math.cos(1.35) - 3, 100 * Math.sin(1.35) - 8, "PPC₁", "var(--muted)", "end");
+  }
+
+  function drawADAS(m) {
+    var F = Lab.frame(svgAD, { x: [60, 150], y: [60, 150], xLabel: "Real GDP (Y)", yLabel: "Price level (P)",
+      xTicks: [70, 80, 90, 100, 110, 120, 130, 140], yTicks: [70, 80, 90, 100, 110, 120, 130, 140],
+      fmtX: function (v) { return v === 100 ? "Y₁" : ""; } });
+    var xs = [60, 150];
+    var movedL = Math.abs(m.Yf - 100) > 1e-9, movedA = Math.abs(m.a) > 1e-9;
+    if (movedL) {
+      Lab.vline(F, 100, "var(--ghost)", 2, "6 5");
+      Lab.line(F, xs.map(function (y) { return [y, 100 + 0.8 * (y - 100)]; }), "var(--ghost)", 2, "6 5");
+    }
+    if (movedA) Lab.line(F, xs.map(function (y) { return [y, 100 - 0.8 * (y - 100)]; }), "var(--ghost)", 2, "6 5");
+    Lab.vline(F, m.Yf, "var(--lrpc)", 3);
+    Lab.line(F, xs.map(function (y) { return [y, m.P0 + 0.8 * (y - m.Yf)]; }), "var(--srpc)", 3);
+    Lab.line(F, xs.map(function (y) { return [y, 100 + m.a - 0.8 * (y - 100)]; }), "var(--accent)", 3);
+    if (movedL) Lab.arrow(F, 100, 143, m.Yf, 143, m.Yf > 100 ? "var(--lrpc)" : "var(--bad)");
+    Lab.dot(F, m.Y, m.P, "var(--ink)", true);
+    Lab.tag(F, m.Yf + 1.5, 136, "LRAS", "var(--lrpc)");
+    Lab.tag(F, 146, m.P0 + 0.8 * (146 - m.Yf) + 3, "SRAS", "var(--srpc)", "end");
+    Lab.tag(F, 146, 100 + m.a - 0.8 * 46 + 5, "AD", "var(--accent)", "end");
+  }
+
+  var NAMES = { k: "Physical capital", h: "Human capital", t: "Technology", r: "Resources and labor force" };
+  var MORE = { k: "Firms added factories and equipment, so each worker has more tools to work with.",
+    h: "Workers gained education and skills, so each one produces more per hour.",
+    t: "Better technology lets the same workers and machines produce more.",
+    r: "More land, raw materials, or workers are available for production." };
+  var LESS = { k: "Capital was lost or wore out, so workers have fewer tools.",
+    h: "Workers lost skills or training, so each produces less.",
+    t: "Productive methods were lost or blocked.",
+    r: "Fewer resources or workers are available." };
+
+  function story(m, s) {
+    var html = "";
+    var growth = m.Yf - 100;
+    if (Math.abs(growth) < 1e-9 && s.slump === 0) {
+      html += "<p><b>Starting point.</b> The economy is on its PPC and at full employment. Real GDP equals potential (100), where AD, SRAS, and LRAS all meet.</p>";
+    } else if (growth > 1e-9) {
+      html += "<p><b>Economic growth.</b> Potential output is " + fmt(growth) + "% higher. The PPC shifts <b>outward</b> and LRAS (with SRAS) shifts <b>right</b>. With AD unchanged, real GDP rises to " + fmt(m.Yf) + " at full employment and the price level falls to " + fmt(m.P0) + ".</p>";
+    } else if (growth < -1e-9) {
+      html += "<p><b>Lost capacity.</b> Potential output is " + fmt(-growth) + "% lower. The PPC shifts <b>inward</b> and LRAS shifts <b>left</b>. With AD unchanged, the price level rises to " + fmt(m.P0) + " and full-employment output falls to " + fmt(m.Yf) + ".</p>";
+    } else {
+      html += "<p><b>No change in capacity.</b> The PPC and LRAS are where they started.</p>";
+    }
+    var why = [];
+    ["k", "h", "t", "r"].forEach(function (k) {
+      if (s[k] > 0) why.push("<b>" + NAMES[k] + " up.</b> " + MORE[k]);
+      if (s[k] < 0) why.push("<b>" + NAMES[k] + " down.</b> " + LESS[k]);
+    });
+    if (s.slump > 0) why.push("<b>Spending slump.</b> AD shifted left, so real GDP (" + fmt(m.Y) + ") is below potential (" + fmt(m.Yf) + "). The economy is at a point <b>inside</b> its PPC with idle workers and machines. This is a recession, not a loss of capacity, so the PPC and LRAS do not move because of it.");
+    if (why.length) html += "<ul>" + why.map(function (w) { return "<li>" + w + "</li>"; }).join("") + "</ul>";
+    if (growth > 1e-9) html += "<p>In real economies AD usually grows too, so the price level does not have to fall. On the AP exam, show growth by shifting LRAS right.</p>";
+    return html;
+  }
+
+  var ids = { k: "s-k", h: "s-h", t: "s-t", r: "s-r", slump: "s-slump" };
+  function signed(v) { return v === 0 ? "start" : (v > 0 ? "+" : "−") + Math.abs(v); }
+  function render() {
+    var m = model(S);
+    Object.keys(ids).forEach(function (k) { document.getElementById(ids[k]).value = S[k]; });
+    ["k", "h", "t", "r"].forEach(function (k) { document.getElementById("o-" + k).textContent = signed(S[k]); });
+    document.getElementById("o-slump").textContent = ["none", "mild", "moderate", "severe", "deep"][S.slump];
+    drawPPC(m); drawADAS(m);
+    document.getElementById("r-yf").textContent = fmt(m.Yf);
+    document.getElementById("r-y").textContent = fmt(m.Y);
+    document.getElementById("r-p").textContent = fmt(m.P);
+    var st = document.getElementById("r-status");
+    st.innerHTML = m.u < 0.995 ? '<span class="pill rec">Recession</span>' :
+      m.Yf > 100.01 ? '<span class="pill lr">Growth</span>' :
+      m.Yf < 99.99 ? '<span class="pill infl">Lost capacity</span>' : '<span class="pill lr">At potential</span>';
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  Object.keys(ids).forEach(function (k) {
+    document.getElementById(ids[k]).addEventListener("input", function (e) { S[k] = parseFloat(e.target.value); render(); });
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+  var scen = [
+    ["Build more factories", { k: 1 }],
+    ["Better schools and training", { h: 1 }],
+    ["New technology", { t: 1 }],
+    ["Labor force grows", { r: 1 }],
+    ["Recession (spending falls)", { slump: 3 }],
+    ["Natural disaster", { k: -1, r: -0.5 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Lab 2: two countries ----------
+  var T = { a: 0.2, b: 0.5 };
+  var svgTwo = document.getElementById("two");
+  function theta(share) { return share * Math.PI / 2; }
+  function future(share) { return 1 + 0.5 * share; }
+  function renderTwo() {
+    document.getElementById("s-a").value = T.a; document.getElementById("s-b").value = T.b;
+    document.getElementById("o-a").textContent = Math.round(T.a * 100) + "%";
+    document.getElementById("o-b").textContent = Math.round(T.b * 100) + "%";
+    var F = Lab.frame(svgTwo, { x: [0, 140], y: [0, 140], xLabel: "Consumer goods", yLabel: "Capital goods",
+      xTicks: [20, 40, 60, 80, 100, 120, 140], yTicks: [20, 40, 60, 80, 100, 120, 140] });
+    var fa = future(T.a), fb = future(T.b);
+    Lab.line(F, ppcPts(100 * fa), "var(--c3)", 2.5, "7 4");
+    Lab.line(F, ppcPts(100 * fb), "var(--c4)", 2.5, "7 4");
+    Lab.line(F, ppcPts(100), "var(--lrpc)", 3);
+    var ax = 100 * Math.cos(theta(T.a)), ay = 100 * Math.sin(theta(T.a));
+    var bx = 100 * Math.cos(theta(T.b)), by = 100 * Math.sin(theta(T.b));
+    Lab.dot(F, ax, ay, "var(--c3)", false); Lab.tag(F, ax + 3, ay + 5, "A", "var(--c3)");
+    Lab.dot(F, bx, by, "var(--c4)", false); Lab.tag(F, bx + 3, by + 5, "B", "var(--c4)");
+    var rows = [
+      ["Consumer goods today, A", fmt(ax, 0)], ["Consumer goods today, B", fmt(bx, 0)],
+      ["Capacity in 20 years, A", "+" + fmt((fa - 1) * 100, 0) + "%"], ["Capacity in 20 years, B", "+" + fmt((fb - 1) * 100, 0) + "%"]
+    ];
+    document.getElementById("two-calc").innerHTML = rows.map(function (r) { return '<div class="row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>'; }).join("");
+    var msg;
+    if (Math.abs(T.a - T.b) < 1e-9) msg = "Both countries make the same choice, so their PPCs grow by the same amount.";
+    else {
+      var hi = T.a > T.b ? "A" : "B", lo = hi === "A" ? "B" : "A";
+      msg = "Country " + hi + " has fewer consumer goods today, but its larger stock of capital shifts its PPC out further. Country " + lo + " consumes more now and grows less later.";
+    }
+    document.getElementById("two-story").textContent = msg;
+  }
+  document.getElementById("s-a").addEventListener("input", function (e) { T.a = parseFloat(e.target.value); renderTwo(); });
+  document.getElementById("s-b").addEventListener("input", function (e) { T.b = parseFloat(e.target.value); renderTwo(); });
+  renderTwo();
+
+  // ---------- Lab 3: compounding ----------
+  var C = { g1: 1, g2: 3, yr: 35 };
+  var svgComp = document.getElementById("comp");
+  function money(v) { return v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + "M" : "$" + Math.round(v / 1000) + "k"; }
+  function niceMax(v) { var p = Math.pow(10, Math.floor(Math.log10(v))); var n = Math.ceil(v / p); var steps = [1, 2, 2.5, 5, 10]; for (var i = 0; i < steps.length; i++) if (steps[i] >= n) return steps[i] * p; return 10 * p; }
+  function renderComp() {
+    ["g1", "g2", "yr"].forEach(function (k) { document.getElementById("s-" + k).value = C[k]; });
+    document.getElementById("o-g1").textContent = fmt(C.g1) + "%";
+    document.getElementById("o-g2").textContent = fmt(C.g2) + "%";
+    document.getElementById("o-yr").textContent = "year " + C.yr;
+    var v = function (g, t) { return 20000 * Math.pow(1 + g / 100, t); };
+    var ymax = niceMax(Math.max(v(C.g1, 70), v(C.g2, 70), 40000) * 1.02);
+    var yt = []; for (var i = 1; i <= 5; i++) yt.push(ymax * i / 5);
+    var F = Lab.frame(svgComp, { x: [0, 70], y: [0, ymax], xLabel: "Years", yLabel: "Real GDP per capita",
+      xTicks: [0, 10, 20, 30, 40, 50, 60, 70], yTicks: yt,
+      fmtX: function (x) { return x; }, fmtY: money });
+    Lab.hline(F, 40000, "var(--rule)", 1.5, "4 4");
+    Lab.tag(F, 1, 40000 + ymax * 0.02, "Doubled ($40k)", "var(--muted)");
+    Lab.fn(F, function (t) { return v(C.g1, t); }, "var(--c3)", 3);
+    Lab.fn(F, function (t) { return v(C.g2, t); }, "var(--c4)", 3);
+    Lab.vline(F, C.yr, "var(--muted)", 1, "3 3");
+    Lab.dot(F, C.yr, v(C.g1, C.yr), "var(--c3)", false);
+    Lab.dot(F, C.yr, v(C.g2, C.yr), "var(--c4)", false);
+    function dbl(g) { return g > 0 ? fmt(70 / g) + " years" : "never"; }
+    var rows = [
+      ["Economy 1 doubles in", dbl(C.g1)], ["Economy 2 doubles in", dbl(C.g2)],
+      ["Economy 1 at year " + C.yr, "$" + Math.round(v(C.g1, C.yr)).toLocaleString()],
+      ["Economy 2 at year " + C.yr, "$" + Math.round(v(C.g2, C.yr)).toLocaleString()]
+    ];
+    var r = v(C.g2, C.yr) / v(C.g1, C.yr);
+    rows.push(["Economy 2 ÷ Economy 1", fmt(r, 2) + "×"]);
+    document.getElementById("comp-calc").innerHTML = rows.map(function (x) { return '<div class="row"><span>' + x[0] + '</span><span>' + x[1] + '</span></div>'; }).join("");
+  }
+  ["g1", "g2", "yr"].forEach(function (k) {
+    document.getElementById("s-" + k).addEventListener("input", function (e) { C[k] = parseFloat(e.target.value); renderComp(); });
+  });
+  renderComp();
+
+  // ---------- Lab 4: cycle vs trend ----------
+  var Y = { tg: 2.5, amp: 4 };
+  var svgCyc = document.getElementById("cycle");
+  function renderCycle() {
+    document.getElementById("s-tg").value = Y.tg; document.getElementById("s-amp").value = Y.amp;
+    document.getElementById("o-tg").textContent = fmt(Y.tg) + "% a year";
+    document.getElementById("o-amp").textContent = "±" + Y.amp + "%";
+    var pot = function (t) { return 100 * Math.pow(1 + Y.tg / 100, t); };
+    var act = function (t) { return pot(t) * (1 + Y.amp / 100 * Math.sin(2 * Math.PI * t / 7)); };
+    var top = Math.ceil(pot(20) * (1 + Y.amp / 100) / 10) * 10 + 10;
+    var yt = []; for (var v = 90; v <= top; v += (top > 200 ? 40 : 20)) yt.push(v);
+    var F = Lab.frame(svgCyc, { x: [0, 20], y: [85, top], xLabel: "Years", yLabel: "Real GDP (index)",
+      xTicks: [0, 5, 10, 15, 20], yTicks: yt, fmtX: function (x) { return x; }, fmtY: function (x) { return x; } });
+    if (Y.amp > 0) Lab.rect(F, 8.75, 85, 12.25, top, "var(--bad)", 0.08);
+    Lab.fn(F, pot, "var(--lrpc)", 3, null, 80);
+    Lab.fn(F, act, "var(--accent)", 3, null, 160);
+    if (Y.amp > 0) {
+      Lab.dot(F, 8.75, act(8.75), "var(--ink)"); Lab.tag(F, 8.75, act(8.75) + (top - 85) * 0.05, "Peak", "var(--ink)", "middle");
+      Lab.dot(F, 12.25, act(12.25), "var(--ink)"); Lab.tag(F, 12.25, act(12.25) - (top - 85) * 0.07, "Trough", "var(--ink)", "middle");
+      Lab.tag(F, 10.5, top - (top - 85) * 0.06, "Recession", "var(--bad)", "middle");
+    }
+    Lab.tag(F, 19.6, pot(19.6) - (top - 85) * 0.06, "Potential", "var(--lrpc)", "end");
+    var msg = "Over 20 years, potential GDP grows from 100 to " + fmt(pot(20)) + ". ";
+    msg += Y.amp > 0 ? "Actual GDP swings " + Y.amp + "% above and below that path. The shaded stretch from peak to trough is a recession: output falls below potential and unemployment rises, but the trend keeps climbing." : "With no business cycle, actual GDP stays on the trend line the whole time.";
+    if (Y.tg === 0) msg = "With 0% trend growth, potential GDP stays at 100. " + (Y.amp > 0 ? "Recoveries only bring the economy back to the same level." : "");
+    document.getElementById("cycle-story").textContent = msg;
+  }
+  document.getElementById("s-tg").addEventListener("input", function (e) { Y.tg = parseFloat(e.target.value); renderCycle(); });
+  document.getElementById("s-amp").addEventListener("input", function (e) { Y.amp = parseFloat(e.target.value); renderCycle(); });
+  renderCycle();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following best shows economic growth on a production possibilities curve?", o: ["A movement from a point inside the PPC to a point on the PPC", "A movement along the PPC toward more capital goods", "An outward shift of the PPC", "An inward shift of the PPC"], c: 2, w: "Growth means the economy can produce more of everything, so the whole curve shifts outward. Moving from inside to the curve only uses idle resources." },
+    { s: "Economic growth is best measured as the percentage increase in:", o: ["Nominal GDP", "Real GDP per capita", "The price level", "Total employment"], c: 1, w: "Real GDP removes the effect of inflation, and dividing by population shows output per person, which tracks living standards." },
+    { s: "Which of the following would most likely increase labor productivity?", o: ["An increase in aggregate demand", "A decrease in the unemployment rate", "More workers completing technical training", "An increase in the price level"], c: 2, w: "Training raises human capital, so each worker produces more per hour. The other choices change spending or employment, not output per worker." },
+    { s: "A point inside a country's PPC means that:", o: ["The country has experienced economic growth", "Some resources are unemployed or used inefficiently", "The output is unattainable with current resources", "The country is specializing in capital goods"], c: 1, w: "Inside the curve, the economy could produce more with the resources it already has. That signals unemployment or inefficiency." },
+    { s: "If real GDP per capita grows at 2% per year, about how many years will it take to double?", o: ["14 years", "20 years", "35 years", "70 years"], c: 2, w: "Rule of 70: 70 ÷ 2 = 35 years." },
+    { s: "Country X devotes a larger share of its output to capital goods than Country Y. Compared with Country Y, Country X will most likely have:", o: ["More consumer goods now and a larger PPC shift later", "Fewer consumer goods now and a larger PPC shift later", "Fewer consumer goods now and a smaller PPC shift later", "The same PPC shift, since both have the same resources"], c: 1, w: "Building capital means giving up consumer goods today. The extra capital raises future productive capacity, so the PPC shifts out further." },
+    { s: "Holding aggregate demand constant, an improvement in technology will cause:", o: ["LRAS to shift right and the price level to fall", "LRAS to shift left and the price level to rise", "AD to shift right and the price level to rise", "No change in LRAS, since technology affects only the short run"], c: 0, w: "Better technology raises potential output, shifting LRAS (and SRAS) right. With AD unchanged, real GDP rises and the price level falls." },
+    { s: "Which of the following would NOT shift the LRAS curve to the right?", o: ["Discovery of new natural resources", "An increase in the stock of physical capital", "An increase in consumer spending", "An increase in the size of the labor force"], c: 2, w: "Consumer spending is part of aggregate demand. It changes output in the short run but does not change the economy's productive capacity." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+
+  Lab.nav("5.6");
+})();
+</script>
+</body>
+</html>

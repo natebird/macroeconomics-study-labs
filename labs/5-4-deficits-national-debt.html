@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deficits and Debt Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+  .controls.five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .toggle { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+  .toggle button { border: 0; border-radius: 0; padding: 4px 12px; font-size: .8rem; }
+  .toggle button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+  .ctl label.chk { justify-content: flex-start; }
+  .chk { display: flex; gap: 8px; align-items: center; font-size: .9rem; font-weight: 500; }
+  .chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: .85rem; }
+  td.neg { color: var(--bad); } td.pos { color: var(--good); }
+  tr.rec td { background: var(--accent-soft); }
+  .predict { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .predict input[type="number"] { font: inherit; font-family: var(--mono); width: 130px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+  .fb { font-size: .92rem; }
+  .fb.ok { color: var(--good); } .fb.no { color: var(--bad); }
+  @media (max-width: 860px) { .controls.five { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .controls.five { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 5 · Topic 5.4</span>
+  <h1>Deficits and Debt Study Lab</h1>
+  <p class="lede">A budget deficit is what the government is short in one year. The national debt is the running total of every deficit it has ever borrowed to cover, minus any surpluses. Run a hypothetical country's budget for ten years and watch each year's deficit pile up into the debt.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Ten-year budget simulator</h2>
+    <p>The country starts with nominal GDP of $1,000 billion. Spending and taxes are set as a share of GDP. Interest on the debt is paid on top of regular spending, so it counts toward the deficit too.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Budget balance each year <small>flow, $ billions</small></h3>
+      <svg class="chart" id="bal" viewBox="0 0 440 330" role="img" aria-label="Bar chart of yearly budget deficits and surpluses"></svg>
+      <div class="legend"><span class="l-lrpc">Surplus</span><span style="color:var(--bad)">Deficit</span><span class="l-c4">Interest cost</span></div>
+    </div>
+    <div class="card graph-card">
+      <h3>National debt <span class="toggle" role="group" aria-label="Debt measure"><button type="button" id="v-level" aria-pressed="true">$ billions</button><button type="button" id="v-ratio" aria-pressed="false">% of GDP</button></span></h3>
+      <svg class="chart" id="debt" viewBox="0 0 440 330" role="img" aria-label="Line chart of the national debt"></svg>
+      <div class="legend"><span class="l-ad">Debt (stock)</span><span class="l-ghost">Starting debt</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls five">
+      <div class="ctl">
+        <label for="s-G">Government spending <output id="o-G"></output></label>
+        <input type="range" id="s-G" min="10" max="30" step="0.1">
+        <span class="hint">Purchases + transfers, % of GDP (not interest)</span>
+      </div>
+      <div class="ctl">
+        <label for="s-T">Tax revenue <output id="o-T"></output></label>
+        <input type="range" id="s-T" min="10" max="30" step="0.1">
+        <span class="hint">% of GDP</span>
+      </div>
+      <div class="ctl">
+        <label for="s-g">Nominal GDP growth <output id="o-g"></output></label>
+        <input type="range" id="s-g" min="0" max="8" step="0.5">
+        <span class="hint">Per year</span>
+      </div>
+      <div class="ctl">
+        <label for="s-r">Interest rate on debt <output id="o-r"></output></label>
+        <input type="range" id="s-r" min="0" max="8" step="0.5">
+        <span class="hint">Paid each year on last year's debt</span>
+      </div>
+      <div class="ctl">
+        <label for="s-d0">Starting debt <output id="o-d0"></output></label>
+        <input type="range" id="s-d0" min="0" max="150" step="5">
+        <span class="hint">% of GDP in year 0</span>
+      </div>
+      <div class="ctl" style="align-content:center;">
+        <label class="chk" for="s-rec"><input type="checkbox" id="s-rec"> Recession in years 3 and 4</label>
+        <span class="hint">GDP shrinks, tax revenue falls, transfers rise</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Year 1 budget balance</div><div class="v" id="r-b1"></div></div>
+    <div class="stat"><div class="k">Debt, year 0 → year 10</div><div class="v" id="r-debt"></div></div>
+    <div class="stat"><div class="k">Debt-to-GDP, year 0 → year 10</div><div class="v" id="r-ratio"></div></div>
+    <div class="stat"><div class="k">Interest as share of taxes, year 10</div><div class="v" id="r-int"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- TABLE CHECK -->
+<section aria-labelledby="tab-h">
+  <div class="sec-head">
+    <h2 id="tab-h">2. Follow the money, year by year</h2>
+    <p>This table runs the same simulation. Each row obeys one rule: <span class="formula">Debt this year = Debt last year + Deficit this year</span>. A surplus is a negative deficit, so it subtracts from the debt.</p>
+  </div>
+  <div class="card" style="display:grid; gap:12px;">
+    <div class="tag">Check yourself</div>
+    <p id="pq"></p>
+    <div class="predict">
+      <label for="p-in" style="font-weight:500;">Debt at end of year <span id="p-yr"></span> ($B):</label>
+      <input type="number" id="p-in" step="1" inputmode="decimal">
+      <button class="primary" type="button" id="p-check">Check</button>
+      <button type="button" id="p-new">Another year</button>
+    </div>
+    <p class="fb" id="p-fb" aria-live="polite"></p>
+  </div>
+  <div class="tbl-wrap">
+    <table id="ytable">
+      <thead><tr><th>Year</th><th class="num">Nominal GDP</th><th class="num">Tax revenue</th><th class="num">Spending</th><th class="num">Interest</th><th class="num">Surplus (+) / Deficit (−)</th><th class="num">Debt at year end</th><th class="num">Debt % GDP</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">3. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Flow</span><h3>Budget deficit</h3><p>The amount by which government spending (purchases plus transfer payments) exceeds tax revenue in a single year. The government borrows to cover it by selling bonds.</p></div>
+    <div class="card"><span class="tag">Stock</span><h3>National debt</h3><p>The total amount the government owes at a point in time. It equals the sum of all past deficits minus all past surpluses.</p></div>
+    <div class="card"><span class="tag">Flow</span><h3>Budget surplus</h3><p>Tax revenue is greater than spending for the year. The government can use the surplus to pay back bondholders, which reduces the debt.</p></div>
+    <div class="card"><span class="tag">Two kinds</span><h3>Cyclical vs. structural deficit</h3><p>A cyclical deficit comes from the business cycle: recessions shrink tax revenue and raise transfers. A structural deficit is the part that would remain even at full employment.</p></div>
+    <div class="card"><span class="tag">Built in</span><h3>Automatic stabilizers</h3><p>Progressive income taxes and transfer programs like unemployment insurance change on their own as the economy moves, with no new law. They push the budget toward deficit in recessions and toward surplus in expansions.</p></div>
+    <div class="card"><span class="tag">Creditors</span><h3>Who holds the debt</h3><p>Anyone who owns a government bond: households, banks, pension funds, foreign investors and governments, the central bank, and other government agencies.</p></div>
+    <div class="card"><span class="tag">Long run</span><h3>Interest burden</h3><p>A bigger debt means bigger interest payments. Interest is spending too, so it adds to future deficits and leaves less room for other programs.</p></div>
+    <div class="card"><span class="tag">Link to 5.5</span><h3>Crowding out</h3><p>Government borrowing increases the demand for loanable funds, which raises the real interest rate and reduces private investment. Less investment means slower growth of the capital stock.</p></div>
+    <div class="card"><span class="tag">Long run</span><h3>Burden on future generations</h3><p>Future taxpayers inherit the interest payments. If crowding out lowers investment, they also inherit a smaller capital stock and less productive capacity.</p></div>
+  </div>
+</section>
+
+<!-- REFERENCE TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">4. What happens to the deficit and the debt</h2>
+    <p>The deficit is a speed. The debt is the distance traveled. Slowing down is not the same as going backward.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Budget deficit (flow)</th><th>National debt (stock)</th></tr></thead>
+    <tbody>
+      <tr><td>Government spending rises, taxes unchanged (expansionary fiscal policy)</td><td><b>Increases</b> (or the surplus shrinks)</td><td>Grows faster</td></tr>
+      <tr><td>Recession: tax revenue falls and transfers rise automatically</td><td><b>Increases</b> (cyclical deficit)</td><td>Grows faster</td></tr>
+      <tr><td>Expansion: tax revenue rises and transfers fall automatically</td><td><b>Decreases</b></td><td>Grows more slowly</td></tr>
+      <tr><td>Deficit shrinks from $80B to $50B</td><td>Smaller, but still a deficit</td><td><span class="shift">Still rises</span>, by $50B</td></tr>
+      <tr><td>Budget surplus</td><td>None (revenue exceeds spending)</td><td><span class="lshift">Falls</span> by the amount of the surplus</td></tr>
+      <tr><td>Interest rate on the debt rises</td><td><b>Increases</b> because interest payments rise</td><td>Grows faster</td></tr>
+      <tr><td>Nominal GDP grows faster than the debt</td><td>No direct change</td><td>Debt-to-GDP ratio falls, even if the debt itself rises</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">5. Answering it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Phrases that earn points</h3>
+      <ul>
+        <li>Define the deficit for one year: government spending minus tax revenue.</li>
+        <li>Expansionary fiscal policy (more spending or lower taxes) <b>increases</b> the deficit. Contractionary fiscal policy decreases it.</li>
+        <li>When asked what happens to the debt, say whether there is still a deficit. Any deficit, however small, adds to the debt.</li>
+        <li>Connect borrowing to the loanable funds market: demand for loanable funds increases, the real interest rate rises, and private investment falls.</li>
+        <li>Name automatic stabilizers by example: progressive income taxes, unemployment insurance. Say they work without new legislation.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Mixing up the deficit and the debt. One is a yearly flow, the other is a total stock.</li>
+        <li>Saying the debt falls when the deficit falls. The debt only falls when there is a surplus.</li>
+        <li>Thinking a balanced budget erases the debt. It keeps the debt from growing, but the old debt is still owed.</li>
+        <li>Confusing the budget deficit with a trade deficit. The trade deficit is about imports and exports (Unit 6).</li>
+        <li>Saying the Fed controls the budget. Congress and the President run fiscal policy. The Fed runs monetary policy.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">6. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DEFAULT = { G: 21, T: 18, g: 4, r: 3, d0: 60, rec: false };
+  var S = Object.assign({}, DEFAULT);
+  var view = "level";
+
+  // ---------- Model ----------
+  function simulate(p) {
+    var gdp = 1000, debt = p.d0 / 100 * gdp, rows = [{ t: 0, gdp: gdp, debt: debt, ratio: p.d0 }];
+    for (var t = 1; t <= 10; t++) {
+      var rec = p.rec && (t === 3 || t === 4);
+      gdp = gdp * (1 + (rec ? -2 : p.g) / 100);
+      var G = p.G + (rec ? 1.5 : 0), T = p.T - (rec ? 2 : 0);
+      var interest = p.r / 100 * debt;
+      var spend = G / 100 * gdp, rev = T / 100 * gdp;
+      var deficit = spend + interest - rev;
+      var prev = debt;
+      debt = prev + deficit;
+      rows.push({ t: t, gdp: gdp, rev: rev, spend: spend, interest: interest, balance: -deficit, prev: prev, debt: debt, ratio: 100 * debt / gdp, rec: rec });
+    }
+    return rows;
+  }
+
+  function nice(lo, hi, n) {
+    var span = hi - lo || 1, raw = span / (n || 5), mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var step = [1, 2, 2.5, 5, 10].map(function (m) { return m * mag; }).find(function (s) { return s >= raw; });
+    var a = Math.floor(lo / step) * step, b = Math.ceil(hi / step) * step, ticks = [];
+    for (var v = a; v <= b + step * 1e-6; v += step) ticks.push(Math.round(v * 1000) / 1000);
+    return { min: a, max: b, ticks: ticks };
+  }
+  function money(v) { var s = Math.abs(v) >= 100 ? Math.round(Math.abs(v)).toLocaleString() : Lab.fmt(Math.abs(v)); return (v < 0 ? "−" : "") + "$" + s + "B"; }
+
+  // ---------- Charts ----------
+  var svgB = document.getElementById("bal"), svgD = document.getElementById("debt");
+  function drawBalance(rows) {
+    var vals = rows.slice(1).map(function (r) { return r.balance; }).concat(rows.slice(1).map(function (r) { return -r.interest; }));
+    var lo = Math.min(0, Math.min.apply(null, vals)), hi = Math.max(0, Math.max.apply(null, vals));
+    if (hi - lo < 10) { lo = Math.min(lo, -5); hi = Math.max(hi, 5); }
+    hi = Math.max(hi, (hi - lo) * 0.12);
+    var Y = nice(lo, hi, 5);
+    var F = Lab.frame(svgB, { x: [0.3, 10.7], y: [Y.min, Y.max], xLabel: "Year", yLabel: "Surplus (+) / deficit (−), $B",
+      xTicks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], yTicks: Y.ticks, fmtX: function (v) { return v; }, fmtY: function (v) { return v; } });
+    rows.forEach(function (r) { if (r.rec) Lab.rect(F, r.t - 0.5, Y.min, r.t + 0.5, Y.max, "var(--accent)", 0.08); });
+    Lab.hline(F, 0, "var(--ink)", 1.5);
+    rows.slice(1).forEach(function (r) {
+      Lab.rect(F, r.t - 0.32, 0, r.t + 0.32, r.balance, r.balance >= 0 ? "var(--lrpc)" : "var(--bad)", 0.88);
+    });
+    Lab.line(F, rows.slice(1).map(function (r) { return [r.t, -r.interest]; }), "var(--c4)", 2, "5 4");
+    rows.slice(1).forEach(function (r) { Lab.el("circle", { cx: F.sx(r.t), cy: F.sy(-r.interest), r: 3, fill: "var(--c4)" }, F.g); });
+    if (rows.some(function (r) { return r.rec; })) Lab.tag(F, 3.5, Y.max - (Y.max - Y.min) * 0.06, "Recession", "var(--accent)", "middle");
+  }
+  function drawDebt(rows) {
+    var key = view === "level" ? "debt" : "ratio";
+    var vals = rows.map(function (r) { return r[key]; });
+    var lo = Math.min(0, Math.min.apply(null, vals)), hi = Math.max.apply(null, vals);
+    if (hi - lo < 10) hi = lo + 10;
+    var Y = nice(lo, hi * 1.05, 5);
+    var F = Lab.frame(svgD, { x: [0, 10], y: [Y.min, Y.max], xLabel: "Year", yLabel: view === "level" ? "Debt, $ billions" : "Debt as % of GDP",
+      xTicks: [0, 2, 4, 6, 8, 10], yTicks: Y.ticks, fmtX: function (v) { return v; }, fmtY: function (v) { return view === "level" ? v : v + "%"; } });
+    rows.forEach(function (r) { if (r.rec) Lab.rect(F, r.t - 1, Y.min, r.t, Y.max, "var(--accent)", 0.08); });
+    Lab.hline(F, rows[0][key], "var(--ghost)", 2, "6 5");
+    Lab.line(F, rows.map(function (r) { return [r.t, r[key]]; }), "var(--accent)", 3);
+    rows.forEach(function (r) { Lab.el("circle", { cx: F.sx(r.t), cy: F.sy(r[key]), r: 3.5, fill: "var(--accent)" }, F.g); });
+    var last = rows[10];
+    Lab.dot(F, 10, last[key], "var(--ink)", false);
+    Lab.tag(F, 9.8, last[key] + (Y.max - Y.min) * 0.05, view === "level" ? money(last.debt) : Lab.fmt(last.ratio) + "%", "var(--ink)", "end");
+  }
+
+  // ---------- Story ----------
+  function story(rows, p) {
+    var b1 = rows[1], last = rows[10];
+    var primary1 = b1.rev - b1.spend;
+    var deficits = rows.slice(1).filter(function (r) { return r.balance < -0.05; }).length;
+    var surpluses = rows.slice(1).filter(function (r) { return r.balance > 0.05; }).length;
+    var out = [];
+    var lead;
+    if (deficits === 10) lead = "<b>A deficit every year.</b> The government spends more than it collects in all ten years, so it borrows every year and the debt grows from " + money(rows[0].debt) + " to " + money(last.debt) + ".";
+    else if (surpluses === 10) lead = "<b>A surplus every year.</b> Revenue covers all spending, including interest, so the government pays back bondholders and the debt falls from " + money(rows[0].debt) + " to " + money(last.debt) + ".";
+    else if (deficits === 0 && surpluses === 0) lead = "<b>A balanced budget.</b> Spending equals revenue each year, so nothing is borrowed and the debt stays at " + money(last.debt) + ".";
+    else lead = "<b>A mix of deficits and surpluses.</b> " + deficits + " deficit year" + (deficits === 1 ? "" : "s") + " added to the debt and " + surpluses + " surplus year" + (surpluses === 1 ? "" : "s") + " subtracted from it. The debt went from " + money(rows[0].debt) + " to " + money(last.debt) + ".";
+    var html = "<p>" + lead + "</p><ul>";
+    if (b1.interest > 0.5) {
+      if (primary1 >= 0 && b1.balance < 0) out.push("Without interest, year 1 would be a surplus of " + money(primary1) + ". The " + money(b1.interest) + " interest bill turns it into a deficit. Old debt creates new deficits.");
+      else out.push("Interest on the existing debt costs " + money(b1.interest) + " in year 1 and " + money(last.interest) + " in year 10. Interest is part of spending, so it adds to every year's deficit.");
+    }
+    if (p.rec) {
+      var r3 = rows[3], r2 = rows[2];
+      out.push("In the recession years the deficit jumps from " + money(-r2.balance) + " in year 2 to " + money(-r3.balance) + " in year 3. No one voted for that: tax revenue fell and transfer payments rose automatically. That extra borrowing is a <b>cyclical deficit</b>.");
+      if (rows[5].balance < 0) out.push("After the recession the deficit shrinks again, but the debt keeps the extra borrowing from years 3 and 4.");
+    }
+    var ratioDown = last.ratio < rows[0].ratio - 0.05, debtUp = last.debt > rows[0].debt + 0.5;
+    if (ratioDown && debtUp) out.push("The debt grew, but nominal GDP grew faster, so the <b>debt-to-GDP ratio fell</b> from " + Lab.fmt(rows[0].ratio) + "% to " + Lab.fmt(last.ratio) + "%. The economy can carry the debt more easily.");
+    else if (!ratioDown && last.ratio > rows[0].ratio + 0.05) out.push("The debt grew faster than GDP, so the <b>debt-to-GDP ratio rose</b> from " + Lab.fmt(rows[0].ratio) + "% to " + Lab.fmt(last.ratio) + "%.");
+    else if (ratioDown) out.push("The debt-to-GDP ratio fell from " + Lab.fmt(rows[0].ratio) + "% to " + Lab.fmt(last.ratio) + "%.");
+    if (p.r > p.g && rows[0].debt > 0) out.push("The interest rate (" + p.r + "%) is higher than GDP growth (" + p.g + "%). Unless taxes exceed other spending by enough, interest costs will grow faster than the economy.");
+    var share = last.rev > 0 ? 100 * last.interest / last.rev : 0;
+    if (share >= 12) out.push("By year 10, interest eats " + Lab.fmt(share, 0) + "% of tax revenue. That money can't be spent on roads, schools, or defense. This is the <b>interest burden</b> AP questions ask about.");
+    if (deficits >= 6) out.push("Borrowing this much every year increases the demand for loanable funds, which can raise real interest rates and <b>crowd out</b> private investment (Topic 5.5).");
+    html += out.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    return html;
+  }
+
+  // ---------- Table + predict ----------
+  var tbody = document.querySelector("#ytable tbody");
+  function drawTable(rows) {
+    var h = "<tr><td>0</td><td class='num'>" + money(rows[0].gdp) + "</td><td class='num'></td><td class='num'></td><td class='num'></td><td class='num'></td><td class='num'>" + money(rows[0].debt) + "</td><td class='num'>" + Lab.fmt(rows[0].ratio) + "%</td></tr>";
+    rows.slice(1).forEach(function (r) {
+      h += "<tr" + (r.rec ? " class='rec'" : "") + "><td>" + r.t + (r.rec ? " (recession)" : "") + "</td><td class='num'>" + money(r.gdp) + "</td><td class='num'>" + money(r.rev) + "</td><td class='num'>" + money(r.spend) + "</td><td class='num'>" + money(r.interest) + "</td><td class='num " + (r.balance < 0 ? "neg" : "pos") + "'>" + (r.balance >= 0 ? "+" : "") + money(r.balance) + "</td><td class='num'>" + money(r.debt) + "</td><td class='num'>" + Lab.fmt(r.ratio) + "%</td></tr>";
+    });
+    tbody.innerHTML = h;
+  }
+  var pYear = 4, ROWS = null;
+  function setPredict() {
+    var r = ROWS[pYear];
+    document.getElementById("p-yr").textContent = pYear;
+    document.getElementById("pq").innerHTML = "At the end of year " + (pYear - 1) + ", the debt was <b>" + money(r.prev) + "</b>. In year " + pYear + ", tax revenue was " + money(r.rev) + ", spending was " + money(r.spend) + ", and interest was " + money(r.interest) + ". What is the debt at the end of year " + pYear + "?";
+    document.getElementById("p-in").value = "";
+    var fb = document.getElementById("p-fb"); fb.textContent = ""; fb.className = "fb";
+  }
+  document.getElementById("p-check").addEventListener("click", function () {
+    var v = parseFloat(document.getElementById("p-in").value), r = ROWS[pYear], fb = document.getElementById("p-fb");
+    if (isNaN(v)) { fb.className = "fb no"; fb.textContent = "Type a number in billions, such as 750."; return; }
+    var def = r.spend + r.interest - r.rev;
+    var work = money(r.prev) + " + (" + money(r.spend) + " + " + money(r.interest) + " − " + money(r.rev) + ") = " + money(r.prev) + (def >= 0 ? " + " : " − ") + money(Math.abs(def)) + " = " + money(r.debt);
+    if (Math.abs(v - r.debt) <= Math.max(2, Math.abs(r.debt) * 0.005)) { fb.className = "fb ok"; fb.textContent = "Correct. " + work + "."; }
+    else { fb.className = "fb no"; fb.textContent = "Not quite. Add this year's " + (def >= 0 ? "deficit" : "surplus as a negative number") + " to last year's debt: " + work + "."; }
+  });
+  document.getElementById("p-check").previousElementSibling.addEventListener("keydown", function (e) { if (e.key === "Enter") document.getElementById("p-check").click(); });
+  document.getElementById("p-new").addEventListener("click", function () { var n; do { n = 1 + Math.floor(Math.random() * 10); } while (n === pYear); pYear = n; setPredict(); });
+
+  // ---------- Controls ----------
+  var ids = { G: "s-G", T: "s-T", g: "s-g", r: "s-r", d0: "s-d0" };
+  function render() {
+    Object.keys(ids).forEach(function (k) { document.getElementById(ids[k]).value = S[k]; });
+    document.getElementById("s-rec").checked = S.rec;
+    document.getElementById("o-G").textContent = Lab.fmt(S.G) + "%";
+    document.getElementById("o-T").textContent = Lab.fmt(S.T) + "%";
+    document.getElementById("o-g").textContent = Lab.fmt(S.g) + "%";
+    document.getElementById("o-r").textContent = Lab.fmt(S.r) + "%";
+    document.getElementById("o-d0").textContent = S.d0 + "%";
+    var rows = simulate(S); ROWS = rows;
+    drawBalance(rows); drawDebt(rows); drawTable(rows); setPredict();
+    var b1 = rows[1].balance;
+    document.getElementById("r-b1").innerHTML = "<span style='color:" + (b1 < -0.05 ? "var(--bad)" : "var(--good)") + "'>" + (Math.abs(b1) < 0.05 ? "Balanced" : (b1 < 0 ? "Deficit " : "Surplus ") + money(Math.abs(b1))) + "</span>";
+    document.getElementById("r-debt").textContent = money(rows[0].debt) + " → " + money(rows[10].debt);
+    document.getElementById("r-ratio").textContent = Lab.fmt(rows[0].ratio, 0) + "% → " + Lab.fmt(rows[10].ratio, 0) + "%";
+    document.getElementById("r-int").textContent = Lab.fmt(rows[10].rev > 0 ? 100 * rows[10].interest / rows[10].rev : 0, 0) + "%";
+    document.getElementById("story").innerHTML = story(rows, S);
+  }
+  Object.keys(ids).forEach(function (k) {
+    document.getElementById(ids[k]).addEventListener("input", function (e) { S[k] = parseFloat(e.target.value); render(); });
+  });
+  document.getElementById("s-rec").addEventListener("change", function (e) { S.rec = e.target.checked; render(); });
+  function setView(v) {
+    view = v;
+    document.getElementById("v-level").setAttribute("aria-pressed", v === "level");
+    document.getElementById("v-ratio").setAttribute("aria-pressed", v === "ratio");
+    drawDebt(ROWS);
+  }
+  document.getElementById("v-level").addEventListener("click", function () { setView("level"); });
+  document.getElementById("v-ratio").addEventListener("click", function () { setView("ratio"); });
+
+  var scen = [
+    ["Persistent deficit", { G: 21, T: 18, g: 4, r: 3, d0: 60, rec: false }, "level"],
+    ["Balanced budget", { G: 16.3, T: 18, g: 4, r: 3, d0: 60, rec: false }, "level"],
+    ["Recession hits", { G: 18, T: 19, g: 4, r: 3, d0: 60, rec: true }, "level"],
+    ["Paying down the debt", { G: 17, T: 21, g: 4, r: 3, d0: 80, rec: false }, "level"],
+    ["Growth outpaces interest", { G: 19.5, T: 19, g: 6, r: 2, d0: 80, rec: false }, "ratio"],
+    ["Interest snowball", { G: 20, T: 20, g: 2, r: 7, d0: 120, rec: false }, "level"]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, x[1]); view = x[2]; setView(view); render(); });
+    sc.appendChild(b);
+  });
+
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "A government budget deficit occurs when, in a given year:", o: ["Total national debt exceeds GDP", "Government spending exceeds tax revenue", "Imports exceed exports", "The central bank sells more bonds than it buys"], c: 1, w: "The deficit is a one-year flow: spending (purchases plus transfers) minus tax revenue. Debt over GDP is a ratio, and imports over exports is a trade deficit." },
+    { s: "A country's national debt is $500 billion. This year it runs a budget deficit of $40 billion. At the end of the year, the national debt is:", o: ["$460 billion", "$500 billion", "$540 billion", "$40 billion"], c: 2, w: "Debt this year = debt last year + this year's deficit = $500B + $40B = $540B." },
+    { s: "The budget deficit falls from $80 billion last year to $50 billion this year. This year the national debt will:", o: ["Fall by $30 billion", "Fall by $50 billion", "Stay the same", "Rise by $50 billion"], c: 3, w: "There is still a $50B deficit, and every deficit adds to the debt. The debt only falls when the budget is in surplus." },
+    { s: "During a recession, the budget deficit increases even though Congress passes no new laws. This is mainly because:", o: ["Automatic stabilizers reduce tax revenue and increase transfer payments", "The central bank lowers the discount rate", "Discretionary fiscal policy raises government purchases", "The national debt is paid down"], c: 0, w: "Falling incomes mean less income-tax revenue, and more people qualify for programs like unemployment insurance. These automatic stabilizers create a cyclical deficit without new legislation." },
+    { s: "Which of the following would reduce the national debt?", o: ["A smaller budget deficit", "A balanced budget", "A budget surplus", "A decrease in the interest rate on government bonds"], c: 2, w: "Only a surplus lets the government pay back bondholders. A smaller deficit or a balanced budget keeps the debt from growing as quickly, but it does not shrink it." },
+    { s: "If the government finances a larger budget deficit by borrowing, the most likely effect in the loanable funds market is:", o: ["A lower real interest rate and more private investment", "A higher real interest rate and less private investment", "A lower real interest rate and less private investment", "No change in the real interest rate"], c: 1, w: "Government borrowing increases the demand for loanable funds. The real interest rate rises and private investment falls. This is crowding out." },
+    { s: "The interest rate the government pays on its existing debt rises. Holding everything else constant, the budget deficit will:", o: ["Decrease, because bonds are worth less", "Not change, because interest is not government spending", "Increase, because interest payments are part of government spending", "Become a surplus"], c: 2, w: "Interest payments are government outlays. Higher rates on the debt mean higher outlays and a larger deficit." },
+    { s: "A structural deficit is best described as the deficit that:", o: ["Exists only during recessions", "Would remain even if the economy were at full employment", "Is caused by automatic stabilizers", "Is financed by the central bank"], c: 1, w: "A structural deficit comes from the basic design of spending and tax policy. The cyclical deficit is the extra part caused by the business cycle." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+
+  Lab.nav("5.4");
+})();
+</script>
+</body>
+</html>

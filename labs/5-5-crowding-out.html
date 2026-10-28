@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crowding Out Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 5 · Topic 5.5</span>
+  <h1>The Crowding Out Study Lab</h1>
+  <p class="lede">When the government borrows to cover a budget deficit, it competes with businesses for the same pool of saving. That pushes up the real interest rate and squeezes out some private investment. Less investment today means less capital and slower growth later. Use the lab to follow that chain from the loanable funds market to the long run.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Linked graphs</h2>
+    <p>Dashed grey lines show where the market started (5% real interest rate, 100 billion in private investment). Solid lines show where it is now.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Loanable funds market <small>real interest rate vs. quantity</small></h3>
+      <svg class="chart" id="lf" role="img" aria-label="Loanable funds market graph"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>The long run <small>LRAS ten years from now</small></h3>
+      <svg class="chart" id="lr" role="img" aria-label="Long-run aggregate supply graph"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Demand for loanable funds</span><span class="l-srpc">Supply of loanable funds</span><span class="l-c3">Private investment only</span><span class="l-lrpc">LRAS</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="toggles">
+      <div style="display:grid; gap:6px;">
+        <span style="font-size:.86rem; font-weight:500;">Show the government budget on the</span>
+        <div class="seg" role="group" aria-label="How to show the deficit">
+          <button type="button" id="mode-d" aria-pressed="true">Demand side</button>
+          <button type="button" id="mode-s" aria-pressed="false">Supply side (public saving)</button>
+        </div>
+      </div>
+      <label class="check" for="c-fed"><input type="checkbox" id="c-fed"> Central bank expands the money supply to hold rates down</label>
+      <label class="check" for="c-slack"><input type="checkbox" id="c-slack"> Economy is in a recession (lots of slack)</label>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(3, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-d">Budget balance <output id="o-d"></output></label>
+        <input type="range" id="s-d" min="-30" max="40" step="5">
+        <span class="hint">Right = bigger deficit, left = surplus</span>
+      </div>
+      <div class="ctl">
+        <label for="s-ps">Private saving <output id="o-ps"></output></label>
+        <input type="range" id="s-ps" min="-2" max="2" step="0.5">
+        <span class="hint">Households and firms saving more or less</span>
+      </div>
+      <div class="ctl">
+        <label for="s-id">Investment demand <output id="o-id"></output></label>
+        <input type="range" id="s-id" min="-2" max="2" step="0.5">
+        <span class="hint">Tax credits, business confidence</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real interest rate</div><div class="v" id="r-r">5.0%</div></div>
+    <div class="stat"><div class="k">Total loanable funds</div><div class="v" id="r-q">100</div></div>
+    <div class="stat"><div class="k">Private investment</div><div class="v" id="r-i">100</div></div>
+    <div class="stat"><div class="k">Investment crowded out</div><div class="v" id="r-c">0</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Crowding out</h3><p>Government borrowing raises the real interest rate, which reduces private investment spending. The government's spending partly replaces private spending instead of adding to it.</p></div>
+    <div class="card"><span class="tag">The market</span><h3>Loanable funds</h3><p>Savers supply funds and borrowers demand them. Supply comes from private saving, public saving (a budget surplus), and foreign saving. Demand comes from firms that want to invest and from a government running a deficit.</p></div>
+    <div class="card"><span class="tag">r = i − π</span><h3>Real interest rate</h3><p>The loanable funds market sets the <b>real</b> interest rate: the nominal rate minus expected inflation. Firms compare it with the return they expect from new machines and buildings.</p></div>
+    <div class="card"><span class="tag">Public saving</span><h3>Two ways to draw it</h3><p>A deficit is negative public saving. You can show it as more demand for loanable funds (the government borrows) or as less supply (national saving falls). Both raise the real interest rate. AP graders accept either if you label it clearly.</p></div>
+    <div class="card"><span class="tag">Long run</span><h3>Why growth slows</h3><p>Investment builds the capital stock. If deficits crowd out investment year after year, the economy has fewer machines and less technology later, so LRAS shifts right more slowly.</p></div>
+    <div class="card"><span class="tag">The reverse</span><h3>Crowding in</h3><p>A budget surplus adds to the supply of loanable funds. The real interest rate falls, private investment rises, and long-run growth speeds up.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Loanable funds cheat sheet</h2>
+    <p>Each row is a chain you can write out on an FRQ: shift, then interest rate, then investment, then growth.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Loanable funds shift</th><th>Real interest rate</th><th>Private investment</th><th>Long-run growth</th></tr></thead>
+    <tbody>
+      <tr><td>Government budget deficit increases</td><td><b>Demand right</b> (or supply left)</td><td>↑</td><td>↓ (crowding out)</td><td>Slower</td></tr>
+      <tr><td>Government runs a budget surplus</td><td><span class="shift">Supply right</span> (or demand left)</td><td>↓</td><td>↑ (crowding in)</td><td>Faster</td></tr>
+      <tr><td>Households save more</td><td><span class="shift">Supply right</span></td><td>↓</td><td>↑</td><td>Faster</td></tr>
+      <tr><td>Investment tax credit, business optimism</td><td><b>Demand right</b></td><td>↑</td><td>↑</td><td>Faster</td></tr>
+      <tr><td>Business pessimism</td><td><b>Demand left</b></td><td>↓</td><td>↓</td><td>Slower</td></tr>
+      <tr><td>Inflow of foreign financial capital</td><td><span class="shift">Supply right</span></td><td>↓</td><td>↑</td><td>Faster</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Real interest rate</b>. Horizontal axis: <b>Quantity of loanable funds</b>.</li>
+        <li>Draw supply sloping up and demand sloping down. Label them S<sub>LF</sub> and D<sub>LF</sub>.</li>
+        <li>Mark the starting rate r₁ and the new rate r₂ on the vertical axis, with r₂ above r₁ for a deficit.</li>
+        <li>Label the new curve D<sub>LF2</sub> (or S<sub>LF2</sub>) and add an arrow showing the direction.</li>
+        <li>In words, finish the chain: higher real interest rate, lower private investment, slower growth of the capital stock.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Using the money market. Crowding out from borrowing belongs on the loanable funds graph, which shows the <b>real</b> rate. The money market shows the <b>nominal</b> rate and a vertical money supply set by the central bank.</li>
+        <li>Shifting supply right for a deficit. A deficit reduces national saving, so if you shift supply it goes <b>left</b>.</li>
+        <li>Saying the quantity of loanable funds falls when demand shifts right. Total quantity rises; it is <b>private investment</b> that falls.</li>
+        <li>Mixing up deficit and debt. The deficit is one year's borrowing. The debt is the total of all past deficits minus surpluses.</li>
+        <li>Stopping at the interest rate. Questions about the long run want the link to capital and economic growth.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { D: 0, ps: 0, id: 0, mode: "d", fed: false, slack: false };
+  var S = Object.assign({}, BASE);
+
+  // ---------- Model ----------
+  // Private saving supply: Q = 100 + sl*(r-5) + 10*ps (+ fed offset)
+  // Private investment demand: I = 100 - 12*(r-5) + 10*id
+  // Deficit D adds to demand (mode d) or subtracts from supply (mode s). Same r either way.
+  function slope(s) { return s.slack ? 24 : 12; }
+  function fedShift(s) { return s.fed && s.D > 0 ? s.D / 10 : 0; }
+  function rate(s, D, fed) { return 5 + (10 * s.id - 10 * s.ps - 10 * fed + D) / (slope(s) + 12); }
+  function inv(s, r) { return 100 - 12 * (r - 5) + 10 * s.id; }
+  function model(s) {
+    var fed = fedShift(s);
+    var r = rate(s, s.D, fed);
+    var I = inv(s, r);
+    var rNo = rate(s, 0, 0);                     // same economy with a balanced budget and no Fed action
+    var crowd = inv(s, rNo) - I;                 // positive = crowded out, negative = crowded in
+    var Qtot = s.mode === "d" ? I + s.D : I;     // in supply mode the government's borrowing is netted out of supply
+    var lrShift = 0.1 * I;                       // LRAS growth over ten years from investment
+    return { r: r, I: I, rNo: rNo, crowd: crowd, Q: Qtot, fed: fed, lr: lrShift };
+  }
+
+  // ---------- Graphs ----------
+  var svgLF = document.getElementById("lf"), svgLR = document.getElementById("lr");
+  function supplyQ(s, r, withGov, fed) { return 100 + slope(s) * (r - 5) + 10 * s.ps + 10 * fed - (withGov ? s.D : 0); }
+  function demandQ(s, r, withGov) { return 100 - 12 * (r - 5) + 10 * s.id + (withGov ? s.D : 0); }
+  function curve(qf) { var p = []; for (var r = 0; r <= 10.001; r += 0.25) p.push([qf(r), r]); return p; }
+
+  function drawLF(m, s) {
+    var F = Lab.frame(svgLF, { x: [40, 180], y: [0, 10], xLabel: "Quantity of loanable funds", yLabel: "Real interest rate (%)",
+      xTicks: [60, 100, 140, 180], yTicks: [0, 2, 4, 6, 8, 10],
+      fmtX: function (v) { return v === 100 ? "Q₀" : ""; }, fmtY: function (v) { return v + "%"; } });
+    var moved = s.D !== 0 || s.ps !== 0 || s.id !== 0 || m.fed > 0 || s.slack;
+    if (moved) {
+      Lab.line(F, curve(function (r) { return 100 + 12 * (r - 5); }), "var(--ghost)", 2, "6 5");
+      Lab.line(F, curve(function (r) { return 100 - 12 * (r - 5); }), "var(--ghost)", 2, "6 5");
+    }
+    var govD = s.mode === "d", govS = s.mode === "s";
+    // private-investment-only demand when the deficit is drawn on the demand side
+    if (govD && s.D !== 0) {
+      Lab.line(F, curve(function (r) { return demandQ(s, r, false); }), "var(--c3)", 2, "4 4");
+    }
+    Lab.line(F, curve(function (r) { return supplyQ(s, r, govS, m.fed); }), "var(--srpc)", 3);
+    Lab.line(F, curve(function (r) { return demandQ(s, r, govD); }), "var(--accent)", 3);
+    // crowding-out bracket on the private investment curve
+    if (Math.abs(m.crowd) > 0.4) {
+      var y = m.r;
+      var Ino = inv(s, m.rNo);
+      Lab.line(F, [[m.I, y], [Ino, y]], m.crowd > 0 ? "var(--bad)" : "var(--good)", 5);
+      Lab.tag(F, (m.I + Ino) / 2, y - 0.75, m.crowd > 0 ? "crowded out" : "crowded in", m.crowd > 0 ? "var(--bad)" : "var(--good)", "middle");
+    }
+    if (govD && s.D !== 0) Lab.dot(F, m.I, m.r, "var(--c3)", false);
+    Lab.dot(F, m.Q, m.r, "var(--ink)", true);
+    // labels at the top of each curve
+    var sTop = supplyQ(s, 9.3, govS, m.fed), dTop = demandQ(s, 8.6, govD);
+    Lab.tag(F, sTop - 4, 9.3, govS && s.D !== 0 ? "Supply (after deficit)" : "Supply", "var(--srpc)", "end");
+    Lab.tag(F, dTop + 3, 8.6, govD && s.D > 0 ? "Demand = I + borrowing" : govD && s.D < 0 ? "Demand (net of surplus)" : "Demand", "var(--accent)");
+    if (govD && s.D !== 0) Lab.tag(F, demandQ(s, 1.0, false) - 3, 1.0, "I (private)", "var(--c3)", "end");
+  }
+
+  function drawLR(m, s) {
+    var F = Lab.frame(svgLR, { x: [90, 125], y: [0, 10], xLabel: "Real GDP", yLabel: "Price level",
+      xTicks: [95, 100, 105, 110, 115, 120], yTicks: [],
+      fmtX: function (v) { return v === 100 ? "Today" : ""; } });
+    Lab.vline(F, 100, "var(--ghost)", 2, "6 5");
+    Lab.tag(F, 100.4, 9.4, "LRAS today", "var(--muted)");
+    var base = 110, now = 100 + m.lr;
+    if (Math.abs(now - base) > 0.05) {
+      Lab.vline(F, base, "var(--ghost)", 2, "6 5");
+      Lab.tag(F, base + 0.4, 1.0, "with starting investment", "var(--muted)");
+    }
+    Lab.vline(F, now, "var(--lrpc)", 3);
+    Lab.tag(F, now + 0.4, 8.2, "LRAS in 10 years", "var(--lrpc)");
+    Lab.arrow(F, 100.3, 5, now - 0.4, 5, "var(--lrpc)");
+    Lab.tag(F, (100 + now) / 2, 5.6, "+" + Lab.fmt(m.lr), "var(--lrpc)", "middle");
+  }
+
+  // ---------- Story ----------
+  var f = Lab.fmt;
+  function story(m, s) {
+    var lines = [], lead;
+    if (s.D > 0) {
+      lead = "<b>The government borrows " + s.D + " billion to cover a deficit.</b> ";
+      lead += s.mode === "d"
+        ? "Government borrowing adds to the demand for loanable funds, so D<sub>LF</sub> shifts right."
+        : "A deficit is negative public saving, so national saving falls and S<sub>LF</sub> shifts left.";
+    } else if (s.D < 0) {
+      lead = "<b>The government runs a surplus of " + (-s.D) + " billion.</b> ";
+      lead += s.mode === "d"
+        ? "The government repays debt instead of borrowing, so demand for loanable funds falls (shift left). Most textbooks show a surplus the other way: switch to Supply side to see S<sub>LF</sub> shift right."
+        : "Positive public saving adds to national saving, so S<sub>LF</sub> shifts right. This is the usual way to draw a surplus.";
+    } else {
+      lead = "<b>The budget is balanced.</b> The government is not borrowing, so the market is set by private saving and private investment.";
+    }
+    if (m.fed > 0) lines.push("The central bank buys bonds. Banks have more reserves to lend, so the supply of loanable funds shifts right and offsets the government's borrowing.");
+    if (s.ps > 0) lines.push("Households save more, so the supply of loanable funds shifts right.");
+    if (s.ps < 0) lines.push("Households save less, so the supply of loanable funds shifts left.");
+    if (s.id > 0) lines.push("Firms want to invest more (for example, an investment tax credit), so demand for loanable funds shifts right. The rate rises here, but investment rises too, so this is not crowding out.");
+    if (s.id < 0) lines.push("Firms want to invest less, so demand for loanable funds shifts left.");
+    if (s.slack) lines.push("In a recession, investment demand is weak and saving responds more to rates, so the same borrowing moves the rate less. Crowding out is smaller than at full employment.");
+
+    var rTxt = "The real interest rate is now <b>" + f(m.r) + "%</b>";
+    if (Math.abs(m.r - 5) > 0.04) rTxt += m.r > 5 ? ", up from 5.0%." : ", down from 5.0%.";
+    else rTxt += ", the same as at the start.";
+    var cTxt = "";
+    if (m.crowd > 0.4) cTxt = " Compared with a balanced budget, private investment is <b>" + f(m.crowd) + " billion lower</b>. That lost investment is crowding out.";
+    else if (m.crowd < -0.4) cTxt = " Compared with a balanced budget, private investment is <b>" + f(-m.crowd) + " billion higher</b>. That is crowding in.";
+    else if (s.D > 0 && m.fed > 0) cTxt = " The rate did not rise, so private investment was not crowded out in this model.";
+
+    var lr = "<b>Long run:</b> investment of " + f(m.I) + " billion a year adds to the capital stock, so LRAS shifts right by " + f(m.lr) + " over ten years";
+    if (m.lr < 9.95) lr += ", less than the 10.0 it would with starting investment. Growth is slower.";
+    else if (m.lr > 10.05) lr += ", more than the 10.0 it would with starting investment. Growth is faster.";
+    else lr += ", the same as with starting investment.";
+
+    var html = "<p>" + lead + "</p>";
+    if (lines.length) html += "<ul>" + lines.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    html += "<p>" + rTxt + cTxt + "</p><p>" + lr + "</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elD = document.getElementById("s-d"), elPS = document.getElementById("s-ps"), elID = document.getElementById("s-id");
+  var elFed = document.getElementById("c-fed"), elSlack = document.getElementById("c-slack");
+  var bD = document.getElementById("mode-d"), bS = document.getElementById("mode-s");
+  function signed(v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v); }
+  function render() {
+    var m = model(S);
+    elD.value = S.D; elPS.value = S.ps; elID.value = S.id; elFed.checked = S.fed; elSlack.checked = S.slack;
+    bD.setAttribute("aria-pressed", S.mode === "d"); bS.setAttribute("aria-pressed", S.mode === "s");
+    document.getElementById("o-d").textContent = S.D > 0 ? "deficit " + S.D + "B" : S.D < 0 ? "surplus " + (-S.D) + "B" : "balanced";
+    document.getElementById("o-ps").textContent = S.ps === 0 ? "start" : signed(S.ps);
+    document.getElementById("o-id").textContent = S.id === 0 ? "start" : signed(S.id);
+    drawLF(m, S); drawLR(m, S);
+    document.getElementById("r-r").textContent = f(m.r) + "%";
+    document.getElementById("r-q").textContent = f(m.Q, 0);
+    document.getElementById("r-i").textContent = f(m.I, 0);
+    var c = document.getElementById("r-c");
+    c.innerHTML = m.crowd > 0.4 ? '<span class="pill infl">' + f(m.crowd) + ' out</span>' : m.crowd < -0.4 ? '<span class="pill lr">' + f(-m.crowd) + ' in</span>' : "0";
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  elD.addEventListener("input", function () { S.D = parseFloat(elD.value); render(); });
+  elPS.addEventListener("input", function () { S.ps = parseFloat(elPS.value); render(); });
+  elID.addEventListener("input", function () { S.id = parseFloat(elID.value); render(); });
+  elFed.addEventListener("change", function () { S.fed = elFed.checked; render(); });
+  elSlack.addEventListener("change", function () { S.slack = elSlack.checked; render(); });
+  bD.addEventListener("click", function () { S.mode = "d"; render(); });
+  bS.addEventListener("click", function () { S.mode = "s"; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Deficit at full employment", { D: 20 }],
+    ["Deficit in a recession", { D: 20, slack: true, id: -2 }],
+    ["Deficit + central bank buys bonds", { D: 20, fed: true }],
+    ["Budget surplus (crowding in)", { D: -20, mode: "s" }],
+    ["Investment tax credit", { id: 2 }],
+    ["Households save more", { ps: 1.5 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, { mode: S.mode }, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The government increases its budget deficit and finances it by borrowing. In the loanable funds market, which of the following happens?", o: ["Supply of loanable funds increases and the real interest rate falls", "Demand for loanable funds increases and the real interest rate rises", "Demand for loanable funds decreases and the real interest rate falls", "Supply of loanable funds increases and the real interest rate rises"], c: 1, w: "Government borrowing adds to the demand for loanable funds. Demand shifts right, so the real interest rate rises." },
+    { s: "Crowding out refers to:", o: ["A decrease in private investment caused by higher interest rates from government borrowing", "A decrease in consumer spending caused by higher taxes", "An increase in imports caused by a stronger dollar", "A decrease in government spending caused by a balanced-budget rule"], c: 0, w: "Crowding out is the drop in interest-sensitive private spending, mainly investment, when government borrowing pushes up the real interest rate." },
+    { s: "A student shows a larger deficit as a shift of the SUPPLY of loanable funds. Which shift is correct?", o: ["Supply shifts right because the government adds funds", "Supply shifts left because public saving falls", "Supply does not shift; only demand can shift", "Supply shifts right because private saving rises"], c: 1, w: "A deficit is negative public saving. National saving falls, so the supply of loanable funds shifts left. The real interest rate still rises." },
+    { s: "If large deficits crowd out private investment for many years, the most likely long-run effect is:", o: ["Faster growth of the capital stock and LRAS", "Slower growth of the capital stock and LRAS", "A permanent fall in the natural rate of unemployment", "A permanent rise in aggregate demand with no change in LRAS"], c: 1, w: "Less investment means fewer new machines, buildings, and technology. The capital stock grows more slowly, so LRAS shifts right more slowly." },
+    { s: "The government moves from a balanced budget to a budget surplus. What happens to the real interest rate and private investment?", o: ["Rate rises, investment falls", "Rate falls, investment falls", "Rate falls, investment rises", "Rate rises, investment rises"], c: 2, w: "A surplus adds public saving, so the supply of loanable funds shifts right. The real interest rate falls and private investment rises. This is sometimes called crowding in." },
+    { s: "Which central bank action could reduce the crowding out caused by deficit spending?", o: ["Selling government bonds on the open market", "Raising the reserve requirement", "Buying government bonds on the open market", "Raising the interest rate on reserves"], c: 2, w: "Buying bonds increases bank reserves and the money supply. That puts downward pressure on interest rates and offsets the upward pressure from government borrowing." },
+    { s: "Congress passes an investment tax credit. In the loanable funds market:", o: ["Demand increases, the real interest rate rises, and the quantity of loanable funds rises", "Supply increases, the real interest rate falls, and the quantity of loanable funds rises", "Demand decreases, the real interest rate falls, and the quantity of loanable funds falls", "Supply decreases, the real interest rate rises, and the quantity of loanable funds falls"], c: 0, w: "The tax credit makes firms want to borrow more for investment. Demand shifts right, so both the real interest rate and the equilibrium quantity rise." },
+    { s: "Why is crowding out usually smaller when the economy is in a deep recession?", o: ["The government cannot borrow during a recession", "Interest rates are fixed by law during recessions", "Investment demand is weak and there are idle resources, so borrowing puts less pressure on rates", "Recessions always cause budget surpluses"], c: 2, w: "With weak investment demand and plenty of unused saving and capacity, extra government borrowing raises the real interest rate less, so less private investment is pushed out." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("5.5");
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Money Growth and Inflation Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.eq-card { display: grid; gap: 12px; align-content: start; }
+.eq-big { font-family: var(--mono); font-size: 1.05rem; line-height: 1.9; font-variant-numeric: tabular-nums; }
+.eq-big .m { color: var(--accent); } .eq-big .v { color: var(--c3); } .eq-big .y { color: var(--lrpc); } .eq-big .p { color: var(--srpc); font-weight: 600; }
+.controls.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 860px) { .controls.three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .controls.three { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 5 · Topic 5.3</span>
+  <h1>Money Growth and Inflation Study Lab</h1>
+  <p class="lede">In the long run, inflation is driven by how fast the money supply grows. The quantity theory of money explains why. Use the calculator to see how money growth turns into inflation, then use the AD–AS graph to see why extra money raises output only in the short run.</p>
+</header>
+
+<!-- LAB 1 -->
+<section aria-labelledby="lab1-h">
+  <div class="sec-head">
+    <h2 id="lab1-h">1. The quantity theory of money</h2>
+    <p>The equation of exchange is <span class="formula">M × V = P × Y</span>. In growth rates it becomes <span class="formula">%ΔM + %ΔV ≈ %ΔP + %ΔY</span>. Solve for %ΔP and you get the inflation rate.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card eq-card">
+      <h3>Growth-rate version, live</h3>
+      <div class="eq-big" id="eq"></div>
+      <p style="color:var(--muted); font-size:.92rem;">M = money supply, V = velocity (how many times each dollar is spent per year), P = price level, Y = real GDP. P × Y is nominal GDP.</p>
+    </div>
+    <div class="card graph-card">
+      <h3>Price level over 10 years <small>index, year 0 = 100</small></h3>
+      <svg class="chart" id="pchart" role="img" aria-label="Price level over ten years"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-srpc">Price level with your settings</span><span class="l-ghost">Baseline: 2% inflation</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scen1"></div>
+    </div>
+    <div class="controls three">
+      <div class="ctl">
+        <label for="s-m">Money supply growth <output id="o-m"></output></label>
+        <input type="range" id="s-m" min="0" max="60" step="1">
+        <span class="hint">Set by the central bank</span>
+      </div>
+      <div class="ctl">
+        <label for="s-v">Velocity growth <output id="o-v"></output></label>
+        <input type="range" id="s-v" min="-6" max="6" step="1">
+        <span class="hint">Usually close to 0% in the long run</span>
+      </div>
+      <div class="ctl">
+        <label for="s-g">Real GDP growth <output id="o-g"></output></label>
+        <input type="range" id="s-g" min="-4" max="6" step="0.5">
+        <span class="hint">Set by real resources and technology</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Inflation rate</div><div class="v" id="r-pi"></div></div>
+    <div class="stat"><div class="k">Nominal GDP growth</div><div class="v" id="r-ngdp"></div></div>
+    <div class="stat"><div class="k">Price level after 10 years</div><div class="v" id="r-p10"></div></div>
+    <div class="stat"><div class="k">What $100 buys in year 10</div><div class="v" id="r-pp"></div></div>
+  </div>
+
+  <div class="story" id="story1" aria-live="polite"></div>
+</section>
+
+<!-- LAB 2 -->
+<section aria-labelledby="lab2-h">
+  <div class="sec-head">
+    <h2 id="lab2-h">2. Money is neutral in the long run</h2>
+    <p>A one-time increase in the money supply shifts AD right. In the short run, output and prices both rise. In the long run, wages and price expectations catch up, SRAS shifts left, and only the price level stays higher. Dashed grey lines show the starting position.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD-AS graph"></svg>
+    </div>
+    <div class="card" style="display:grid; gap:16px; align-content:start;">
+      <div>
+        <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+        <div class="scenarios" id="scen2"></div>
+      </div>
+      <div class="ctl">
+        <label for="s-dm">One-time change in money supply <output id="o-dm"></output></label>
+        <input type="range" id="s-dm" min="-0.2" max="0.2" step="0.05">
+        <span class="hint">Open market operations, discount rate, reserve changes</span>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="primary" id="btn-lr" type="button">Let the long run play out</button>
+        <button id="btn-reset2" type="button">Reset to start</button>
+      </div>
+      <div class="calc" id="calc2"></div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">AD</span><span class="l-srpc">SRAS</span><span class="l-lrpc">LRAS</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="story" id="story2" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">3. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">MV = PY</span><h3>Equation of exchange</h3><p>Total spending (money times how often it is spent) equals nominal GDP (prices times real output). It is always true as an accounting identity.</p></div>
+    <div class="card"><span class="tag">Quantity theory</span><h3>Money growth causes inflation</h3><p>If velocity is stable and real GDP is set by real resources, then faster money growth must show up as a higher price level. More money chasing the same goods means higher prices.</p></div>
+    <div class="card"><span class="tag">Neutrality</span><h3>Long-run monetary neutrality</h3><p>In the long run, changes in the money supply change only nominal variables (prices, nominal wages, nominal GDP). Real GDP, unemployment, and the real interest rate return to their long-run levels.</p></div>
+    <div class="card"><span class="tag">Nominal vs. real</span><h3>Measured in dollars or in stuff</h3><p>Nominal values are in current dollars. Real values are adjusted for inflation. Money can change nominal values forever but changes real values only temporarily.</p></div>
+    <div class="card"><span class="tag">Classical view</span><h3>Prices adjust</h3><p>Classical economists argue wages and prices are flexible, so money affects only prices. Keynesians stress that sticky wages let money affect output in the short run. AP uses both: short run is sticky, long run is flexible.</p></div>
+    <div class="card"><span class="tag">Target</span><h3>Why aim for low inflation</h3><p>High inflation erodes purchasing power, hurts savers and lenders when it is unexpected, raises menu and shoe-leather costs, and makes planning hard. Many central banks aim for about 2%, not 0%, to leave a cushion against deflation.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">4. Short run vs. long run</h2>
+    <p>The time frame in the question decides the answer. Read for words like "in the long run" or "after the economy adjusts."</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Short run</th><th>Long run</th></tr></thead>
+    <tbody>
+      <tr><td>One-time increase in the money supply</td><td>AD shifts right. Real GDP ↑, price level ↑, unemployment ↓</td><td>SRAS shifts left. Real GDP back to full employment, <b>price level higher</b></td></tr>
+      <tr><td>One-time decrease in the money supply</td><td>AD shifts left. Real GDP ↓, price level ↓, unemployment ↑</td><td>SRAS shifts right. Real GDP back to full employment, <b>price level lower</b></td></tr>
+      <tr><td>Money supply grows faster every year</td><td>Inflation starts rising; output may rise briefly</td><td><b>Inflation rate rises</b> by about the same amount as money growth</td></tr>
+      <tr><td>Money supply grows at the same rate as real GDP (V stable)</td><td>Little change</td><td>Stable prices, <b>about 0% inflation</b></td></tr>
+      <tr><td>Expected inflation rises because of money growth</td><td>Nominal interest rates rise (Fisher effect)</td><td>Real interest rate unchanged; <b>nominal rate = real rate + expected inflation</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">5. On the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>How to answer and draw it</h3>
+      <ul>
+        <li>For a quantity theory question, write the growth version and plug in: %ΔP ≈ %ΔM + %ΔV − %ΔY.</li>
+        <li>If the question says velocity and real output are constant, inflation equals money growth.</li>
+        <li>On the AD–AS graph, label AD₁ and AD₂, mark P₁, P₂, Y₁, Y₂ on the axes, and keep LRAS vertical at full employment output.</li>
+        <li>For the long run, draw SRAS₂ to the left so the new equilibrium is back on LRAS at a higher price level.</li>
+        <li>State the result in words: "Real output returns to full employment; only the price level is higher."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Saying more money raises real GDP in the long run. It does not. Money is neutral in the long run.</li>
+        <li>Shifting LRAS when the money supply changes. LRAS depends on real resources and technology, not money.</li>
+        <li>Confusing nominal GDP with real GDP. Money growth raises nominal GDP; real GDP growth comes from resources and productivity.</li>
+        <li>Mixing up the price level and the inflation rate. A one-time money increase raises the price level once; continuing money growth raises the inflation rate.</li>
+        <li>Forgetting the signs: velocity growth adds to inflation, real GDP growth subtracts from it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">6. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var fmt = Lab.fmt;
+  function pct(v, d) { return (v > 0 ? "" : v < 0 ? "−" : "") + fmt(Math.abs(v), d == null ? 1 : d) + "%"; }
+  function sgn(v) { return v < 0 ? "− " + fmt(Math.abs(v)) : "+ " + fmt(v); }
+
+  // ================= Lab 1: quantity theory =================
+  var B1 = { m: 5, v: 0, g: 3 };
+  var S1 = Object.assign({}, B1);
+  function infl(s) { return s.m + s.v - s.g; }
+  function path(pi) { var p = []; for (var t = 0; t <= 10; t++) p.push([t, 100 * Math.pow(1 + pi / 100, t)]); return p; }
+  function niceStep(span) {
+    var raw = span / 5, mag = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / mag;
+    return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag;
+  }
+
+  function render1() {
+    var pi = infl(S1), base = infl(B1);
+    var cur = path(pi), bp = path(base);
+    var all = cur.concat(bp).map(function (p) { return p[1]; });
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
+    var step = niceStep(Math.max(10, hi - lo));
+    var y0 = Math.floor(Math.min(lo, 100) / step) * step, y1 = Math.ceil(hi * 1.04 / step) * step;
+    if (y1 - y0 < step * 2) y1 = y0 + step * 2;
+    var yt = []; for (var y = y0; y <= y1 + 1e-9; y += step) yt.push(y);
+    var F = Lab.frame(document.getElementById("pchart"), {
+      x: [0, 10], y: [y0, y1], xLabel: "Years from now", yLabel: "Price level",
+      xTicks: [0, 2, 4, 6, 8, 10], yTicks: yt,
+      fmtX: function (v) { return v; }, fmtY: function (v) { return v >= 10000 ? Math.round(v / 1000) + "k" : Math.round(v); }
+    });
+    if (Math.abs(pi - base) > 1e-9) Lab.line(F, bp, "var(--ghost)", 2, "6 5");
+    Lab.line(F, cur, "var(--srpc)", 3);
+    Lab.dot(F, 10, cur[10][1], "var(--ink)", false);
+    Lab.tag(F, 9.8, cur[10][1] + (y1 - y0) * 0.05, "P = " + Math.round(cur[10][1]), "var(--ink)", "end");
+
+    document.getElementById("s-m").value = S1.m;
+    document.getElementById("s-v").value = S1.v;
+    document.getElementById("s-g").value = S1.g;
+    document.getElementById("o-m").textContent = pct(S1.m, 0);
+    document.getElementById("o-v").textContent = pct(S1.v, 0);
+    document.getElementById("o-g").textContent = pct(S1.g);
+
+    document.getElementById("eq").innerHTML =
+      '<span class="m">%ΔM</span> + <span class="v">%ΔV</span> = <span class="p">%ΔP</span> + <span class="y">%ΔY</span><br>' +
+      '<span class="m">' + fmt(S1.m) + '%</span> ' + sgn(S1.v).replace(/^(.)/, "$1") + '% = <span class="p">%ΔP</span> + ' + '<span class="y">' + fmt(S1.g) + '%</span><br>' +
+      '<span class="p">%ΔP = ' + fmt(S1.m) + ' ' + sgn(S1.v) + ' ' + (S1.g < 0 ? "+ " + fmt(-S1.g) : "− " + fmt(S1.g)) + ' = ' + pct(pi) + '</span>';
+
+    var p10 = cur[10][1];
+    document.getElementById("r-pi").textContent = pct(pi);
+    document.getElementById("r-ngdp").textContent = pct(S1.m + S1.v);
+    document.getElementById("r-p10").textContent = Math.round(p10).toLocaleString();
+    document.getElementById("r-pp").textContent = "$" + fmt(100 * 100 / p10, 0 + (p10 > 1000 ? 2 : 0));
+
+    var t = [];
+    if (pi > 20) t.push("<b>Hyperinflation territory.</b> Money is growing far faster than output, so prices rise " + pct(pi) + " a year. After 10 years the price level is about " + Math.round(p10 / 100).toLocaleString() + " times higher, and $100 buys what about $" + fmt(10000 / p10, 2) + " buys today.");
+    else if (pi > 4.05) t.push("<b>Inflation is high.</b> Money is growing " + fmt(S1.m - S1.g) + " points faster than real output, so the extra spending shows up as higher prices: " + pct(pi) + " a year.");
+    else if (pi >= 0.95) t.push("<b>Low, stable inflation (" + pct(pi) + ").</b> Money grows a bit faster than real output. This is close to what many central banks aim for.");
+    else if (pi > -0.05) t.push("<b>Stable prices.</b> Money and velocity together grow at the same rate as real output, so there is no extra spending to push prices up.");
+    else t.push("<b>Deflation (" + pct(pi) + ").</b> Spending (money times velocity) is growing more slowly than real output, so the price level falls. Falling prices can make people delay purchases and raise the real burden of debt.");
+    if (S1.v < 0) t.push("Velocity is falling, which happens when people hold on to money, often in a recession. Slower spending pulls inflation down unless the central bank adds money.");
+    if (S1.v > 0) t.push("Velocity is rising, so each dollar is spent more often. That adds to inflation.");
+    t.push("Notice that the money supply changes the price level and nominal GDP (" + pct(S1.m + S1.v) + " growth). It does not create real output; real GDP growth (" + pct(S1.g) + ") comes from resources and technology.");
+    document.getElementById("story1").innerHTML = "<p>" + t[0] + "</p><ul>" + t.slice(1).map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+  [["s-m", "m"], ["s-v", "v"], ["s-g", "g"]].forEach(function (x) {
+    document.getElementById(x[0]).addEventListener("input", function (e) { S1[x[1]] = parseFloat(e.target.value); render1(); });
+  });
+  [
+    ["Steady 2% inflation", { m: 5, v: 0, g: 3 }],
+    ["Money growth equals real growth", { m: 3, v: 0, g: 3 }],
+    ["Money growth outpaces output", { m: 10, v: 0, g: 3 }],
+    ["Hyperinflation", { m: 40, v: 0, g: 1 }],
+    ["Velocity falls (recession)", { m: 4, v: -5, g: 1 }]
+  ].forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S1 = Object.assign({}, x[1]); render1(); });
+    document.getElementById("scen1").appendChild(b);
+  });
+
+  // ================= Lab 2: AD-AS neutrality =================
+  // AD: P = (1+dm)(110 - (Y-100));  SRAS: P = 110(1+e) + (Y-100);  LRAS: Y = 100
+  var S2 = { dm: 0, e: 0 }, stop = null;
+  function eq2(s) {
+    var G = 110 * (s.dm - s.e) / (2 + s.dm);
+    return { Y: 100 + G, P: 110 * (1 + s.e) + G };
+  }
+  function render2() {
+    var m = eq2(S2);
+    var F = Lab.frame(document.getElementById("adas"), {
+      x: [84, 116], y: [80, 150], xLabel: "Real GDP (Y)", yLabel: "Price level (P)",
+      xTicks: [88, 92, 96, 100, 104, 108, 112], yTicks: [90, 100, 110, 120, 130, 140],
+      fmtX: function (v) { return v === 100 ? "Yf" : ""; }
+    });
+    var AD = function (dm) { return function (y) { return (1 + dm) * (110 - (y - 100)); }; };
+    var SR = function (e) { return function (y) { return 110 * (1 + e) + (y - 100); }; };
+    var moved = Math.abs(S2.dm) > 1e-9 || Math.abs(S2.e) > 1e-9;
+    if (moved) { Lab.fn(F, AD(0), "var(--ghost)", 2, "6 5"); Lab.fn(F, SR(0), "var(--ghost)", 2, "6 5"); }
+    Lab.vline(F, 100, "var(--lrpc)", 3);
+    Lab.fn(F, SR(S2.e), "var(--srpc)", 3);
+    Lab.fn(F, AD(S2.dm), "var(--accent)", 3);
+    if (moved) Lab.dot(F, 100, 110, "var(--ghost)", false);
+    Lab.dot(F, m.Y, m.P, "var(--ink)", true);
+    Lab.tag(F, 100.6, 146, "LRAS", "var(--lrpc)");
+    Lab.tag(F, 113.5, SR(S2.e)(113.5) + 3, "SRAS", "var(--srpc)", "end");
+    Lab.tag(F, 113.5, AD(S2.dm)(113.5) + 4, "AD", "var(--accent)", "end");
+
+    document.getElementById("s-dm").value = S2.dm;
+    document.getElementById("o-dm").textContent = S2.dm === 0 ? "none" : (S2.dm > 0 ? "+" : "−") + Math.round(Math.abs(S2.dm) * 100) + "%";
+    var dP = (m.P / 110 - 1) * 100, gap = m.Y - 100;
+    document.getElementById("calc2").innerHTML =
+      '<div class="row"><span>Real GDP vs. full employment</span><span>' + (Math.abs(gap) < 0.05 ? "at full employment" : (gap > 0 ? "+" : "−") + fmt(Math.abs(gap)) + "%") + '</span></div>' +
+      '<div class="row"><span>Price level vs. start</span><span>' + (Math.abs(dP) < 0.05 ? "unchanged" : (dP > 0 ? "+" : "−") + fmt(Math.abs(dP)) + "%") + '</span></div>' +
+      '<div class="row"><span>Change in money supply</span><span>' + (S2.dm === 0 ? "none" : (S2.dm > 0 ? "+" : "−") + Math.round(Math.abs(S2.dm) * 100) + "%") + '</span></div>';
+
+    var st;
+    var atLR = Math.abs(S2.e - S2.dm) < 1e-6;
+    if (Math.abs(S2.dm) < 1e-9 && Math.abs(S2.e) < 1e-9) st = "<p><b>Long-run equilibrium.</b> AD, SRAS, and LRAS all meet at full employment output. Move the slider or pick a scenario to change the money supply.</p>";
+    else if (atLR) st = "<p><b>Long run: money is neutral.</b> Real GDP is back at full employment. The money supply changed by " + Math.round(Math.abs(S2.dm) * 100) + "%, and the price level is " + fmt(Math.abs(dP)) + "% " + (dP > 0 ? "higher" : "lower") + ", the same proportion. Only nominal values changed.</p>";
+    else if (S2.dm > S2.e) st = "<p><b>Short run: output and prices both rise.</b> More money lowers interest rates, which raises investment and consumption, so AD shifts right. Wages have not caught up yet, so firms produce more: real GDP is " + fmt(gap) + "% above full employment and the price level is up " + fmt(dP) + "%.</p><p><b>What happens next:</b> workers notice higher prices and push for higher nominal wages. SRAS shifts left until output is back at full employment, at an even higher price level. Press <i>Let the long run play out</i>.</p>";
+    else st = "<p><b>Short run: output and prices both fall.</b> Less money raises interest rates, which lowers investment and consumption, so AD shifts left. Real GDP is " + fmt(Math.abs(gap)) + "% below full employment and the price level is down " + fmt(Math.abs(dP)) + "%.</p><p><b>What happens next:</b> with high unemployment, nominal wages and price expectations fall. SRAS shifts right until output is back at full employment, at an even lower price level. Press <i>Let the long run play out</i>.</p>";
+    document.getElementById("story2").innerHTML = st;
+    document.getElementById("btn-lr").disabled = atLR || !!stop;
+  }
+  function halt() { if (stop) { stop(); stop = null; } }
+  document.getElementById("s-dm").addEventListener("input", function (e) { halt(); S2 = { dm: parseFloat(e.target.value), e: 0 }; render2(); });
+  document.getElementById("btn-lr").addEventListener("click", function () {
+    var from = S2.e, to = S2.dm;
+    stop = Lab.animate(1400, function (k) { S2.e = from + (to - from) * k; render2(); }, function () { stop = null; S2.e = to; render2(); });
+    render2();
+  });
+  document.getElementById("btn-reset2").addEventListener("click", function () { halt(); S2 = { dm: 0, e: 0 }; render2(); });
+  [["Money supply +10%", 0.1], ["Money supply +20%", 0.2], ["Money supply −10%", -0.1]].forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { halt(); S2 = { dm: x[1], e: 0 }; render2(); });
+    document.getElementById("scen2").appendChild(b);
+  });
+
+  render1(); render2();
+
+  // ================= Quiz =================
+  var Q = [
+    { s: "According to the quantity theory of money, if velocity and real GDP are constant and the money supply increases by 6%, the price level will:", o: ["Stay the same", "Increase by 6%", "Increase by 3%", "Decrease by 6%"], c: 1, w: "With V and Y fixed, MV = PY means P must rise in the same proportion as M." },
+    { s: "The money supply grows 8% per year, velocity is constant, and real GDP grows 3% per year. The approximate inflation rate is:", o: ["11%", "8%", "5%", "3%"], c: 2, w: "%ΔP ≈ %ΔM + %ΔV − %ΔY = 8 + 0 − 3 = 5%." },
+    { s: "Long-run monetary neutrality means that a change in the money supply affects:", o: ["Only real variables such as real GDP", "Only nominal variables such as the price level", "Both real and nominal variables permanently", "Neither real nor nominal variables"], c: 1, w: "In the long run, money changes prices and nominal values but not real output, employment, or the real interest rate." },
+    { s: "The economy is in long-run equilibrium when the central bank increases the money supply. In the long run, compared with the original equilibrium:", o: ["Real GDP is higher and the price level is higher", "Real GDP is the same and the price level is higher", "Real GDP is higher and the price level is the same", "Real GDP is the same and the price level is the same"], c: 1, w: "AD shifts right, then SRAS shifts left as wages adjust. Output returns to full employment at a higher price level." },
+    { s: "In the short run, an increase in the money supply will most likely cause:", o: ["Real GDP to increase and the price level to increase", "Real GDP to decrease and the price level to increase", "LRAS to shift to the right", "Velocity to fall to zero"], c: 0, w: "In the short run, nominal wages are sticky, so AD shifting right raises both output and prices." },
+    { s: "Which of the following would shift the long-run aggregate supply curve?", o: ["A 10% increase in the money supply", "An increase in velocity", "An improvement in technology", "An increase in the price level"], c: 2, w: "LRAS depends on real resources and technology. Money, velocity, and the price level do not shift LRAS." },
+    { s: "Nominal GDP grew by 7% and real GDP grew by 2%. Approximately what was the inflation rate?", o: ["9%", "7%", "5%", "2%"], c: 2, w: "Nominal GDP growth ≈ inflation + real growth, so inflation ≈ 7 − 2 = 5%." },
+    { s: "A country experiencing hyperinflation is most likely:", o: ["Growing its money supply far faster than its real output", "Running a large budget surplus", "Experiencing rapid growth in real GDP", "Holding its money supply constant"], c: 0, w: "Hyperinflation happens when a government creates money much faster than output grows, often to pay for spending." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("5.3");
+})();
+</script>
+</body>
+</html>
