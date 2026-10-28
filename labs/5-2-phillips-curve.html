@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phillips Curve Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 5 · Topic 5.2</span>
+  <h1>The Phillips Curve Study Lab</h1>
+  <p class="lede">The Phillips curve shows the trade-off between inflation and unemployment. Move the sliders or pick a scenario below, and watch the AD–AS graph and the Phillips curve change together. Every AP question on this topic comes back to how those two graphs line up.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Linked graphs</h2>
+    <p>Dashed grey lines show where the economy started (5% unemployment, 3% inflation). Solid lines show where it is now.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" viewBox="0 0 440 330" role="img" aria-label="AD-AS graph"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Phillips curve <small>inflation vs. unemployment</small></h3>
+      <svg class="chart" id="pc" viewBox="0 0 440 330" role="img" aria-label="Phillips curve graph"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-srpc">SRPC / SRAS</span><span class="l-lrpc">LRPC / LRAS</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <label for="s-ad">Aggregate demand <output id="o-ad"></output></label>
+        <input type="range" id="s-ad" min="-2" max="2" step="0.25">
+        <span class="hint">Policy, spending, confidence</span>
+      </div>
+      <div class="ctl">
+        <label for="s-pe">Expected inflation <output id="o-pe"></output></label>
+        <input type="range" id="s-pe" min="0" max="7" step="0.25">
+        <span class="hint">Shifts SRAS and SRPC together</span>
+      </div>
+      <div class="ctl">
+        <label for="s-z">Supply shock <output id="o-z"></output></label>
+        <input type="range" id="s-z" min="-2" max="2" step="0.25">
+        <span class="hint">Right = negative shock (oil spike)</span>
+      </div>
+      <div class="ctl">
+        <label for="s-n">Long-run capacity <output id="o-n"></output></label>
+        <input type="range" id="s-n" min="-1" max="1" step="0.25">
+        <span class="hint">Moves LRAS and the natural rate</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="primary" id="btn-lr">Let the long run play out</button>
+      <button id="btn-reset">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Unemployment rate</div><div class="v" id="r-u">5.0%</div></div>
+    <div class="stat"><div class="k">Inflation rate</div><div class="v" id="r-pi">3.0%</div></div>
+    <div class="stat"><div class="k">Natural rate of unemployment</div><div class="v" id="r-un">5.0%</div></div>
+    <div class="stat"><div class="k">Output gap</div><div class="v" id="r-gap"><span class="pill lr">None</span></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">SRPC</span><h3>Short-run Phillips curve</h3><p>Slopes downward. In the short run, lower unemployment comes with higher inflation, and higher unemployment with lower inflation. It mirrors the upward-sloping SRAS curve.</p></div>
+    <div class="card"><span class="tag">LRPC</span><h3>Long-run Phillips curve</h3><p>Vertical at the natural rate of unemployment. In the long run there is no trade-off: inflation can be any level, but unemployment returns to the natural rate. It mirrors the vertical LRAS curve.</p></div>
+    <div class="card"><span class="tag">u*</span><h3>Natural rate of unemployment</h3><p>Frictional plus structural unemployment, with zero cyclical unemployment. At the natural rate, real GDP equals full-employment output.</p></div>
+    <div class="card"><span class="tag">πᵉ</span><h3>Expected inflation</h3><p>The SRPC crosses the LRPC at the expected inflation rate. When people expect more inflation, they demand higher wages, SRAS shifts left, and the SRPC shifts right.</p></div>
+    <div class="card"><span class="tag">Stagflation</span><h3>Both get worse</h3><p>A negative supply shock raises unemployment and inflation at the same time. On the graph, the whole SRPC shifts right (up). This is why the trade-off broke down in the 1970s.</p></div>
+    <div class="card"><span class="tag">Watch the words</span><h3>Disinflation vs. deflation</h3><p>Disinflation means inflation is falling but still positive (5% to 2%). Deflation means the price level itself is falling (inflation below 0%).</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Translating between the two graphs</h2>
+    <p>Memorize this table. Most multiple-choice questions on the Phillips curve are one row of it.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>On the AD–AS graph</th><th>On the Phillips curve</th></tr></thead>
+    <tbody>
+      <tr><td>Expansionary fiscal or monetary policy</td><td>AD shifts right, P↑ and Y↑</td><td><b>Move up and left along</b> the SRPC</td></tr>
+      <tr><td>Contractionary policy, falling confidence</td><td>AD shifts left, P↓ and Y↓</td><td><b>Move down and right along</b> the SRPC</td></tr>
+      <tr><td>Negative supply shock, higher expected inflation, higher wages</td><td>SRAS shifts left</td><td><span class="shift">SRPC shifts right</span></td></tr>
+      <tr><td>Positive supply shock, lower expected inflation</td><td>SRAS shifts right</td><td><span class="shift">SRPC shifts left</span></td></tr>
+      <tr><td>Economic growth: more capital, better technology, better job matching</td><td>LRAS shifts right</td><td><span class="lshift">LRPC shifts left</span> (natural rate falls)</td></tr>
+      <tr><td>Loss of productive capacity, more structural unemployment</td><td>LRAS shifts left</td><td><span class="lshift">LRPC shifts right</span> (natural rate rises)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Inflation rate</b>. Horizontal axis: <b>Unemployment rate</b>.</li>
+        <li>Draw the LRPC vertical and label it at the natural rate (u*).</li>
+        <li>Draw the SRPC sloping downward and crossing the LRPC.</li>
+        <li>Mark the current point and label its coordinates, such as u₁ and π₁, on the axes.</li>
+        <li>When a curve shifts, label the new one SRPC₂ and use an arrow to show direction.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting the SRPC when AD changes. A change in AD is a <b>movement along</b> the SRPC.</li>
+        <li>Putting the price level on the vertical axis. The Phillips curve uses the inflation <i>rate</i>.</li>
+        <li>Forgetting the long-run step. If unemployment is below the natural rate, expectations rise and the SRPC shifts right until unemployment returns to u*.</li>
+        <li>Moving the LRPC in the same direction as LRAS. They move in opposite directions on the page.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { a: 0, pe: 3, z: 0, n: 0 };
+  var S = Object.assign({}, BASE);
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Model ----------
+  function model(s) {
+    var Yf = 100 + 4 * s.n;
+    var un = 5 - s.n;
+    var sh = (s.pe - 3) + s.z;               // SRAS shift
+    var Y = (100 + Yf) / 2 + 2 * (s.a - sh);
+    var P = 110 + 4 * s.a - (Y - 100);
+    var gap = Y - Yf;
+    var u = un - 0.35 * gap;
+    var anchor = s.pe + s.z;                 // where SRPC meets LRPC
+    var pi = srpc(anchor, un, u);
+    return { Yf: Yf, un: un, sh: sh, Y: Y, P: P, gap: gap, u: u, pi: pi, anchor: anchor };
+  }
+  function srpc(anchor, un, u) { var d = un - u; return anchor + 1.0 * d + 0.07 * d * d; }
+  function lrPe(s) { return 3 + s.a - s.n - s.z; }
+
+  // ---------- SVG helpers ----------
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  var W = 440, H = 330, M = { l: 52, r: 18, t: 18, b: 46 };
+  function frame(svg, xr, yr, xlab, ylab, xt, yt, fmtX, fmtY) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var sx = function (v) { return M.l + (v - xr[0]) / (xr[1] - xr[0]) * (W - M.l - M.r); };
+    var sy = function (v) { return H - M.b - (v - yr[0]) / (yr[1] - yr[0]) * (H - M.t - M.b); };
+    var defs = el("defs", {}, svg);
+    var cp = el("clipPath", { id: svg.id + "-clip" }, defs);
+    el("rect", { x: M.l, y: M.t, width: W - M.l - M.r, height: H - M.t - M.b }, cp);
+    xt.forEach(function (v) {
+      el("line", { x1: sx(v), x2: sx(v), y1: M.t, y2: H - M.b, stroke: "var(--grid)" }, svg);
+      el("text", { x: sx(v), y: H - M.b + 16, "text-anchor": "middle" }, svg, fmtX(v));
+    });
+    yt.forEach(function (v) {
+      el("line", { x1: M.l, x2: W - M.r, y1: sy(v), y2: sy(v), stroke: "var(--grid)" }, svg);
+      el("text", { x: M.l - 8, y: sy(v) + 4, "text-anchor": "end" }, svg, fmtY(v));
+    });
+    el("line", { x1: M.l, x2: M.l, y1: M.t, y2: H - M.b, stroke: "var(--ink)", "stroke-width": 1.5 }, svg);
+    el("line", { x1: M.l, x2: W - M.r, y1: H - M.b, y2: H - M.b, stroke: "var(--ink)", "stroke-width": 1.5 }, svg);
+    el("text", { x: (M.l + W - M.r) / 2, y: H - 8, "text-anchor": "middle", class: "lbl", style: "fill:var(--ink)" }, svg, xlab);
+    el("text", { x: 14, y: (M.t + H - M.b) / 2, "text-anchor": "middle", class: "lbl", style: "fill:var(--ink)", transform: "rotate(-90 14 " + (M.t + H - M.b) / 2 + ")" }, svg, ylab);
+    var g = el("g", { "clip-path": "url(#" + svg.id + "-clip)" }, svg);
+    return { sx: sx, sy: sy, g: g, svg: svg, xr: xr, yr: yr };
+  }
+  function line(F, pts, color, w, dash) {
+    var d = pts.map(function (p, i) { return (i ? "L" : "M") + F.sx(p[0]).toFixed(1) + " " + F.sy(p[1]).toFixed(1); }).join(" ");
+    var a = { d: d, fill: "none", stroke: color, "stroke-width": w || 2.5, "stroke-linecap": "round" };
+    if (dash) a["stroke-dasharray"] = dash;
+    return el("path", a, F.g);
+  }
+  function tag(F, x, y, txt, color, anchor) {
+    var cx = Math.max(F.xr[0], Math.min(F.xr[1], x)), cy = Math.max(F.yr[0], Math.min(F.yr[1], y));
+    el("text", { x: F.sx(cx), y: F.sy(cy), fill: color, style: "fill:" + color, class: "lbl", "text-anchor": anchor || "start" }, F.svg, txt);
+  }
+  function dot(F, x, y, color, guide) {
+    if (guide) {
+      line(F, [[x, F.yr[0]], [x, y], [F.xr[0], y]], "var(--muted)", 1, "3 3");
+    }
+    el("circle", { cx: F.sx(x), cy: F.sy(y), r: 6, fill: color, stroke: "var(--surface)", "stroke-width": 2 }, F.g);
+  }
+
+  // ---------- Draw ----------
+  var svgA = document.getElementById("adas"), svgP = document.getElementById("pc");
+  var b0 = model(BASE);
+
+  function drawADAS(m, s) {
+    var F = frame(svgA, [84, 116], [80, 150], "Real GDP (Y)", "Price level (P)",
+      [88, 92, 96, 100, 104, 108, 112], [90, 100, 110, 120, 130, 140],
+      function (v) { return v === 100 ? "Y₀" : ""; }, function (v) { return ""; });
+    var xs = [84, 116];
+    function AD(a) { return xs.map(function (y) { return [y, 110 + 4 * a - (y - 100)]; }); }
+    function SRAS(sh, Yf) { return xs.map(function (y) { return [y, 110 + 4 * sh + (y - Yf)]; }); }
+    var moved = Math.abs(s.a) > 1e-9 || Math.abs(m.sh) > 1e-9 || Math.abs(s.n) > 1e-9;
+    if (moved) {
+      line(F, AD(0), "var(--ghost)", 2, "6 5");
+      line(F, SRAS(0, 100), "var(--ghost)", 2, "6 5");
+      line(F, [[100, 80], [100, 150]], "var(--ghost)", 2, "6 5");
+    }
+    line(F, [[m.Yf, 80], [m.Yf, 150]], "var(--lrpc)", 3);
+    line(F, SRAS(m.sh, m.Yf), "var(--srpc)", 3);
+    line(F, AD(s.a), "var(--accent)", 3);
+    dot(F, m.Y, m.P, "var(--ink)", true);
+    tag(F, m.Yf + 0.6, 146, "LRAS", "var(--lrpc)");
+    var srEnd = 110 + 4 * m.sh + (113 - m.Yf);
+    tag(F, 113, srEnd + 3, "SRAS", "var(--srpc)", "end");
+    tag(F, 113.5, 110 + 4 * s.a - 13.5 + 4, "AD", "var(--accent)", "end");
+  }
+
+  function drawPC(m, s) {
+    var F = frame(svgP, [0, 10], [-2, 10], "Unemployment rate (%)", "Inflation rate (%)",
+      [0, 2, 4, 6, 8, 10], [-2, 0, 2, 4, 6, 8, 10],
+      function (v) { return v + "%"; }, function (v) { return v + "%"; });
+    // zero line
+    line(F, [[0, 0], [10, 0]], "var(--rule)", 1.5);
+    function curve(anchor, un) { var p = []; for (var u = 0; u <= 10.001; u += 0.25) p.push([u, srpc(anchor, un, u)]); return p; }
+    var moved = Math.abs(m.anchor - b0.anchor) > 1e-9 || Math.abs(m.un - b0.un) > 1e-9;
+    if (moved) {
+      line(F, curve(b0.anchor, b0.un), "var(--ghost)", 2, "6 5");
+      line(F, [[b0.un, -2], [b0.un, 10]], "var(--ghost)", 2, "6 5");
+    }
+    line(F, [[m.un, -2], [m.un, 10]], "var(--lrpc)", 3);
+    line(F, curve(m.anchor, m.un), "var(--srpc)", 3);
+    dot(F, m.u, m.pi, "var(--ink)", true);
+    tag(F, m.un + 0.15, 9.4, "LRPC", "var(--lrpc)");
+    var uEnd = 9.6; tag(F, uEnd, srpc(m.anchor, m.un, uEnd) + 0.5, "SRPC", "var(--srpc)", "end");
+    // expected inflation marker on LRPC
+    el("circle", { cx: F.sx(m.un), cy: F.sy(m.anchor), r: 3.5, fill: "var(--lrpc)" }, F.g);
+  }
+
+  // ---------- Narrative ----------
+  function fmt(v) { return (Math.round(v * 10) / 10).toFixed(1); }
+  function story(m, s) {
+    var out = [];
+    var g = m.gap;
+    var lead;
+    if (g > 0.15) lead = "<b>Short run: inflationary gap.</b> Real GDP is above full employment, so unemployment (" + fmt(m.u) + "%) is below the natural rate (" + fmt(m.un) + "%). The economy sits on the SRPC, to the <b>left</b> of the LRPC, with inflation at " + fmt(m.pi) + "%.";
+    else if (g < -0.15) lead = "<b>Short run: recessionary gap.</b> Real GDP is below full employment, so unemployment (" + fmt(m.u) + "%) is above the natural rate (" + fmt(m.un) + "%). The economy sits on the SRPC, to the <b>right</b> of the LRPC, with inflation at " + fmt(m.pi) + "%.";
+    else lead = "<b>Long-run equilibrium.</b> Unemployment equals the natural rate (" + fmt(m.un) + "%) and actual inflation equals expected inflation (" + fmt(m.pi) + "%). The SRPC and LRPC cross right at the current point.";
+    var why = [];
+    if (s.a > 0.01) why.push("AD increased, which moves the economy <b>up and left along</b> the SRPC. The SRPC itself does not shift.");
+    if (s.a < -0.01) why.push("AD decreased, which moves the economy <b>down and right along</b> the SRPC. The SRPC itself does not shift.");
+    if (s.z > 0.01) why.push("A negative supply shock shifted SRAS left and the <b>SRPC right</b>: higher inflation and higher unemployment at once (stagflation).");
+    if (s.z < -0.01) why.push("A positive supply shock shifted SRAS right and the <b>SRPC left</b>: lower inflation and lower unemployment.");
+    if (s.pe > 3.01) why.push("Expected inflation rose to " + fmt(s.pe) + "%. Workers bargain for higher wages, SRAS shifts left, and the <b>SRPC shifts right</b>.");
+    if (s.pe < 2.99) why.push("Expected inflation fell to " + fmt(s.pe) + "%. SRAS shifts right and the <b>SRPC shifts left</b>.");
+    if (s.n > 0.01) why.push("Long-run capacity grew: LRAS shifts right and the <b>LRPC shifts left</b> because the natural rate fell to " + fmt(m.un) + "%.");
+    if (s.n < -0.01) why.push("Long-run capacity shrank: LRAS shifts left and the <b>LRPC shifts right</b> because the natural rate rose to " + fmt(m.un) + "%.");
+    var next = "";
+    if (g > 0.15) next = "<b>What happens next (no policy):</b> people see inflation running hot and raise their expectations. Wages rise, SRAS shifts left, and the SRPC shifts right until unemployment is back at " + fmt(m.un) + "%, now with higher inflation.";
+    else if (g < -0.15) next = "<b>What happens next (no policy):</b> with high unemployment, wages and inflation expectations fall. SRAS shifts right, and the SRPC shifts left until unemployment is back at " + fmt(m.un) + "%, now with lower inflation.";
+    var html = "<p>" + lead + "</p>";
+    if (why.length) html += "<ul>" + why.map(function (w) { return "<li>" + w + "</li>"; }).join("") + "</ul>";
+    if (next) html += "<p>" + next + " Press <i>Let the long run play out</i> to watch it.</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var ids = { a: "s-ad", pe: "s-pe", z: "s-z", n: "s-n" };
+  function signed(v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(2).replace(/\.?0+$/, ""); }
+  function render() {
+    var m = model(S);
+    document.getElementById(ids.a).value = S.a;
+    document.getElementById(ids.pe).value = S.pe;
+    document.getElementById(ids.z).value = S.z;
+    document.getElementById(ids.n).value = S.n;
+    document.getElementById("o-ad").textContent = S.a === 0 ? "start" : signed(S.a);
+    document.getElementById("o-pe").textContent = fmt(S.pe) + "%";
+    document.getElementById("o-z").textContent = S.z === 0 ? "none" : (S.z > 0 ? "negative " : "positive ") + Math.abs(S.z);
+    document.getElementById("o-n").textContent = S.n === 0 ? "start" : signed(S.n);
+    drawADAS(m, S); drawPC(m, S);
+    document.getElementById("r-u").textContent = fmt(m.u) + "%";
+    document.getElementById("r-pi").textContent = fmt(m.pi) + "%";
+    document.getElementById("r-un").textContent = fmt(m.un) + "%";
+    var gp = document.getElementById("r-gap");
+    gp.innerHTML = m.gap > 0.15 ? '<span class="pill infl">Inflationary</span>' : m.gap < -0.15 ? '<span class="pill rec">Recessionary</span>' : '<span class="pill lr">None</span>';
+    document.getElementById("story").innerHTML = story(m, S);
+    document.getElementById("btn-lr").disabled = Math.abs(m.gap) <= 0.15 || anim;
+  }
+  Object.keys(ids).forEach(function (k) {
+    document.getElementById(ids[k]).addEventListener("input", function (e) { stopAnim(); S[k] = parseFloat(e.target.value); render(); });
+  });
+
+  var anim = null;
+  function stopAnim() { if (anim) { cancelAnimationFrame(anim); anim = null; } }
+  function animatePe(target, done) {
+    stopAnim();
+    if (reduce) { S.pe = target; render(); if (done) done(); return; }
+    var from = S.pe, t0 = null, dur = 1400;
+    function step(t) {
+      if (!t0) t0 = t;
+      var k = Math.min(1, (t - t0) / dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      S.pe = from + (target - from) * e;
+      anim = k < 1 ? requestAnimationFrame(step) : null;
+      render();
+      if (!anim && done) done();
+    }
+    anim = requestAnimationFrame(step);
+    render();
+  }
+  document.getElementById("btn-lr").addEventListener("click", function () {
+    var t = lrPe(S);
+    t = Math.max(0, Math.min(7, t));
+    animatePe(t);
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { stopAnim(); S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Expansionary policy (AD ↑)", { a: 1.5 }],
+    ["Contractionary policy (AD ↓)", { a: -1.5 }],
+    ["Oil price spike (SRAS ←)", { z: 1.5 }],
+    ["Productivity boom (SRAS →)", { z: -1.5 }],
+    ["Inflation expectations rise", { pe: 5 }],
+    ["Economic growth (LRAS →)", { n: 1, pe: 2 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button");
+    b.textContent = x[0];
+    b.addEventListener("click", function () { stopAnim(); S = Object.assign({}, BASE, x[1]); render(); });
+    sc.appendChild(b);
+  });
+
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The short-run Phillips curve shows which relationship?", o: ["A direct relationship between inflation and unemployment", "An inverse relationship between inflation and unemployment", "An inverse relationship between the price level and real GDP", "No relationship between inflation and unemployment"], c: 1, w: "In the short run, lower unemployment comes with higher inflation and vice versa, so the SRPC slopes downward. There is no trade-off only in the long run." },
+    { s: "The Federal Reserve buys bonds on the open market. In the short run, the economy will:", o: ["Move down and to the right along the SRPC", "Shift the SRPC to the right", "Move up and to the left along the SRPC", "Shift the LRPC to the left"], c: 2, w: "Buying bonds is expansionary monetary policy. AD shifts right, which is a movement along the SRPC to lower unemployment and higher inflation." },
+    { s: "A sharp increase in the price of oil will most likely cause:", o: ["A movement up along the SRPC", "A rightward shift of the SRPC", "A leftward shift of the LRPC", "A leftward shift of the SRPC"], c: 1, w: "An oil price spike is a negative supply shock. SRAS shifts left, raising both inflation and unemployment, which shows up as a rightward shift of the SRPC." },
+    { s: "The long-run Phillips curve is vertical at:", o: ["Zero inflation", "The expected inflation rate", "Full employment with zero unemployment", "The natural rate of unemployment"], c: 3, w: "In the long run unemployment returns to the natural rate no matter what the inflation rate is, so the LRPC is vertical there. The natural rate is not zero, because frictional and structural unemployment remain." },
+    { s: "The economy is currently at a point on the SRPC where unemployment is below the natural rate. With no policy action, in the long run:", o: ["Expected inflation falls and the SRPC shifts left", "Expected inflation rises and the SRPC shifts right", "The LRPC shifts left to meet the economy", "The economy stays at the current point"], c: 1, w: "Inflation is higher than expected, so expectations rise, wages rise, SRAS shifts left, and the SRPC shifts right until unemployment is back at the natural rate, with higher inflation." },
+    { s: "Which of the following would shift the long-run Phillips curve to the left?", o: ["An increase in government spending", "A decrease in expected inflation", "Better job-matching technology that reduces frictional unemployment", "A decrease in the money supply"], c: 2, w: "Lower frictional unemployment lowers the natural rate, shifting the LRPC left (and LRAS right). Spending and money-supply changes are movements along the SRPC; a change in expected inflation shifts the SRPC." },
+    { s: "Which of the following would NOT shift the short-run Phillips curve?", o: ["An increase in expected inflation", "A decrease in personal income taxes", "A rise in nominal wages across the economy", "A favorable supply shock"], c: 1, w: "A tax cut shifts AD, and AD changes are movements along the SRPC. Expectations, wages, and supply shocks all shift SRAS, so they shift the SRPC." },
+    { s: "Inflation falls from 6% to 2% over two years. This is an example of:", o: ["Deflation", "Disinflation", "Stagflation", "Hyperinflation"], c: 1, w: "Prices are still rising, just more slowly, so this is disinflation. Deflation requires the inflation rate to drop below zero." }
+  ];
+  var quiz = document.getElementById("quiz"), answered = 0, right = 0;
+  function buildQuiz() {
+    quiz.innerHTML = ""; answered = 0; right = 0; updScore();
+    Q.forEach(function (q, i) {
+      var card = document.createElement("div"); card.className = "card q";
+      card.innerHTML = '<div class="qn">Question ' + (i + 1) + ' of ' + Q.length + '</div><div class="stem"></div><div class="opts"></div><div class="why" hidden></div>';
+      card.querySelector(".stem").textContent = q.s;
+      var opts = card.querySelector(".opts"), why = card.querySelector(".why");
+      q.o.forEach(function (t, j) {
+        var b = document.createElement("button"); b.className = "opt";
+        b.textContent = String.fromCharCode(65 + j) + ".  " + t;
+        b.addEventListener("click", function () {
+          var all = opts.querySelectorAll("button");
+          all.forEach(function (x) { x.disabled = true; });
+          all[q.c].classList.add("right");
+          if (j !== q.c) b.classList.add("wrong"); else right++;
+          answered++; updScore();
+          why.hidden = false;
+          why.innerHTML = (j === q.c ? "<b style='color:var(--good)'>Correct.</b> " : "<b style='color:var(--bad)'>Not quite.</b> The answer is " + String.fromCharCode(65 + q.c) + ". ") + q.w;
+        });
+        opts.appendChild(b);
+      });
+      quiz.appendChild(card);
+    });
+  }
+  function updScore() { document.getElementById("score").textContent = right + " / " + answered + " correct"; }
+  document.getElementById("quiz-reset").addEventListener("click", buildQuiz);
+  buildQuiz();
+  Lab.nav("5.2");
+})();
+</script>
+</body>
+</html>
