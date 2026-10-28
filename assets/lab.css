@@ -6,8 +6,8 @@
   --muted: #5a6577;
   --rule: #d7dde6;
   --grid: #e7ebf1;
-  --accent: #2753b8;
-  --accent-soft: #e3eafa;
+  --accent: #002e5d;      /* PMS 648 C navy */
+  --accent-soft: #e1e8f1;
   --srpc: #c8641e;
   --lrpc: #17806a;
   --ghost: #a9b2c0;
@@ -25,7 +25,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #12161d; --surface: #1a2029; --ink: #e6eaf0; --muted: #9aa5b6;
-    --rule: #2c3442; --grid: #222a35; --accent: #7fa2ff; --accent-soft: #23304d;
+    --rule: #2c3442; --grid: #222a35; --accent: #8db4e2; --accent-soft: #13263d;
     --srpc: #f0995a; --lrpc: #4cc7a6; --ghost: #566070;
     --good: #5ccb8d; --good-soft: #17301f; --bad: #ff8a85; --bad-soft: #3a1d1d; --c3: #b896f5; --c4: #f080b4;
     color-scheme: dark;
@@ -33,7 +33,7 @@
 }
 :root[data-theme="dark"] {
   --paper: #12161d; --surface: #1a2029; --ink: #e6eaf0; --muted: #9aa5b6;
-  --rule: #2c3442; --grid: #222a35; --accent: #7fa2ff; --accent-soft: #23304d;
+  --rule: #2c3442; --grid: #222a35; --accent: #8db4e2; --accent-soft: #13263d;
   --srpc: #f0995a; --lrpc: #4cc7a6; --ghost: #566070;
   --good: #5ccb8d; --good-soft: #17301f; --bad: #ff8a85; --bad-soft: #3a1d1d; --c3: #b896f5; --c4: #f080b4;
   color-scheme: dark;
