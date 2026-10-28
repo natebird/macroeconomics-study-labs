@@ -270,7 +270,7 @@
     } else {
       lead = "<b>The budget is balanced.</b> The government is not borrowing, so the market is set by private saving and private investment.";
     }
-    if (m.fed > 0) lines.push("The central bank buys bonds. Banks have more reserves to lend, so the supply of loanable funds shifts right and offsets the government's borrowing.");
+    if (m.fed > 0) lines.push("The central bank buys bonds. Banks have more reserves to lend, so the supply of loanable funds shifts right. That can partly or fully offset the upward pressure from government borrowing, depending on how large the Fed's action is.");
     if (s.ps > 0) lines.push("Households save more, so the supply of loanable funds shifts right.");
     if (s.ps < 0) lines.push("Households save less, so the supply of loanable funds shifts left.");
     if (s.id > 0) lines.push("Firms want to invest more (for example, an investment tax credit), so demand for loanable funds shifts right. The rate rises here, but investment rises too, so this is not crowding out.");
@@ -283,7 +283,7 @@
     var cTxt = "";
     if (m.crowd > 0.4) cTxt = " Compared with a balanced budget, private investment is <b>" + f(m.crowd) + " billion lower</b>. That lost investment is crowding out.";
     else if (m.crowd < -0.4) cTxt = " Compared with a balanced budget, private investment is <b>" + f(-m.crowd) + " billion higher</b>. That is crowding in.";
-    else if (s.D > 0 && m.fed > 0) cTxt = " The rate did not rise, so private investment was not crowded out in this model.";
+    else if (s.D > 0 && m.fed > 0) cTxt = " In this example the Fed's action fully offsets the rate increase, so private investment is not crowded out.";
 
     var lr = "<b>Long run:</b> investment of " + f(m.I) + " billion a year adds to the capital stock, so LRAS shifts right by " + f(m.lr) + " over ten years";
     if (m.lr < 9.95) lr += ", less than the 10.0 it would with starting investment. Growth is slower.";

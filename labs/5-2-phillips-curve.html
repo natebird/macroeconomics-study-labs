@@ -64,9 +64,9 @@
         <span class="hint">Right = negative shock (oil spike)</span>
       </div>
       <div class="ctl">
-        <label for="s-n">Long-run capacity <output id="o-n"></output></label>
+        <label for="s-n">Natural rate change <output id="o-n"></output></label>
         <input type="range" id="s-n" min="-1" max="1" step="0.25">
-        <span class="hint">Moves LRAS and the natural rate</span>
+        <span class="hint">Right = less structural unemployment</span>
       </div>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -112,8 +112,9 @@
       <tr><td>Contractionary policy, falling confidence</td><td>AD shifts left, P↓ and Y↓</td><td><b>Move down and right along</b> the SRPC</td></tr>
       <tr><td>Negative supply shock, higher expected inflation, higher wages</td><td>SRAS shifts left</td><td><span class="shift">SRPC shifts right</span></td></tr>
       <tr><td>Positive supply shock, lower expected inflation</td><td>SRAS shifts right</td><td><span class="shift">SRPC shifts left</span></td></tr>
-      <tr><td>Economic growth: more capital, better technology, better job matching</td><td>LRAS shifts right</td><td><span class="lshift">LRPC shifts left</span> (natural rate falls)</td></tr>
-      <tr><td>Loss of productive capacity, more structural unemployment</td><td>LRAS shifts left</td><td><span class="lshift">LRPC shifts right</span> (natural rate rises)</td></tr>
+      <tr><td>More capital or better technology</td><td>LRAS shifts right</td><td>LRPC does not move unless the natural rate changes</td></tr>
+      <tr><td>Better job matching, less structural unemployment</td><td>LRAS shifts right</td><td><span class="lshift">LRPC shifts left</span> (natural rate falls)</td></tr>
+      <tr><td>More structural unemployment</td><td>LRAS shifts left</td><td><span class="lshift">LRPC shifts right</span> (natural rate rises)</td></tr>
     </tbody>
   </table>
   </div>
@@ -139,7 +140,7 @@
         <li>Shifting the SRPC when AD changes. A change in AD is a <b>movement along</b> the SRPC.</li>
         <li>Putting the price level on the vertical axis. The Phillips curve uses the inflation <i>rate</i>.</li>
         <li>Forgetting the long-run step. If unemployment is below the natural rate, expectations rise and the SRPC shifts right until unemployment returns to u*.</li>
-        <li>Moving the LRPC in the same direction as LRAS. They move in opposite directions on the page.</li>
+        <li>Moving the LRPC in the same direction as LRAS. When a change in the natural rate shifts both curves, they move in opposite directions on the page.</li>
       </ul>
     </div>
   </div>
@@ -295,8 +296,8 @@
     if (s.z < -0.01) why.push("A positive supply shock shifted SRAS right and the <b>SRPC left</b>: lower inflation and lower unemployment.");
     if (s.pe > 3.01) why.push("Expected inflation rose to " + fmt(s.pe) + "%. Workers bargain for higher wages, SRAS shifts left, and the <b>SRPC shifts right</b>.");
     if (s.pe < 2.99) why.push("Expected inflation fell to " + fmt(s.pe) + "%. SRAS shifts right and the <b>SRPC shifts left</b>.");
-    if (s.n > 0.01) why.push("Long-run capacity grew: LRAS shifts right and the <b>LRPC shifts left</b> because the natural rate fell to " + fmt(m.un) + "%.");
-    if (s.n < -0.01) why.push("Long-run capacity shrank: LRAS shifts left and the <b>LRPC shifts right</b> because the natural rate rose to " + fmt(m.un) + "%.");
+    if (s.n > 0.01) why.push("The natural rate fell (for example, better job matching): LRAS shifts right and the <b>LRPC shifts left</b> because the natural rate fell to " + fmt(m.un) + "%.");
+    if (s.n < -0.01) why.push("The natural rate rose (for example, more structural unemployment): LRAS shifts left and the <b>LRPC shifts right</b> because the natural rate rose to " + fmt(m.un) + "%.");
     var next = "";
     if (g > 0.15) next = "<b>What happens next (no policy):</b> people see inflation running hot and raise their expectations. Wages rise, SRAS shifts left, and the SRPC shifts right until unemployment is back at " + fmt(m.un) + "%, now with higher inflation.";
     else if (g < -0.15) next = "<b>What happens next (no policy):</b> with high unemployment, wages and inflation expectations fall. SRAS shifts right, and the SRPC shifts left until unemployment is back at " + fmt(m.un) + "%, now with lower inflation.";
@@ -362,7 +363,7 @@
     ["Oil price spike (SRAS ←)", { z: 1.5 }],
     ["Productivity boom (SRAS →)", { z: -1.5 }],
     ["Inflation expectations rise", { pe: 5 }],
-    ["Economic growth (LRAS →)", { n: 1, pe: 2 }]
+    ["Better job matching (natural rate ↓)", { n: 1, pe: 2 }]
   ];
   var sc = document.getElementById("scenarios");
   scen.forEach(function (x) {
