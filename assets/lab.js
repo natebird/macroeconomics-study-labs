@@ -149,7 +149,7 @@
   function nav(cur) {
     var top = document.getElementById("topnav");
     if (top) {
-      top.innerHTML = '<a href="../index.html">← All Unit 5 labs</a><nav class="topics" aria-label="Unit 5 topics"></nav>';
+      top.innerHTML = '<span style="display:flex;gap:16px;flex-wrap:wrap"><a href="../index.html">← All Unit 5 labs</a><a href="../terms/unit-5.html">Unit 5 terms</a><a href="../terms/index.html">All terms</a></span><nav class="topics" aria-label="Unit 5 topics"></nav>';
       var t = top.querySelector(".topics");
       TOPICS.forEach(function (x) {
         var a = document.createElement("a"); a.href = x.file; a.textContent = x.id; a.title = x.title;

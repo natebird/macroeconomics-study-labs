@@ -12,6 +12,16 @@ Interactive study pages for **AP Macroeconomics Unit 5: Long-Run Consequences of
 | 5.6 | [Economic Growth](labs/5-6-economic-growth.html) |
 | 5.7 | [Public Policy and Economic Growth](labs/5-7-public-policy-growth.html) |
 
+## Terminology guides
+
+A searchable glossary of every key term in the course, with flashcards (progress saved in the browser) and a self-quiz.
+
+- [Master guide: all six units](terms/index.html)
+- Unit guides: [1](terms/unit-1.html) · [2](terms/unit-2.html) · [3](terms/unit-3.html) · [4](terms/unit-4.html) · [5](terms/unit-5.html) · [6](terms/unit-6.html)
+- Each Unit 5 lab ends with a Key terms section for its own topic.
+
+Terms live in `assets/glossary/unit-N.js`. Each term is stored once, in the topic where the course introduces it, and an `also` list places it in later topics that reuse it.
+
 ## Using it
 
 Open `index.html` in any browser, or visit the GitHub Pages site for this repo. There is no build step and nothing to install. Every page is plain HTML, CSS, and JavaScript.
@@ -22,7 +32,10 @@ Open `index.html` in any browser, or visit the GitHub Pages site for this repo. 
 index.html          Landing page linking every lab
 assets/lab.css      Shared styles (light and dark themes)
 assets/lab.js       Shared helpers: SVG charts, quiz builder, page navigation
+assets/glossary.js  Glossary viewer: term list, flashcards, quiz
+assets/glossary/    Term data, one file per unit
 labs/               One page per Unit 5 topic
+terms/              Master glossary and one page per unit
 ```
 
 ## A note on the numbers

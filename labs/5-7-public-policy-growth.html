@@ -165,10 +165,25 @@
   <div class="quiz" id="quiz"></div>
 </section>
 
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 5.7. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-5.html">Unit 5 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
 <div class="pager" id="pager"></div>
 
 </div>
 
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
 <script src="../assets/lab.js"></script>
 <script>
 (function () {
@@ -363,5 +378,6 @@
   Lab.nav("5.7");
 })();
 </script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [5], topic: "5.7", compact: true, storageKey: "topic-5.7" });</script>
 </body>
 </html>
