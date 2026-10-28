@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Financial Assets Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.ctl-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) auto; gap: 14px 24px; align-items: end; }
+.ctl-row .grp { display: grid; gap: 6px; }
+.ctl-row .grp > span { font-size: .86rem; font-weight: 500; }
+.sub-h { font-size: 1.2rem; margin-top: 8px; }
+.asset-detail { display: grid; gap: 10px; align-content: start; }
+.asset-detail dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: .94rem; }
+.asset-detail dt { font-weight: 600; }
+.asset-detail dd { margin: 0; }
+.enrich { display: grid; gap: 10px; }
+.enrich .tag { color: var(--c3); }
+@media (max-width: 860px) { .ctl-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 4 · Topic 4.1</span>
+  <h1>Financial Assets Study Lab</h1>
+  <p class="lede">People store wealth in financial assets such as cash, bank deposits, bonds, and stocks, and each one trades off liquidity, rate of return, and risk. Move the interest rate to see why bond prices and interest rates always move in opposite directions. Then compare the four assets side by side.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. The bond seesaw</h2>
+    <p>You own an existing bond with a $1,000 face value that pays a fixed $50 a year (a 5% coupon). When it was issued, the market interest rate was 5%. Change the market interest rate and watch what a buyer will pay for your bond.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>The seesaw <small>interest rate vs. bond price</small></h3>
+      <svg class="chart" id="seesaw" role="img" aria-label="Seesaw showing the market interest rate on one end and the price of the existing bond on the other"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Price of the existing bond <small>at each market interest rate</small></h3>
+      <svg class="chart" id="pg" role="img" aria-label="Graph of the bond's price against the market interest rate"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Market interest rate</span><span class="l-srpc">Bond price</span><span class="l-lrpc">Face value ($1,000)</span><span class="l-ghost">Starting point (5%, $1,000)</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="ctl-row">
+      <div class="ctl">
+        <label for="s-r">Market interest rate on new bonds <output id="o-r"></output></label>
+        <input type="range" id="s-r" min="2" max="10" step="0.5">
+        <span class="hint">Your bond's $50 coupon never changes</span>
+      </div>
+      <div class="grp">
+        <span id="mat-l">Time until your bond repays $1,000</span>
+        <div class="seg" role="group" aria-labelledby="mat-l">
+          <button type="button" id="m-1" aria-pressed="false">1 year</button>
+          <button type="button" id="m-10" aria-pressed="true">10 years</button>
+          <button type="button" id="m-p" aria-pressed="false">Never (pays forever)</button>
+        </div>
+      </div>
+      <div><button id="btn-reset" type="button">Reset to start</button></div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Market interest rate</div><div class="v" id="r-r">5.0%</div></div>
+    <div class="stat"><div class="k">Price of your bond</div><div class="v" id="r-p">$1,000</div></div>
+    <div class="stat"><div class="k">Change from $1,000</div><div class="v" id="r-c">0</div></div>
+    <div class="stat"><div class="k">Interest lost holding $1,000 cash</div><div class="v" id="r-o">$50 / yr</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="card enrich">
+    <span class="tag">Enrichment: beyond the core AP framework</span>
+    <h3>Where the price comes from (present value)</h3>
+    <p>A buyer pays today for money that arrives later. Each future payment is worth less today, because money today could earn the market interest rate. The price of the bond is the present value of everything it will pay. You do not need this math on the AP exam; the inverse relationship is what matters.</p>
+    <div class="formula" id="f-pv"></div>
+    <div class="calc" id="calc" aria-live="polite"></div>
+  </div>
+
+  <h3 class="sub-h">Compare the assets</h3>
+  <p style="color:var(--muted); max-width:70ch;">Pick an asset. Bars show a rough ranking from low to high on each trait. The pattern to remember: the more liquid and safe an asset is, the lower the rate of return it usually pays.</p>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Liquidity, return, and risk <small>rough ranking, not real data</small></h3>
+      <svg class="chart" id="ac" role="img" aria-label="Bar chart comparing liquidity, rate of return, and risk for cash, checking deposits, bonds, and stocks"></svg>
+      <div class="legend"><span class="l-ad">Liquidity</span><span class="l-lrpc">Rate of return</span><span class="l-srpc">Risk</span></div>
+    </div>
+    <div class="card asset-detail">
+      <div class="seg" role="group" aria-label="Choose an asset" id="asset-btns"></div>
+      <div id="asset-text" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Financial assets</h3><p>A financial asset is a claim on future income or value. Cash, checking deposits, bonds, and stocks are all financial assets. Households hold them to store wealth.</p></div>
+    <div class="card"><span class="tag">Trait 1</span><h3>Liquidity</h3><p>Liquidity is how easily and quickly an asset can be turned into cash without losing value. Cash is the most liquid asset. Checking deposits are close behind. Stocks and bonds take a sale and their price may have changed.</p></div>
+    <div class="card"><span class="tag">Trait 2</span><h3>Rate of return</h3><p>The rate of return is the gain from holding an asset, as a percent of what you paid. Cash earns nothing. Bonds pay interest. Stocks can pay dividends and can rise in price.</p></div>
+    <div class="card"><span class="tag">Trait 3</span><h3>Risk</h3><p>Risk is the chance that the actual return differs from what you expected, including losing money. Buyers demand a higher expected return before they will hold a riskier asset.</p></div>
+    <div class="card"><span class="tag">Inverse relationship</span><h3>Bond prices and interest rates</h3><p>An existing bond pays a fixed amount. When market interest rates rise, new bonds pay more, so the old bond's price must fall until a buyer earns the market rate. When rates fall, the old bond's price rises.</p></div>
+    <div class="card"><span class="tag">Opportunity cost</span><h3>Holding money</h3><p>Money in your pocket earns no interest. The interest you give up by holding money instead of a bond is the opportunity cost of holding money, measured by the nominal interest rate. A higher nominal rate means people hold less money.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Bond and interest rate cheat sheet</h2>
+    <p>Each row is a chain you can write on an FRQ. Bond prices and interest rates always move in opposite directions.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Price of existing bonds</th><th>Interest rate</th><th>Opportunity cost of holding money</th><th>Quantity of money demanded</th></tr></thead>
+    <tbody>
+      <tr><td>Market interest rates rise</td><td><span class="shift">↓ Falls</span></td><td>↑</td><td>↑</td><td>↓</td></tr>
+      <tr><td>Market interest rates fall</td><td><span class="lshift">↑ Rises</span></td><td>↓</td><td>↓</td><td>↑</td></tr>
+      <tr><td>Central bank buys bonds (open market purchase)</td><td><span class="lshift">↑ Rises</span> (more demand for bonds)</td><td>↓</td><td>↓</td><td>↑</td></tr>
+      <tr><td>Central bank sells bonds (open market sale)</td><td><span class="shift">↓ Falls</span> (more supply of bonds)</td><td>↑</td><td>↑</td><td>↓</td></tr>
+      <tr><td>Savers want more bonds (demand for bonds rises)</td><td><span class="lshift">↑ Rises</span></td><td>↓</td><td>↓</td><td>No change (MS fixed)</td></tr>
+      <tr><td>Government or firms issue more bonds</td><td><span class="shift">↓ Falls</span></td><td>↑</td><td>↑</td><td>No change (MS fixed)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Asset</th><th>Liquidity</th><th>Rate of return</th><th>Risk</th></tr></thead>
+    <tbody>
+      <tr><td>Cash</td><td><b>Highest</b></td><td>None (0%)</td><td>Very low; inflation lowers its purchasing power</td></tr>
+      <tr><td>Checking deposits</td><td><b>Very high</b></td><td>Very low</td><td>Very low (deposits are insured)</td></tr>
+      <tr><td>Bonds</td><td>Medium</td><td>Medium (interest)</td><td>Medium: default risk and price risk when rates rise</td></tr>
+      <tr><td>Stocks</td><td>Medium to lower</td><td>Highest expected</td><td>Highest: prices and dividends can fall</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Writing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Answers that earn points</h3>
+      <ul>
+        <li>State the direction and the reason: "Interest rates rise, so the price of previously issued bonds falls, because new bonds pay a higher rate."</li>
+        <li>For open market operations, link all three: the central bank buys bonds, bond prices rise, interest rates fall. Selling bonds does the reverse.</li>
+        <li>When a question gives a bond's fixed annual payment, show the work. For a bond that pays a fixed amount forever (no maturity date), price = annual payment ÷ market interest rate: $50 ÷ 0.10 = $500. For bonds that mature, AP only asks for the direction: the price falls.</li>
+        <li>For the opportunity cost of holding money, name the <b>nominal interest rate</b>. A higher nominal rate raises the opportunity cost and lowers the quantity of money demanded.</li>
+        <li>On a money market graph, label the vertical axis <b>Nominal interest rate</b> and show a change in the interest rate as a movement along MD.</li>
+        <li>When comparing assets, use the words liquidity, rate of return, and risk, and state the trade-off: more liquid assets usually earn a lower return.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Saying bond prices rise when interest rates rise. They move in opposite directions.</li>
+        <li>Thinking the bond's coupon payment changes. The payment is fixed when the bond is issued. Only the price changes.</li>
+        <li>Mixing up liquidity and return. Cash is the most liquid asset and earns the lowest return.</li>
+        <li>Calling a stock a loan. A stock is ownership in a firm. A bond is a loan to a government or firm.</li>
+        <li>Saying a higher interest rate shifts money demand left. A change in the nominal interest rate causes a movement along MD, a change in the quantity of money demanded.</li>
+        <li>Using the real interest rate for the opportunity cost of holding money. Use the nominal rate.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 4.1. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-4.html">Unit 4 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var FACE = 1000, COUPON = 50, CR = 5;
+  var BASE = { r: 5, m: "10" };
+  var S = Object.assign({}, BASE);
+  var stopAnim = null;
+
+  // ---------- Model ----------
+  // Price = present value of the bond's payments at the market interest rate.
+  function price(rPct, m) {
+    var r = rPct / 100;
+    if (m === "1") return (FACE + COUPON) / (1 + r);
+    if (m === "p") return COUPON / r;
+    return COUPON * (1 - Math.pow(1 + r, -10)) / r + FACE / Math.pow(1 + r, 10);
+  }
+  function money(v) { return "$" + Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  var f = Lab.fmt;
+
+  // ---------- Seesaw ----------
+  var svgS = document.getElementById("seesaw");
+  function drawSeesaw(r, P) {
+    while (svgS.firstChild) svgS.removeChild(svgS.firstChild);
+    svgS.setAttribute("viewBox", "0 0 440 330");
+    var cx = 220, cy = 236, L = 150;
+    var th = Math.max(-16, Math.min(16, (r - CR) * 4)) * Math.PI / 180; // positive = interest-rate end up
+    var lx = cx - L * Math.cos(th), ly = cy - L * Math.sin(th);
+    var rx = cx + L * Math.cos(th), ry = cy + L * Math.sin(th);
+    Lab.el("line", { x1: 40, x2: 400, y1: 290, y2: 290, stroke: "var(--rule)", "stroke-width": 2 }, svgS);
+    Lab.el("path", { d: "M" + cx + " " + (cy + 4) + " L" + (cx - 30) + " 290 L" + (cx + 30) + " 290 Z", fill: "var(--muted)" }, svgS);
+    Lab.el("line", { x1: lx, y1: ly, x2: rx, y2: ry, stroke: "var(--ink)", "stroke-width": 7, "stroke-linecap": "round" }, svgS);
+    Lab.el("circle", { cx: cx, cy: cy, r: 5, fill: "var(--surface)", stroke: "var(--ink)", "stroke-width": 2 }, svgS);
+    function box(x, y, title, val, color, dir) {
+      var w = 128, h = 58, x0 = x - w / 2, y0 = y - 10 - h;
+      Lab.el("line", { x1: x, x2: x, y1: y - 10, y2: y - 2, stroke: color, "stroke-width": 2 }, svgS);
+      Lab.el("rect", { x: x0, y: y0, width: w, height: h, rx: 8, fill: "var(--surface)", stroke: color, "stroke-width": 2 }, svgS);
+      Lab.el("text", { x: x, y: y0 + 20, "text-anchor": "middle", style: "fill:" + color, "class": "lbl" }, svgS, title);
+      Lab.el("text", { x: x, y: y0 + 45, "text-anchor": "middle", style: "fill:var(--ink); font-family:var(--mono); font-size:18px; font-weight:600" }, svgS, val + (dir ? " " + dir : ""));
+    }
+    var up = r > CR + 0.01, down = r < CR - 0.01;
+    box(lx, ly, "Interest rate", f(r) + "%", "var(--accent)", up ? "▲" : down ? "▼" : "");
+    box(rx, ry, "Bond price", money(P), "var(--srpc)", up ? "▼" : down ? "▲" : "");
+    var head = up ? "Rates up, so the old bond's price goes down" : down ? "Rates down, so the old bond's price goes up" : "Rate equals the 5% coupon: price equals face value";
+    Lab.el("text", { x: cx, y: 28, "text-anchor": "middle", "class": "lbl", style: "fill:var(--ink)" }, svgS, head);
+    Lab.el("text", { x: cx, y: 316, "text-anchor": "middle" }, svgS, "Fixed coupon: $50 a year · face value $1,000");
+  }
+
+  // ---------- Price graph ----------
+  var svgP = document.getElementById("pg");
+  function drawPrice(r, P, m) {
+    var F = Lab.frame(svgP, { x: [2, 10], y: [0, 2600], xLabel: "Market interest rate (%)", yLabel: "Price of the existing bond",
+      xTicks: [2, 4, 6, 8, 10], yTicks: [0, 500, 1500, 2000, 2500],
+      fmtX: function (v) { return v + "%"; }, fmtY: function (v) { return v === 0 ? "$0" : "$" + (v / 1000) + "k"; } });
+    Lab.hline(F, FACE, "var(--lrpc)", 2, "4 4");
+    Lab.tag(F, 9.9, FACE + 70, "Face value", "var(--lrpc)", "end");
+    Lab.fn(F, function (x) { return price(x, m); }, "var(--srpc)", 3, null, 80);
+    var lblX = m === "p" ? 3.1 : 2.3;
+    Lab.tag(F, lblX, Math.min(2500, price(lblX, m)) + 120, "Bond price", "var(--srpc)");
+    var moved = Math.abs(r - CR) > 0.01;
+    if (moved) {
+      Lab.dot(F, CR, FACE, "var(--ghost)", true);
+      Lab.arrow(F, CR, FACE + (P > FACE ? 90 : -90), CR, P + (P > FACE ? -120 : 120), "var(--muted)");
+    }
+    Lab.dot(F, r, P, "var(--ink)", true, moved ? "r₂" : "r₁", moved ? "P₂" : "P₁");
+    if (moved) {
+      Lab.el("text", { x: F.sx(CR), y: F.H - F.M.b + 16, "text-anchor": "middle", style: "fill:var(--muted); font-weight:600" }, F.svg, Math.abs(r - CR) > 0.6 ? "r₁" : "");
+    }
+  }
+
+  // ---------- Story ----------
+  var M_TXT = { "1": "repays $1,000 in one year", "10": "repays $1,000 in ten years", "p": "never repays the $1,000 and pays $50 a year forever" };
+  function story(r, P, m) {
+    var newPay = r * 10, html;
+    if (r > CR + 0.01) {
+      html = "<p><b>The market interest rate rises to " + f(r) + "%.</b> A new $1,000 bond now pays " + money(newPay) + " a year. Your old bond still pays only $50. No buyer will pay $1,000 for $50 a year when a new bond pays " + money(newPay) + ", so the price of your bond falls to <b>" + money(P) + "</b>.</p>";
+      html += "<p>At that lower price, the buyer gets " + (m === "p" ? "$50 a year on " + money(P) + ", which is $50 ÷ " + money(P) + " = " + f(r) + "%" : "the $50 payments plus a gain when the bond repays $1,000, which together work out to " + f(r) + "% a year") + ". That matches what new bonds pay, so buyers are willing to hold it.</p>";
+    } else if (r < CR - 0.01) {
+      html = "<p><b>The market interest rate falls to " + f(r) + "%.</b> A new $1,000 bond now pays only " + money(newPay) + " a year. Your old bond pays $50, which is better, so buyers compete for it and bid its price up to <b>" + money(P) + "</b>.</p>";
+      html += "<p>At that higher price, the buyer earns " + (m === "p" ? "$50 ÷ " + money(P) + " = " + f(r) + "%" : "the $50 payments minus a loss when the bond repays only $1,000, which together work out to " + f(r) + "% a year") + ", the same as a new bond.</p>";
+    } else {
+      html = "<p><b>The market interest rate is 5%, the same as your bond's coupon.</b> New bonds pay $50 per $1,000, just like yours, so your bond sells for its face value of <b>$1,000</b>. Move the slider to see the seesaw tip.</p>";
+    }
+    var mt = "Your bond " + M_TXT[m] + ". ";
+    if (m === "1") mt += "With only one year left, the price barely moves: there is little time for the lower or higher coupon to matter.";
+    else if (m === "10") mt += "Try 1 year and Never: the longer the time until repayment, the bigger the price swing for the same rate change.";
+    else mt += "For a bond that pays forever, the price is simply $50 ÷ the market interest rate.";
+    html += "<p>" + mt + "</p>";
+    html += "<p><b>Opportunity cost of holding money:</b> keeping $1,000 as cash instead of buying a bond gives up about <b>" + money(newPay) + " a year</b> in interest at a " + f(r) + "% nominal interest rate. " +
+      (r > CR + 0.01 ? "That cost is higher than at the start, so people want to hold less money." : r < CR - 0.01 ? "That cost is lower than at the start, so people are more willing to hold money." : "A higher rate would raise that cost and people would hold less money.") + "</p>";
+    html += "<p><b>AP answer:</b> " + (r > CR + 0.01 ? "An increase in interest rates decreases the price of previously issued bonds." : r < CR - 0.01 ? "A decrease in interest rates increases the price of previously issued bonds." : "Bond prices and interest rates are inversely related.") + "</p>";
+    return html;
+  }
+
+  // ---------- Enrichment calc ----------
+  function calcHTML(r, P, m) {
+    var R = r / 100, rows = [];
+    if (m === "1") {
+      document.getElementById("f-pv").textContent = "Price = ($1,000 + $50) ÷ (1 + r)";
+      rows.push(["Payment in one year", "$1,050"]);
+      rows.push(["Divide by (1 + " + f(R, 3) + ")", "$1,050 ÷ " + f(1 + R, 3)]);
+      rows.push(["Price today", money(P)]);
+    } else if (m === "p") {
+      document.getElementById("f-pv").textContent = "Price = annual payment ÷ r";
+      rows.push(["Annual payment", "$50"]);
+      rows.push(["Market interest rate as a decimal", f(R, 3)]);
+      rows.push(["Price today", "$50 ÷ " + f(R, 3) + " = " + money(P)]);
+    } else {
+      document.getElementById("f-pv").textContent = "Price = PV of ten $50 payments + $1,000 ÷ (1 + r)^10";
+      var pvC = COUPON * (1 - Math.pow(1 + R, -10)) / R, pvF = FACE / Math.pow(1 + R, 10);
+      rows.push(["Present value of the ten $50 payments", money(pvC)]);
+      rows.push(["Present value of $1,000 in year 10: $1,000 ÷ " + f(Math.pow(1 + R, 10), 3), money(pvF)]);
+      rows.push(["Price today", money(P)]);
+    }
+    return rows.map(function (x) { return '<div class="row"><span>' + x[0] + "</span><span>" + x[1] + "</span></div>"; }).join("");
+  }
+
+  // ---------- Render ----------
+  var elR = document.getElementById("s-r");
+  var mBtns = { "1": document.getElementById("m-1"), "10": document.getElementById("m-10"), "p": document.getElementById("m-p") };
+  function render() {
+    var P = price(S.r, S.m);
+    elR.value = S.r;
+    document.getElementById("o-r").textContent = f(S.r) + "%";
+    Object.keys(mBtns).forEach(function (k) { mBtns[k].setAttribute("aria-pressed", S.m === k); });
+    drawSeesaw(S.r, P);
+    drawPrice(S.r, P, S.m);
+    document.getElementById("r-r").textContent = f(S.r) + "%";
+    document.getElementById("r-p").textContent = money(P);
+    var d = P - FACE, c = document.getElementById("r-c");
+    c.innerHTML = Math.abs(d) < 0.5 ? "$0" : d < 0 ? '<span class="pill infl">−' + money(-d) + '</span>' : '<span class="pill lr">+' + money(d) + '</span>';
+    document.getElementById("r-o").textContent = money(S.r * 10) + " / yr";
+    document.getElementById("story").innerHTML = story(S.r, P, S.m);
+    document.getElementById("calc").innerHTML = calcHTML(S.r, P, S.m);
+  }
+  function goTo(target) {
+    if (stopAnim) stopAnim();
+    var from = S.r;
+    stopAnim = Lab.animate(600, function (t) { S.r = Math.round((from + (target - from) * t) * 100) / 100; render(); }, function () { S.r = target; render(); });
+  }
+  elR.addEventListener("input", function () { if (stopAnim) stopAnim(); S.r = parseFloat(elR.value); render(); });
+  Object.keys(mBtns).forEach(function (k) { mBtns[k].addEventListener("click", function () { S.m = k; render(); }); });
+  document.getElementById("btn-reset").addEventListener("click", function () { if (stopAnim) stopAnim(); S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Rates rise to 8%", 8],
+    ["Rates fall to 3%", 3],
+    ["Rates double to 10%", 10],
+    ["Central bank buys bonds (rates fall to 4%)", 4],
+    ["Central bank sells bonds (rates rise to 6%)", 6],
+    ["Rate equals the coupon (5%)", 5]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { goTo(x[1]); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Compare assets ----------
+  var ASSETS = [
+    { k: "cash", n: "Cash", v: [5, 0.15, 0.8],
+      liq: "Highest. It already is money, so you can spend it right away.", ret: "None. Cash pays no interest (0% nominal return).", risk: "Very low. Its dollar value never changes, but inflation lowers what it can buy.",
+      why: "People hold cash for convenience. The cost is the interest they give up, which is the opportunity cost of holding money." },
+    { k: "chk", n: "Checking deposits", v: [4.7, 0.6, 0.9],
+      liq: "Very high. You can pay with a debit card or check at any time.", ret: "Very low. Some accounts pay a little interest; many pay none.", risk: "Very low. Deposits are insured up to a limit.",
+      why: "Checking deposits are almost as liquid as cash and slightly safer to carry, so they also pay very little." },
+    { k: "bond", n: "Bonds", v: [2.8, 2.6, 2.4],
+      liq: "Medium. You can sell a bond before it repays, but the price may be below what you paid.", ret: "Medium. Bonds pay a fixed amount of interest each year.", risk: "Medium. The issuer could default, and the price falls if interest rates rise.",
+      why: "A bond is a loan to a government or firm. You give up some liquidity to earn interest." },
+    { k: "stock", n: "Stocks", v: [2.3, 4.2, 4.4],
+      liq: "Medium to lower. You can sell quickly, but the price may have dropped when you need the cash.", ret: "Highest expected. Dividends plus any rise in the share price.", risk: "Highest. Share prices and dividends can fall, and the firm could fail.",
+      why: "A stock is a share of ownership in a corporation. Buyers accept more risk and less liquidity in exchange for a higher expected return." }
+  ];
+  var sel = 0;
+  var svgA = document.getElementById("ac"), btnWrap = document.getElementById("asset-btns");
+  var COLORS = ["var(--accent)", "var(--lrpc)", "var(--srpc)"];
+  function drawAssets() {
+    var F = Lab.frame(svgA, { x: [0, 12], y: [0, 5.4], xLabel: "Asset", yLabel: "Low to high",
+      xTicks: [1.5, 4.5, 7.5, 10.5], yTicks: [1, 3, 5],
+      fmtX: function (v) { return ["Cash", "Checking", "Bonds", "Stocks"][Math.round((v - 1.5) / 3)]; },
+      fmtY: function (v) { return v === 1 ? "Low" : v === 3 ? "Med" : "High"; } });
+    ASSETS.forEach(function (a, i) {
+      var x0 = i * 3 + 0.45;
+      a.v.forEach(function (h, j) {
+        Lab.rect(F, x0 + j * 0.72, 0, x0 + j * 0.72 + 0.62, h, COLORS[j], i === sel ? 0.95 : 0.3);
+      });
+    });
+    var a = ASSETS[sel];
+    Lab.tag(F, sel * 3 + 1.5, Math.max.apply(null, a.v) + 0.3, "▼", "var(--ink)", "middle");
+  }
+  function showAsset() {
+    var a = ASSETS[sel];
+    Array.prototype.forEach.call(btnWrap.children, function (b, i) { b.setAttribute("aria-pressed", i === sel); });
+    document.getElementById("asset-text").innerHTML = "<h3>" + a.n + "</h3><dl><dt>Liquidity</dt><dd>" + a.liq + "</dd><dt>Rate of return</dt><dd>" + a.ret + "</dd><dt>Risk</dt><dd>" + a.risk + "</dd></dl>" +
+      "<p style=\"margin-top:10px\">" + a.why + "</p><p style=\"margin-top:8px; color:var(--muted)\"><b>The trade-off:</b> moving from cash toward stocks, liquidity falls while expected return and risk rise. No asset is best on all three.</p>";
+    drawAssets();
+  }
+  ASSETS.forEach(function (a, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "a-" + a.k; b.textContent = a.n;
+    b.addEventListener("click", function () { sel = i; showAsset(); });
+    btnWrap.appendChild(b);
+  });
+  showAsset();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following assets is the most liquid?", o: ["Shares of stock in a large corporation", "A 10-year government bond", "Cash", "A house"], c: 2, w: "Liquidity is how easily an asset can be turned into cash without losing value. Cash already is money, so it is the most liquid asset. Stocks and bonds must be sold, and their prices may have changed." },
+    { s: "If market interest rates rise, what happens to the price of previously issued bonds?", o: ["It falls, because new bonds pay a higher rate and the old bonds pay a fixed amount", "It rises, because bonds now earn more interest", "It stays the same, because the coupon payment is fixed", "It rises at first and then returns to face value"], c: 0, w: "The old bond's payment is fixed. Buyers can get the higher rate on new bonds, so they pay less for the old bond until its return matches the market rate. Option C is tempting, but the fixed coupon is exactly why the price must change." },
+    { s: "A bond with no maturity date pays $40 a year. When the market interest rate is 4%, it sells for $1,000. If the market interest rate rises to 8%, what will the bond sell for?", o: ["$1,000", "$1,080", "$800", "$500"], c: 3, w: "For a bond that pays a fixed amount forever, price = annual payment ÷ interest rate. $40 ÷ 0.08 = $500. The rate doubled, so the price fell by half. Price and rate move in opposite directions." },
+    { s: "Why do checking deposits usually pay a lower rate of return than stocks?", o: ["Banks are required to pay zero interest", "Checking deposits are more liquid and less risky, so people accept a lower return", "Stocks are more liquid than checking deposits", "Checking deposits are not financial assets"], c: 1, w: "People trade off liquidity and safety against return. Checking deposits can be spent right away and are insured, so savers accept a low return. Stocks are riskier and less liquid, so they must offer a higher expected return." },
+    { s: "The opportunity cost of holding money is best measured by the", o: ["price level", "real GDP", "nominal interest rate", "unemployment rate"], c: 2, w: "Money earns little or no interest. Holding money means giving up the interest you could earn on a bond, so the opportunity cost is the nominal interest rate. The real rate is a common wrong answer; AP uses the nominal rate for money demand." },
+    { s: "The central bank sells government bonds on the open market. Which of the following is the most likely result?", o: ["Bond prices rise and interest rates fall", "Bond prices rise and interest rates rise", "Bond prices fall and interest rates fall", "Bond prices fall and interest rates rise"], c: 3, w: "Selling bonds increases the supply of bonds, so bond prices fall. Lower bond prices mean higher interest rates. Options B and C pair price and rate moving the same way, which never happens." },
+    { s: "Maria keeps $2,000 in cash instead of buying a bond. The nominal interest rate is 3%. What is her opportunity cost of holding this money for one year?", o: ["$60", "$600", "$6", "$2,060"], c: 0, w: "Opportunity cost = amount held × nominal interest rate = $2,000 × 0.03 = $60 a year in interest she gives up." },
+    { s: "(Enrichment) At an interest rate of 10%, what is the present value of $1,100 received one year from now?", o: ["$990", "$1,000", "$1,100", "$1,210"], c: 1, w: "Present value = future value ÷ (1 + r) = $1,100 ÷ 1.10 = $1,000. Check: $1,000 invested at 10% grows to $1,100 in one year. $1,210 is the future value of $1,100, the reverse calculation." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("4.1");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [4], topic: "4.1", compact: true, storageKey: "topic-4.1" });</script>
+</body>
+</html>

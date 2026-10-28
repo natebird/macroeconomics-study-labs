@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Long-Run Self-Adjustment Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.side table { min-width: 0; }
+.stat .sub { font-size: .76rem; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.7</span>
+  <h1>The Long-Run Self-Adjustment Study Lab</h1>
+  <p class="lede">When AD shifts, the economy can land in a recessionary or inflationary gap. With no policy, nominal wages and other input prices slowly adjust, SRAS shifts, and real GDP returns to full-employment output. Create a gap with the AD slider or a scenario, then press <i>Let the long run play out</i> and watch SRAS do the work.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Watch the economy fix itself</h2>
+    <p>Dashed grey lines show where the economy started: long-run equilibrium E₁ at full-employment output Yf = 1,000 and price level 100. Solid lines show where it is now.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD-AS graph showing short-run and long-run equilibrium"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>What adjusts and what does not</h3>
+      <div class="tbl-wrap side">
+        <table>
+          <thead><tr><th>Curve</th><th id="t-head">During self-adjustment</th></tr></thead>
+          <tbody>
+            <tr><td><b>AD</b></td><td id="t-ad"></td></tr>
+            <tr><td><b>SRAS</b></td><td id="t-sras"></td></tr>
+            <tr><td><b>LRAS</b></td><td id="t-lras"></td></tr>
+            <tr><td><b>Nominal wages</b></td><td id="t-w"></td></tr>
+            <tr><td><b>Unemployment</b></td><td id="t-u"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">AD</span><span class="l-srpc">SRAS</span><span class="l-lrpc">LRAS</span><span class="l-c4">Short-run equilibrium E₂</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-ad">Aggregate demand shock <output id="o-ad"></output></label>
+        <input type="range" id="s-ad" min="-3" max="3" step="1">
+        <span class="hint">Left = AD falls (recession), right = AD rises (overheating)</span>
+      </div>
+      <div class="toggles">
+        <label class="check" for="c-sticky"><input type="checkbox" id="c-sticky"> Wages are very sticky (long contracts, workers resist pay cuts)</label>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="primary" id="btn-lr" type="button">Let the long run play out</button>
+      <button id="btn-pol" type="button">Close the gap with policy instead</button>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real GDP (Yf = 1,000)</div><div class="v" id="r-y">1,000</div><div class="sub" id="r-y2"></div></div>
+    <div class="stat"><div class="k">Price level (PL₁ = 100)</div><div class="v" id="r-p">100</div><div class="sub" id="r-p2"></div></div>
+    <div class="stat"><div class="k">Nominal wage index</div><div class="v" id="r-w">100</div><div class="sub" id="r-w2"></div></div>
+    <div class="stat"><div class="k">Output gap</div><div class="v" id="r-gap"><span class="pill lr">None</span></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Self-correction</span><h3>The economy heads back to Yf</h3><p>In the long run, real GDP returns to full-employment output on its own. The adjustment happens through SRAS, because nominal wages and other input prices eventually catch up with the price level.</p></div>
+    <div class="card"><span class="tag">Recessionary gap</span><h3>Wages fall, SRAS shifts right</h3><p>Output is below Yf and unemployment is above the natural rate. Over time, workers accept lower nominal wages and input prices fall. Lower costs shift SRAS right, the price level falls, and real GDP rises back to Yf.</p></div>
+    <div class="card"><span class="tag">Inflationary gap</span><h3>Wages rise, SRAS shifts left</h3><p>Output is above Yf and unemployment is below the natural rate. Workers are scarce, so nominal wages and input prices rise. Higher costs shift SRAS left, the price level rises further, and real GDP falls back to Yf.</p></div>
+    <div class="card"><span class="tag">Long run</span><h3>AD changes only the price level</h3><p>After self-adjustment, real GDP is back at Yf. The only lasting effect of the AD shift is a different price level: lower after a fall in AD, higher after a rise in AD.</p></div>
+    <div class="card"><span class="tag">Sticky wages</span><h3>Why it can take years</h3><p>Wage contracts, minimum wage laws, and workers' resistance to pay cuts slow the adjustment, especially downward. Wages are slower to fall than to rise, so recessions can drag on.</p></div>
+    <div class="card"><span class="tag">Policy</span><h3>Why governments step in</h3><p>Waiting can mean years of high unemployment or rising prices. Fiscal and monetary policy can shift AD back toward Yf faster, which is the case for stabilization policy in topics 3.8 and 4.6.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Self-adjustment cheat sheet</h2>
+    <p>Memorize both rows. Each one is a full FRQ answer: the gap, what wages do, which way SRAS moves, and where the price level and real GDP end up.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Starting gap</th><th>Real GDP vs. Yf</th><th>Unemployment</th><th>Nominal wages and input prices</th><th>SRAS shift</th><th>Long-run price level</th><th>Long-run real GDP</th></tr></thead>
+    <tbody>
+      <tr><td>Recessionary gap (after AD falls)</td><td>Below Yf</td><td>Above the natural rate</td><td>Fall</td><td><span class="shift">Right</span></td><td>Falls further (below PL₁)</td><td>Rises back to Yf</td></tr>
+      <tr><td>Inflationary gap (after AD rises)</td><td>Above Yf</td><td>Below the natural rate</td><td>Rise</td><td><span class="shift">Left</span></td><td>Rises further (above PL₁)</td><td>Falls back to Yf</td></tr>
+      <tr><td>Long-run equilibrium</td><td>Equal to Yf</td><td>Equal to the natural rate</td><td>No pressure to change</td><td>None</td><td>Stays put</td><td>Stays at Yf</td></tr>
+      <tr><td>Recessionary gap closed by expansionary policy</td><td>Below Yf</td><td>Above the natural rate</td><td>Do not need to fall</td><td>None (AD shifts right instead)</td><td>Returns to about PL₁</td><td>Rises back to Yf</td></tr>
+      <tr><td>Inflationary gap closed by contractionary policy</td><td>Above Yf</td><td>Below the natural rate</td><td>Do not need to rise</td><td>None (AD shifts left instead)</td><td>Returns to about PL₁</td><td>Falls back to Yf</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price level</b> (PL). Horizontal axis: <b>Real GDP</b> (or real output).</li>
+        <li>Draw LRAS vertical and label full-employment output <b>Yf</b> on the horizontal axis.</li>
+        <li>Label the short-run equilibrium where AD crosses SRAS, with its output (Y₂) and price level (PL₂) on the axes. Show the gap between Y₂ and Yf.</li>
+        <li>For the long run, draw SRAS₂ and an arrow showing the shift, then label the new equilibrium on LRAS with PL₃.</li>
+        <li>Name the mechanism in words: "Nominal wages fall (rise), so SRAS shifts right (left)." Graders look for the word <b>wages</b> or <b>input prices</b>.</li>
+        <li>If asked about the long run, say real GDP returns to Yf and unemployment returns to the natural rate.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting AD during self-adjustment. With no policy, AD stays put. Only SRAS shifts.</li>
+        <li>Shifting LRAS. Wage and input-price changes move SRAS, not LRAS. Yf does not change.</li>
+        <li>Getting the price level backward. In a recessionary gap the price level <b>falls further</b> as SRAS shifts right. It does not climb back to PL₁.</li>
+        <li>Mixing up the wage direction. Recessionary gap: wages fall. Inflationary gap: wages rise.</li>
+        <li>Saying output "stays low forever." The AP model says output returns to Yf in the long run; the question is how long it takes.</li>
+        <li>Confusing self-adjustment with policy. Policy closes a gap by shifting AD; self-adjustment closes it by shifting SRAS.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.7. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  // d: AD shock (shift in Lab.market units). s: SRAS shift from wage adjustment. p: AD shift from policy.
+  // phase: "sr" (short run, no adjustment yet), "adj" (wages adjusting), "lr" (done), "pol" (policy moving AD), "poldone".
+  var BASE = { d: 0, s: 0, p: 0, sticky: false, phase: "sr" };
+  var S = Object.assign({}, BASE, { d: -2 });
+  var K = 1; // slope of AD and SRAS in Lab.market
+
+  // ---------- Model ----------
+  // Lab.market equilibrium: x = 5 + (dAD + s)/2, y = 5 + K*(dAD - s)/2. LRAS at x = 5.
+  // Long-run target: s = -d puts x back at 5 and y at 5 + K*d.
+  function eqOf(dAD, s) { return { x: 5 + (dAD + s) / 2, y: 5 + K * (dAD - s) / 2 }; }
+  function gdp(x) { return 1000 + 50 * (x - 5); }      // Yf = 1,000
+  function pl(y) { return 100 + 10 * (y - 5); }        // PL1 = 100
+  function wage(s) { return 100 - 10 * s; }            // SRAS shifts right when wages fall
+  function model(st) {
+    var ad = st.d + st.p;
+    var e = eqOf(ad, st.s), e2 = eqOf(st.d, 0);
+    return { ad: ad, x: e.x, y: e.y, Y: gdp(e.x), P: pl(e.y), W: wage(st.s), gap: gdp(e.x) - 1000,
+             x2: e2.x, y2: e2.y, Y2: gdp(e2.x), P2: pl(e2.y), P3: pl(5 + K * st.d) };
+  }
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("adas");
+  function draw(m, st) {
+    var adjusted = st.phase === "adj" || st.phase === "lr";
+    var policy = st.phase === "pol" || st.phase === "poldone";
+    var gapNow = Math.abs(m.x - 5) > 0.01;
+    var eqL;
+    if (st.d === 0) eqL = ["Yf", "PL₁"];
+    else if (st.phase === "sr") eqL = ["Y₂", "PL₂"];
+    else if (st.phase === "lr") eqL = [null, "PL₃"];
+    else if (st.phase === "poldone") eqL = ["Yf", "PL₁"];
+    else eqL = [null, null];
+    var adLabel = st.d === 0 ? "AD" : policy ? (st.phase === "poldone" ? "AD₃" : "AD") : "AD₂";
+    var srLabel = st.d === 0 ? "SRAS" : adjusted && Math.abs(st.s) > 0.01 ? "SRAS₂" : "SRAS₁";
+
+    Lab.market(svg, {
+      xLabel: "Real GDP", yLabel: "Price level", slope: K,
+      demand: { shift: m.ad, label: adLabel },
+      supply: { shift: st.s, label: srLabel },
+      longRun: { shift: 0, label: "LRAS" },
+      start: { demand: 0, supply: 0, longRun: 0 },
+      eqLabels: eqL,
+      startLabels: ["Yf", "PL₁"],
+      arrows: false,
+      extra: function (F, eq, c) {
+        function eTag(x, y, t, col) { Lab.tag(F, x + 0.3, y - 0.15, t, col); }
+        if (st.d === 0) { eTag(5, 5, "E₁", "var(--ink)"); return; }
+        var rec = st.d < 0;
+        // ghost labels for the starting curves
+        if (Math.abs(m.ad) > 0.01) Lab.tag(F, 9.6, c.D(0)(9.6) + 0.3, "AD₁", "var(--muted)", "end");
+        if (Math.abs(st.s) > 0.01) {
+          if (rec) Lab.tag(F, 8.3, 8.6, "SRAS₁", "var(--muted)", "end");
+          else Lab.tag(F, 8.9, 8.4, "SRAS₁", "var(--muted)");
+        }
+        // shift arrows placed away from the equilibrium points
+        var yAD = rec ? 1.5 : 4;
+        if (!policy && Math.abs(st.d) > 0.01) Lab.arrow(F, 10 - yAD + 0.15 * Math.sign(st.d), yAD, 10 + st.d - yAD - 0.15 * Math.sign(st.d), yAD, "var(--muted)");
+        if (policy && Math.abs(st.p) > 0.2) Lab.arrow(F, 10 + st.d - yAD - 0.15 * Math.sign(st.d), yAD, 10 + m.ad - yAD + 0.15 * Math.sign(st.d), yAD, "var(--muted)");
+        var ySR = rec ? 2 : 8;
+        if (Math.abs(st.s) > 0.2) Lab.arrow(F, ySR + 0.15 * Math.sign(st.s), ySR, ySR + st.s - 0.15 * Math.sign(st.s), ySR, "var(--muted)");
+        // policy: show the AD curve the shock left behind
+        if (policy) {
+          Lab.fn(F, c.D(st.d), "var(--accent)", 2, "4 4", 2);
+          Lab.tag(F, Math.min(9.6, 5 + st.d + 4.6 / K) - 0.2, c.D(st.d)(Math.min(9.6, 5 + st.d + 4.6 / K)) + 0.3, "AD₂", "var(--accent)", "end");
+        }
+        // short-run equilibrium E2 stays visible once the economy moves on
+        if (st.phase !== "sr") Lab.dot(F, m.x2, m.y2, "var(--c4)", true, "Y₂", "PL₂");
+        eTag(m.x2, m.y2, "E₂", st.phase === "sr" ? "var(--ink)" : "var(--c4)");
+        if (st.phase === "poldone") eTag(5, 5, "E₁ = E₃", "var(--ink)");
+        else eTag(5, 5, "E₁", "var(--muted)");
+        if (st.phase === "lr") eTag(5, eq.y, "E₃", "var(--ink)");
+        // output gap bracket along the bottom
+        if (gapNow) {
+          var col = m.x < 5 ? "var(--accent)" : "var(--bad)";
+          Lab.line(F, [[m.x, 0.45], [5, 0.45]], col, 4);
+          Lab.tag(F, m.x < 5 ? m.x - 0.15 : m.x + 0.15, 0.3, m.x < 5 ? "recessionary gap" : "inflationary gap", col, m.x < 5 ? "end" : "start");
+        }
+      }
+    });
+  }
+
+  // ---------- Side table ----------
+  function fillTable(m, st) {
+    var rec = st.d < 0, inf = st.d > 0, set = function (id, h) { document.getElementById(id).innerHTML = h; };
+    var policy = st.phase === "pol" || st.phase === "poldone";
+    if (st.d === 0) {
+      set("t-head", "In long-run equilibrium");
+      set("t-ad", "Crosses SRAS and LRAS at the same point.");
+      set("t-sras", "No pressure to shift.");
+      set("t-lras", "Vertical at Yf. Never moves in this topic.");
+      set("t-w", "Steady. Workers and firms expect the current price level.");
+      set("t-u", "Equal to the natural rate.");
+      return;
+    }
+    if (policy) {
+      set("t-head", "When policy closes the gap");
+      set("t-ad", rec ? "<b>Shifts right</b> from AD₂ back to where it started (expansionary policy)." : "<b>Shifts left</b> from AD₂ back to where it started (contractionary policy).");
+      set("t-sras", "Stays at SRAS₁. Wages never had to adjust.");
+      set("t-lras", "Does not move.");
+      set("t-w", "Stay at 100.");
+      set("t-u", st.phase === "poldone" ? "Back to the natural rate." : rec ? "Falling toward the natural rate." : "Rising toward the natural rate.");
+      return;
+    }
+    var done = st.phase === "lr";
+    set("t-head", st.phase === "sr" ? "If we wait (no policy)" : done ? "After self-adjustment" : "During self-adjustment");
+    set("t-ad", "Does <b>not</b> move. It stays at AD₂ the whole time.");
+    set("t-sras", rec ? "<b>Shifts right</b> as input costs fall." : "<b>Shifts left</b> as input costs rise.");
+    set("t-lras", "Does not move. Yf stays at 1,000.");
+    set("t-w", rec ? "<b>Fall</b>, slowly, as contracts are renegotiated." : "<b>Rise</b> as firms compete for scarce workers.");
+    set("t-u", done ? "Back to the natural rate." : rec ? "Above the natural rate, then falls back." : "Below the natural rate, then rises back.");
+  }
+
+  // ---------- Story ----------
+  var f0 = function (v) { return Lab.fmt(v, 0).replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
+  function story(m, st) {
+    var rec = st.d < 0, html = "";
+    var slow = st.sticky
+      ? " You checked <i>very sticky wages</i>, so this takes a long time. Each year of waiting is a year of " + (rec ? "high unemployment and lost output." : "rising prices.")
+      : "";
+    if (st.d === 0) {
+      return "<p><b>Long-run equilibrium.</b> AD, SRAS, and LRAS all cross at E₁. Real GDP equals full-employment output (Yf = 1,000), the price level is 100, and unemployment equals the natural rate. There is no gap, so nothing needs to adjust.</p><p>Move the AD slider or pick a scenario to knock the economy out of long-run equilibrium.</p>";
+    }
+    if (st.phase === "sr") {
+      html += rec
+        ? "<p><b>Short run: recessionary gap.</b> AD fell from AD₁ to AD₂. The economy slid down along SRAS₁ to E₂. Real GDP is <b>" + f0(m.Y2) + "</b>, below Yf = 1,000, and the price level fell to " + f0(m.P2) + ". Unemployment is above the natural rate.</p>"
+        : "<p><b>Short run: inflationary gap.</b> AD rose from AD₁ to AD₂. The economy moved up along SRAS₁ to E₂. Real GDP is <b>" + f0(m.Y2) + "</b>, above Yf = 1,000, and the price level rose to " + f0(m.P2) + ". Unemployment is below the natural rate.</p>";
+      html += rec
+        ? "<p><b>What happens next with no policy:</b> with many workers unemployed, nominal wages and other input prices fall as contracts come up for renewal. Lower costs shift SRAS right. The price level falls further and real GDP rises until the economy reaches E₃ on LRAS. Press <i>Let the long run play out</i> to watch it.</p>"
+        : "<p><b>What happens next with no policy:</b> workers are scarce, so nominal wages and other input prices rise. Higher costs shift SRAS left. The price level rises further and real GDP falls until the economy reaches E₃ on LRAS. Press <i>Let the long run play out</i> to watch it.</p>";
+      html += "<p>Wages are sticky, so this does not happen right away. The other option is policy that shifts AD back. Press <i>Close the gap with policy instead</i> to compare.</p>";
+      return html;
+    }
+    if (st.phase === "adj") {
+      return "<p><b>Wages are adjusting.</b> Nominal wages are " + (rec ? "falling" : "rising") + ", so SRAS is shifting " + (rec ? "right" : "left") + " along the fixed AD₂ curve." + slow + "</p>";
+    }
+    if (st.phase === "lr") {
+      html += "<p><b>Long run: back at full employment.</b> Nominal wages " + (rec ? "fell" : "rose") + " from 100 to " + f0(m.W) + ", so SRAS shifted " + (rec ? "right" : "left") + " to SRAS₂. The new long-run equilibrium E₃ is where AD₂, SRAS₂, and LRAS cross.</p>";
+      html += "<p>Real GDP is back at <b>Yf = 1,000</b> and unemployment is back at the natural rate. The price level is <b>" + f0(m.P3) + "</b>, " + (rec ? "below" : "above") + " both PL₁ (100) and PL₂ (" + f0(m.P2) + "). The only lasting effect of the AD " + (rec ? "decrease" : "increase") + " is a " + (rec ? "lower" : "higher") + " price level.</p>";
+      html += "<p><b>AP answer:</b> \"In the long run, nominal wages " + (rec ? "decrease" : "increase") + ", SRAS shifts to the " + (rec ? "right" : "left") + ", the price level " + (rec ? "decreases" : "increases") + ", and real GDP returns to full-employment output.\" AD and LRAS do not move." + slow + "</p>";
+      return html;
+    }
+    if (st.phase === "pol") {
+      return "<p><b>Policy is shifting AD.</b> " + (rec ? "Expansionary fiscal or monetary policy is shifting AD right." : "Contractionary fiscal or monetary policy is shifting AD left.") + " SRAS stays put because wages do not need to change.</p>";
+    }
+    html += "<p><b>Policy closed the gap.</b> " + (rec ? "Expansionary policy (more government spending, lower taxes, or the central bank lowering interest rates) shifted AD right" : "Contractionary policy (less government spending, higher taxes, or the central bank raising interest rates) shifted AD left") + " back to where it started. Real GDP is back at Yf = 1,000 and the price level is back at about 100.</p>";
+    html += "<p><b>Compare:</b> with self-adjustment the price level would end at " + f0(m.P3) + ". Policy reaches Yf sooner and avoids that " + (rec ? "drop" : "rise") + " in the price level, but in practice it comes with policy lags. That trade-off is the case for stabilization policy.</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elAD = document.getElementById("s-ad"), elSticky = document.getElementById("c-sticky");
+  var bLR = document.getElementById("btn-lr"), bPol = document.getElementById("btn-pol");
+  var stop = null;
+  function stopAnim() { if (stop) { stop(); stop = null; } }
+  function render(skipStory) {
+    var m = model(S);
+    elAD.value = S.d; elSticky.checked = S.sticky;
+    document.getElementById("o-ad").textContent = S.d === 0 ? "none" : (S.d < 0 ? "AD falls by " : "AD rises by ") + Math.abs(S.d);
+    draw(m, S);
+    fillTable(m, S);
+    document.getElementById("r-y").textContent = f0(m.Y);
+    document.getElementById("r-y2").textContent = Math.abs(m.gap) < 0.5 ? "equal to Yf" : (m.gap < 0 ? f0(-m.gap) + " below Yf" : f0(m.gap) + " above Yf");
+    document.getElementById("r-p").textContent = f0(m.P);
+    document.getElementById("r-p2").textContent = Math.abs(m.P - 100) < 0.5 ? "same as PL₁" : (m.P < 100 ? "down " : "up ") + f0(Math.abs(m.P - 100)) + " from PL₁";
+    document.getElementById("r-w").textContent = f0(m.W);
+    var wTxt;
+    if (S.d === 0 || S.phase === "pol" || S.phase === "poldone") wTxt = "steady";
+    else if (S.phase === "sr") wTxt = S.d < 0 ? "under pressure to fall" : "under pressure to rise";
+    else if (S.phase === "adj") wTxt = S.d < 0 ? "falling ↓" : "rising ↑";
+    else wTxt = S.d < 0 ? "fell ↓ (SRAS right)" : "rose ↑ (SRAS left)";
+    document.getElementById("r-w2").textContent = wTxt;
+    document.getElementById("r-gap").innerHTML = m.gap < -0.5 ? '<span class="pill rec">Recessionary</span>' : m.gap > 0.5 ? '<span class="pill infl">Inflationary</span>' : '<span class="pill lr">None</span>';
+    if (!skipStory) document.getElementById("story").innerHTML = story(m, S);
+    var canAct = S.phase === "sr" && S.d !== 0;
+    bLR.disabled = !canAct; bPol.disabled = !canAct;
+  }
+  function setShock(d) { stopAnim(); S = Object.assign({}, BASE, { sticky: S.sticky, d: d }); render(); }
+  elAD.addEventListener("input", function () { setShock(parseFloat(elAD.value)); });
+  elSticky.addEventListener("change", function () { S.sticky = elSticky.checked; render(S.phase === "adj" || S.phase === "pol"); });
+
+  bLR.addEventListener("click", function () {
+    if (S.phase !== "sr" || S.d === 0) return;
+    stopAnim();
+    var target = -S.d;
+    S.phase = "adj"; render();
+    stop = Lab.animate(S.sticky ? 4800 : 1800, function (t) { S.s = target * t; render(true); },
+      function () { stop = null; S.s = target; S.phase = "lr"; render(); });
+  });
+  bPol.addEventListener("click", function () {
+    if (S.phase !== "sr" || S.d === 0) return;
+    stopAnim();
+    var target = -S.d;
+    S.phase = "pol"; render();
+    stop = Lab.animate(1400, function (t) { S.p = target * t; render(true); },
+      function () { stop = null; S.p = target; S.phase = "poldone"; render(); });
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { setShock(0); });
+
+  var scen = [
+    ["Consumer confidence falls", -2],
+    ["Business investment collapses", -3],
+    ["Export boom abroad", 2],
+    ["Stock market boom lifts spending", 3],
+    ["Start in long-run equilibrium", 0]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { setShock(x[1]); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "An economy is in a recessionary gap. If the government and central bank take no action, which of the following will happen in the long run?", o: ["AD will shift right as consumers regain confidence, and the price level will rise", "LRAS will shift left until it meets the short-run equilibrium", "Nominal wages will fall, SRAS will shift right, and the price level will fall", "Nominal wages will rise, SRAS will shift left, and real GDP will fall"], c: 2, w: "With unemployment above the natural rate, nominal wages and input prices fall. Lower costs shift SRAS right, so the price level falls and real GDP rises back to full-employment output. AD and LRAS do not move during self-adjustment." },
+    { s: "An economy is producing above full-employment output. Without policy action, the long-run adjustment will include:", o: ["Rising nominal wages, a leftward shift of SRAS, and a higher price level", "Falling nominal wages, a rightward shift of SRAS, and a lower price level", "A rightward shift of LRAS to the current level of output", "A leftward shift of AD back to full-employment output"], c: 0, w: "In an inflationary gap, labor is scarce, so nominal wages and input prices rise. SRAS shifts left, the price level rises further, and real GDP falls back to Yf. LRAS does not chase the economy; output returns to it." },
+    { s: "Full-employment output is $500 billion. After a fall in AD, the short-run equilibrium is real GDP of $460 billion and a price level of 105, down from 110. With no policy, what happens to real GDP and the price level in the long run?", o: ["Real GDP stays at $460 billion; the price level stays at 105", "Real GDP returns to $500 billion; the price level falls below 105", "Real GDP returns to $500 billion; the price level returns to 110", "Real GDP returns to $500 billion; the price level rises above 110"], c: 1, w: "Falling wages shift SRAS right along the unchanged AD curve. Moving down AD, real GDP rises to $500 billion and the price level falls below 105. It does not return to 110, because AD never shifted back." },
+    { s: "Which of the following best explains why self-adjustment from a recessionary gap can take a long time?", o: ["The LRAS curve shifts slowly", "Aggregate demand cannot shift during a recession", "Prices of final goods are perfectly flexible", "Nominal wages are sticky downward because of contracts and workers' resistance to pay cuts"], c: 3, w: "Self-adjustment depends on nominal wages and input prices falling. Long-term contracts, minimum wage laws, and resistance to pay cuts make wages slow to fall, so the economy can stay below Yf for years." },
+    { s: "Compared with waiting for self-adjustment, closing a recessionary gap with expansionary fiscal policy results in:", o: ["A higher long-run price level", "A lower long-run level of real GDP", "A rightward shift of SRAS instead of AD", "No change in unemployment"], c: 0, w: "Policy shifts AD right, so the price level returns to about its original level. Self-adjustment shifts SRAS right instead, which lowers the price level. Both end at Yf, so real GDP is the same in the long run; the price level is higher with policy." },
+    { s: "Which curve shifts during the long-run self-adjustment process?", o: ["Aggregate demand", "Long-run aggregate supply", "Both aggregate demand and short-run aggregate supply", "Short-run aggregate supply only"], c: 3, w: "Self-adjustment works through nominal wages and input prices, which are determinants of SRAS. AD stays where the shock left it, and LRAS stays at Yf. The tempting answer is AD, but a change in AD is what caused the gap, not what closes it." },
+    { s: "On an AD–AS graph, the short-run equilibrium is to the left of the LRAS curve. Which describes the economy now and the SRAS shift in the long run?", o: ["Inflationary gap; SRAS shifts left", "Recessionary gap; SRAS shifts right", "Recessionary gap; SRAS shifts left", "Inflationary gap; SRAS shifts right"], c: 1, w: "Left of LRAS means real GDP is below Yf, which is a recessionary gap. Unemployment is above the natural rate, wages fall, and SRAS shifts right until the economy reaches LRAS." },
+    { s: "An increase in AD moves an economy from long-run equilibrium into an inflationary gap. After full self-adjustment, compared with the original long-run equilibrium, real GDP and the price level are:", o: ["Real GDP higher; price level higher", "Real GDP higher; price level unchanged", "Real GDP unchanged; price level higher", "Real GDP unchanged; price level unchanged"], c: 2, w: "Rising wages shift SRAS left until output returns to Yf. Real GDP ends where it started, but the price level is higher. In the long run, a change in AD changes only the price level." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.7");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.7", compact: true, storageKey: "topic-3.7" });</script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Cycles Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub-h { font-size: 1.2rem; }
+.legend .l-recgap::before, .legend .l-infgap::before { height: 10px; opacity: .35; }
+.legend .l-recgap { color: var(--accent); }
+.legend .l-infgap { color: var(--bad); }
+.legend .l-ink { color: var(--ink); }
+.timebar { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr); gap: 10px 14px; align-items: end; }
+.timebar .ctl { min-width: 0; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.game { display: grid; gap: 14px; align-content: start; }
+.g-count2 { font-family: var(--mono); font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.item { font-family: var(--display); font-size: 1.18rem; font-weight: 600; line-height: 1.4; min-height: 4.2em; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices button { border-radius: 8px; }
+.choices button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choices button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choices button:disabled { cursor: default; }
+.fb { border-left: 4px solid var(--rule); padding: 8px 12px; font-size: .93rem; background: var(--paper); border-radius: 0 8px 8px 0; }
+.fb.ok { border-left-color: var(--good); }
+.fb.no { border-left-color: var(--bad); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.cheat { display: grid; gap: 10px; align-content: start; }
+.cheat dl { margin: 0; display: grid; gap: 8px; }
+.cheat dt { font-weight: 600; }
+.cheat dd { margin: 0; font-size: .92rem; color: var(--muted); }
+@media (max-width: 520px) { .timebar { grid-template-columns: auto auto auto; } .timebar .ctl { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 2 · Topic 2.7</span>
+  <h1>Business Cycles Study Lab</h1>
+  <p class="lede">Real GDP does not grow in a straight line. It rises and falls around potential output, moving through expansion, peak, contraction, and trough. Drag the time slider or press play to walk through ten years of a made-up economy, then test yourself by naming the phase behind each news report.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Walk through the cycle</h2>
+    <p>The green line is potential output, which grows steadily as the economy gains resources and technology. The blue line is actual real GDP. Blue shading marks a recessionary gap and red shading marks an inflationary gap. All numbers are hypothetical.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Business cycle <small>real GDP over time</small></h3>
+      <svg class="chart" id="bc" viewBox="0 0 440 330" role="img" aria-label="Business cycle graph: real GDP fluctuating around a rising potential output line"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Production possibilities <small>where the economy sits now</small></h3>
+      <svg class="chart" id="ppc" viewBox="0 0 440 330" role="img" aria-label="Production possibilities curve with the economy's current point"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Real GDP</span><span class="l-lrpc">Potential output / PPC</span><span class="l-recgap">Recessionary gap</span><span class="l-infgap">Inflationary gap</span><span class="l-ghost">Full-employment point</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Jump to a moment</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="timebar">
+      <button type="button" class="primary" id="btn-play">Play</button>
+      <button type="button" id="btn-back" aria-label="Back one quarter">← Quarter</button>
+      <button type="button" id="btn-fwd" aria-label="Forward one quarter">Quarter →</button>
+      <div class="ctl">
+        <label for="s-t">Time <output id="o-t"></output></label>
+        <input type="range" id="s-t" min="0" max="40" step="1">
+        <span class="hint">40 quarters (ten years)</span>
+      </div>
+    </div>
+    <label class="check" for="c-shade"><input type="checkbox" id="c-shade" checked> Shade the output gaps</label>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Phase</div><div class="v" id="r-phase"></div></div>
+    <div class="stat"><div class="k">Output gap</div><div class="v" id="r-gap"></div></div>
+    <div class="stat"><div class="k">Unemployment vs. natural rate (5%)</div><div class="v" id="r-u"></div></div>
+    <div class="stat"><div class="k">Inflation</div><div class="v" id="r-pi"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <h3 class="sub-h">Identify the phase</h3>
+  <div class="lab">
+    <div class="card game">
+      <div class="g-count2"><span id="g-pos">Report 1 of 13</span><span id="g-score">0 / 0 correct</span></div>
+      <p class="item" id="g-item"></p>
+      <div class="choices" id="g-choices" role="group" aria-label="Choose the phase"></div>
+      <div class="fb" id="g-fb" aria-live="polite">Read the report, then pick the phase it describes.</div>
+      <div class="btnrow">
+        <button type="button" class="primary" id="g-next">Next report</button>
+        <button type="button" id="g-shuffle">Reshuffle and restart</button>
+      </div>
+    </div>
+    <div class="card cheat">
+      <span class="tag">Clues to look for</span>
+      <dl>
+        <dt>Expansion</dt><dd>Real GDP rising, hiring picking up, unemployment falling. Can start with a recessionary gap and end with an inflationary gap.</dd>
+        <dt>Peak</dt><dd>Real GDP at its highest point before it starts to fall. Unemployment is low and inflation pressure is strong.</dd>
+        <dt>Contraction (recession)</dt><dd>Real GDP falling, layoffs rising, unemployment rising, inflation slowing.</dd>
+        <dt>Trough</dt><dd>Real GDP at its lowest point before it starts to rise. Unemployment is high.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Four phases</span><h3>Business cycle</h3><p>The short-run ups and downs of real GDP around its long-run trend. Expansion rises to a peak, contraction falls to a trough, and a new expansion begins. Cycles are irregular: no two have the same length or depth.</p></div>
+    <div class="card"><span class="tag">Trend line</span><h3>Potential output</h3><p>The real GDP the economy produces when unemployment equals the natural rate. It is also called full-employment output. On the cycle graph it is the upward-sloping trend line; on the AD–AS graph it is where LRAS sits.</p></div>
+    <div class="card"><span class="tag">Actual − potential</span><h3>Output gap</h3><p>Output gap = actual real GDP − potential real GDP. As a percent: (actual − potential) ÷ potential × 100. A negative gap is a recessionary gap. A positive gap is an inflationary gap.</p></div>
+    <div class="card"><span class="tag">Gaps and jobs</span><h3>Unemployment and inflation</h3><p>In a recessionary gap, cyclical unemployment pushes unemployment above the natural rate and inflation slows. In an inflationary gap, unemployment falls below the natural rate and inflation speeds up.</p></div>
+    <div class="card"><span class="tag">Rule of thumb</span><h3>What counts as a recession</h3><p>A recession is commonly described as two consecutive quarters of falling real GDP. That is a rule of thumb, not an official definition. In the United States, a committee at the National Bureau of Economic Research dates recessions using a broad set of indicators, including employment, income, sales, and production.</p></div>
+    <div class="card"><span class="tag">PPC link</span><h3>Inside vs. on the PPC</h3><p>A recession is a point inside the PPC: resources such as workers and machines sit idle. Full employment is a point on the PPC. A recession does not shift the PPC, because the economy's resources and technology have not changed.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. The phases at a glance</h2>
+    <p>Memorize this table. Most multiple-choice questions on business cycles test one row of it.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Phase</th><th>Real GDP</th><th>Unemployment</th><th>Inflation</th><th>Output gap</th><th>On the PPC</th></tr></thead>
+    <tbody>
+      <tr><td><b>Expansion</b></td><td>Rising</td><td>Falling</td><td>Tends to rise as output passes potential</td><td>Recessionary early, can turn inflationary late</td><td>Moving out toward the curve</td></tr>
+      <tr><td><b>Peak</b></td><td>At its highest point, about to fall</td><td>At or near its lowest, often below the natural rate</td><td>Upward pressure is strongest</td><td>Usually inflationary (positive)</td><td>On the curve, resources stretched</td></tr>
+      <tr><td><b>Contraction (recession)</b></td><td>Falling</td><td>Rising, with more cyclical unemployment</td><td>Slows (disinflation), and the price level may fall</td><td>Shrinks and turns recessionary</td><td>Moving inside the curve</td></tr>
+      <tr><td><b>Trough</b></td><td>At its lowest point, about to rise</td><td>At or near its highest, above the natural rate</td><td>Downward pressure</td><td>Recessionary (negative)</td><td>Well inside the curve</td></tr>
+      <tr><td><b>Full employment</b></td><td>Equal to potential output</td><td>Equal to the natural rate (no cyclical unemployment)</td><td>Steady at the expected rate</td><td>Zero</td><td>On the curve</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Real GDP</b> (or real output). Horizontal axis: <b>Time</b>.</li>
+        <li>Draw potential output as an upward-sloping straight trend line and label it.</li>
+        <li>Label each phase on the wavy line: <b>expansion</b>, <b>peak</b>, <b>contraction</b> (or recession), <b>trough</b>.</li>
+        <li>Show the gap math: output gap = actual − potential. For percent, divide by potential and multiply by 100. Write the sign and say "recessionary" or "inflationary."</li>
+        <li>Link to other graphs when asked: a recessionary gap is AD and SRAS crossing left of LRAS, and a point inside the PPC.</li>
+        <li>When asked about jobs, name the type: a recession raises <b>cyclical</b> unemployment.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Using nominal GDP. The business cycle tracks <b>real</b> GDP, so rising prices alone do not count as an expansion.</li>
+        <li>Thinking every expansion is an inflationary gap. Early in a recovery, real GDP rises while it is still below potential.</li>
+        <li>Calling the two-quarter rule the official definition. It is a common rule of thumb.</li>
+        <li>Saying unemployment is zero at full employment. It equals the natural rate (frictional plus structural).</li>
+        <li>Shifting the PPC inward for a recession. The point moves inside; the curve stays put.</li>
+        <li>Mixing up the peak (highest real GDP) and the trough (lowest real GDP).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 2.7. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-2.html">Unit 2 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Model (hypothetical, quarterly) ----------
+  // Turning points of real GDP. Between them real GDP moves smoothly in one direction.
+  var K = [[0, 96, "trough"], [10, 110.5, "peak"], [15, 104, "trough"], [27, 120, "peak"], [31, 114, "trough"], [40, 124, null]];
+  var TMAX = 40, UN = 5;
+  function Yp(t) { return 100 + 0.6 * t; }
+  function Y(t) {
+    for (var i = 0; i < K.length - 1; i++) {
+      var a = K[i], b = K[i + 1];
+      if (t <= b[0]) { var s = (t - a[0]) / (b[0] - a[0]); return a[1] + (b[1] - a[1]) * (1 - Math.cos(Math.PI * s)) / 2; }
+    }
+    return K[K.length - 1][1];
+  }
+  function gapPct(t) { return (Y(t) - Yp(t)) / Yp(t) * 100; }
+  function phaseAt(q) {
+    for (var i = 0; i < K.length; i++) if (K[i][0] === q && K[i][2]) return K[i][2];
+    return Y(q + 0.5) > Y(q - 0.5) || q === TMAX ? "expansion" : "contraction";
+  }
+  function declinesInRow(q) { var n = 0; for (var k = q; k >= 1 && Y(k) < Y(k - 1); k--) n++; return n; }
+  function state(q) {
+    var g = gapPct(q);
+    return {
+      q: q, y: Y(q), yp: Yp(q), gap: Y(q) - Yp(q), gp: g,
+      u: UN - 0.5 * g, phase: phaseAt(q), chg: q ? (Y(q) - Y(q - 1)) / Y(q - 1) * 100 : null,
+      falls: declinesInRow(q), gapType: g < -0.5 ? "rec" : g > 0.5 ? "infl" : "none"
+    };
+  }
+
+  var S = { q: 15, shade: true };
+  var fmt = Lab.fmt;
+
+  // ---------- Business cycle chart ----------
+  var svgBC = document.getElementById("bc"), svgP = document.getElementById("ppc");
+  function drawBC(m) {
+    var F = Lab.frame(svgBC, { x: [0, TMAX], y: [90, 130], xLabel: "Time (quarters)", yLabel: "Real GDP",
+      xTicks: [0, 8, 16, 24, 32, 40], yTicks: [90, 100, 110, 120, 130], fmtX: String, fmtY: String });
+    if (S.shade) {
+      var seg = [], sign = 0;
+      function flush() {
+        if (seg.length > 1) {
+          var pts = seg.map(function (t) { return [t, Y(t)]; }).concat(seg.slice().reverse().map(function (t) { return [t, Yp(t)]; }));
+          var d = pts.map(function (p, i) { return (i ? "L" : "M") + F.sx(p[0]).toFixed(1) + " " + F.sy(p[1]).toFixed(1); }).join(" ") + " Z";
+          Lab.el("path", { d: d, fill: sign < 0 ? "var(--accent)" : "var(--bad)", opacity: .2, stroke: "none" }, F.g);
+        }
+      }
+      for (var t = 0; t <= TMAX + 1e-9; t += 0.1) {
+        var sg = Y(t) - Yp(t) >= 0 ? 1 : -1;
+        if (sg !== sign && seg.length) { var last = seg[seg.length - 1]; flush(); seg = [last]; }
+        sign = sg; seg.push(t);
+      }
+      flush();
+    }
+    Lab.fn(F, Yp, "var(--lrpc)", 2.5, null, 2);
+    Lab.fn(F, Y, "var(--accent)", 3, null, 160);
+    Lab.tag(F, 39.5, Yp(39.5) + 2.6, "Potential output", "var(--lrpc)", "end");
+    K.forEach(function (k) {
+      if (!k[2]) return;
+      if (k[2] === "peak") Lab.tag(F, k[0], k[1] + 1.4, "Peak", "var(--ink)", "middle");
+      else Lab.tag(F, Math.max(1.6, k[0]), k[1] - 2.6, "Trough", "var(--ink)", "middle");
+    });
+    // marker
+    Lab.line(F, [[m.q, 90], [m.q, 130]], "var(--muted)", 1.2, "4 4");
+    Lab.line(F, [[m.q, m.yp], [m.q, m.y]], m.gap < 0 ? "var(--accent)" : "var(--bad)", 2.5);
+    Lab.el("circle", { cx: F.sx(m.q), cy: F.sy(m.yp), r: 4, fill: "var(--lrpc)", stroke: "var(--surface)", "stroke-width": 1.5 }, F.g);
+    Lab.dot(F, m.q, m.y, "var(--ink)", false);
+    var lab = PHASE[m.phase].short, anchor = m.q > 33 ? "end" : m.q < 6 ? "start" : "middle";
+    Lab.tag(F, m.q + (anchor === "end" ? -0.5 : anchor === "start" ? 0.5 : 0), 128, "Q" + m.q + ": " + lab, "var(--ink)", anchor);
+  }
+
+  // ---------- PPC ----------
+  function drawPPC(m) {
+    var FE = [6, 8];
+    var f = m.gp < -0.5 ? 1 + m.gp * 0.06 : 1;
+    var pt = [FE[0] * f, FE[1] * f];
+    var inside = f < 1;
+    Lab.ppc(svgP, {
+      xLabel: "Consumer goods", yLabel: "Capital goods", bowed: true,
+      point: pt,
+      extra: function (F) {
+        if (inside) {
+          Lab.el("circle", { cx: F.sx(FE[0]), cy: F.sy(FE[1]), r: 5, fill: "none", stroke: "var(--ghost)", "stroke-width": 2 }, F.g);
+          Lab.tag(F, FE[0] + 0.3, FE[1] + 0.9, "Full employment", "var(--muted)");
+          Lab.arrow(F, FE[0] * 0.96, FE[1] * 0.96, pt[0] + 0.2, pt[1] + 0.27, "var(--muted)");
+          Lab.tag(F, pt[0] + 0.3, pt[1] - 0.7, "Q" + m.q + " (inside)", "var(--ink)");
+        } else {
+          Lab.tag(F, pt[0] - 0.3, pt[1] - 0.8, "Q" + m.q + " (on the PPC)", "var(--ink)", "end");
+        }
+      }
+    });
+  }
+
+  // ---------- Readouts and story ----------
+  var PHASE = {
+    expansion: { short: "Expansion", pill: "lr" },
+    peak: { short: "Peak", pill: "infl" },
+    contraction: { short: "Recession", pill: "rec" },
+    trough: { short: "Trough", pill: "rec" }
+  };
+  function signed(v, d) { return (v > 0 ? "+" : v < 0 ? "−" : "") + fmt(Math.abs(v), d == null ? 1 : d); }
+
+  function story(m) {
+    var out = [];
+    var where = "In quarter " + m.q + ", real GDP is " + fmt(m.y) + " and potential output is " + fmt(m.yp) + ". ";
+    var lead;
+    var uUp = m.q > 0 && m.u > state(m.q - 1).u;
+    if (m.phase === "expansion") lead = "<b>Expansion.</b> " + where + "Real GDP is rising" + (m.chg != null ? " (" + signed(m.chg) + "% from last quarter)" : "") +
+      (uUp ? ", but more slowly than potential output, so the gap is still widening and unemployment is still edging up. Hiring often lags the recovery." : ", so firms are hiring and unemployment is falling.");
+    else if (m.phase === "peak") lead = "<b>Peak.</b> " + where + "This is the highest real GDP of this cycle. Next quarter real GDP starts to fall.";
+    else if (m.phase === "trough") lead = "<b>Trough.</b> " + where + (m.q === 0 ? "This is the lowest point of the last downturn. From here real GDP starts to rise." : "This is the lowest real GDP of this downturn. Next quarter real GDP starts to rise.");
+    else lead = "<b>Contraction.</b> " + where + "Real GDP fell " + fmt(Math.abs(m.chg)) + "% from last quarter, so firms cut production and lay off workers.";
+    out.push("<p>" + lead + "</p>");
+
+    var li = [];
+    var gapTxt = "Output gap = " + fmt(m.y) + " − " + fmt(m.yp) + " = " + signed(m.gap) + " (" + signed(m.gp) + "% of potential). ";
+    if (m.gapType === "rec") li.push(gapTxt + "That is a <b>recessionary gap</b>. Cyclical unemployment pushes unemployment to about " + fmt(m.u) + "%, above the 5% natural rate, and inflation slows. On the PPC the economy sits <b>inside</b> the curve: workers and machines are idle.");
+    else if (m.gapType === "infl") li.push(gapTxt + "That is an <b>inflationary gap</b>. Unemployment falls to about " + fmt(m.u) + "%, below the 5% natural rate, and inflation speeds up as firms compete for scarce workers and inputs. The PPC does not shift; the economy is stretching its resources for a while, so the dot stays on the curve.");
+    else li.push(gapTxt + "That is close to zero, so the economy is near <b>full employment</b>: unemployment is near the 5% natural rate, inflation is steady, and the economy produces on its PPC.");
+
+    if (m.phase === "expansion" && m.gapType === "rec") li.push("Notice the combination: the economy is in an <b>expansion</b> but still has a <b>recessionary gap</b>. A phase describes the direction real GDP is moving. A gap describes where real GDP is compared with potential.");
+    if (m.phase === "contraction" && m.gapType === "infl") li.push("Real GDP is falling, yet output is still above potential. The contraction has started, but the inflationary gap has not closed yet.");
+    if (m.phase === "trough" && m.q === 15) li.push("Look one quarter ahead: real GDP starts rising, but more slowly than potential output grows, so the gap gets a little wider before it starts to close.");
+
+    if (m.phase === "contraction" || (m.phase === "trough" && m.q > 0)) {
+      if (m.falls >= 2) li.push("Real GDP has fallen " + m.falls + " quarters in a row, so this downturn meets the common <b>two-consecutive-quarters</b> rule of thumb for a recession. Official dating looks at more than GDP, such as employment, income, and production.");
+      else li.push("This is the <b>first</b> quarter of falling real GDP. By the two-consecutive-quarters rule of thumb, people would not call it a recession yet.");
+    }
+    out.push("<ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>");
+    var ap;
+    if (m.gapType === "rec") ap = "AP answer: actual real GDP is below potential output (a recessionary gap), unemployment is above the natural rate, and the economy produces at a point inside its PPC.";
+    else if (m.gapType === "infl") ap = "AP answer: actual real GDP is above potential output (an inflationary gap), unemployment is below the natural rate, and there is upward pressure on the price level.";
+    else ap = "AP answer: actual real GDP equals potential output, unemployment equals the natural rate, and the economy produces on its PPC.";
+    out.push("<p><b>" + ap + "</b></p>");
+    return out.join("");
+  }
+
+  function render() {
+    var m = state(S.q);
+    document.getElementById("s-t").value = S.q;
+    document.getElementById("o-t").textContent = "Q" + S.q;
+    document.getElementById("c-shade").checked = S.shade;
+    drawBC(m); drawPPC(m);
+    var p = PHASE[m.phase];
+    document.getElementById("r-phase").innerHTML = '<span class="pill ' + p.pill + '">' + (m.phase === "contraction" ? "Contraction" : p.short) + '</span>';
+    document.getElementById("r-gap").innerHTML = signed(m.gp) + '% <span class="pill ' + (m.gapType === "rec" ? "rec" : m.gapType === "infl" ? "infl" : "lr") + '">' + (m.gapType === "rec" ? "Recessionary" : m.gapType === "infl" ? "Inflationary" : "None") + "</span>";
+    document.getElementById("r-u").textContent = fmt(m.u) + "% " + (m.u > UN + 0.25 ? "▲ above" : m.u < UN - 0.25 ? "▼ below" : "≈ at");
+    document.getElementById("r-pi").innerHTML = m.gapType === "infl" ? '<span class="pill infl">Speeding up ▲</span>' : m.gapType === "rec" ? '<span class="pill rec">Slowing ▼</span>' : '<span class="pill lr">Steady</span>';
+    document.getElementById("story").innerHTML = story(m);
+    document.getElementById("btn-back").disabled = S.q <= 0;
+    document.getElementById("btn-fwd").disabled = S.q >= TMAX;
+  }
+
+  // ---------- Controls ----------
+  var stop = null;
+  var playBtn = document.getElementById("btn-play");
+  function halt() { if (stop) { stop(); stop = null; } playBtn.textContent = "Play"; }
+  function setQ(q) { halt(); S.q = Math.max(0, Math.min(TMAX, q)); render(); }
+  document.getElementById("s-t").addEventListener("input", function (e) { setQ(parseInt(e.target.value, 10)); });
+  document.getElementById("btn-back").addEventListener("click", function () { setQ(S.q - 1); });
+  document.getElementById("btn-fwd").addEventListener("click", function () { setQ(S.q + 1); });
+  document.getElementById("c-shade").addEventListener("change", function (e) { S.shade = e.target.checked; render(); });
+  playBtn.addEventListener("click", function () {
+    if (stop) { halt(); return; }
+    var from = S.q >= TMAX ? 0 : S.q;
+    S.q = from; render();
+    playBtn.textContent = "Pause";
+    stop = Lab.animate((TMAX - from) * 220, function (k) {
+      var q = Math.round(from + (TMAX - from) * k);
+      if (q !== S.q) { S.q = q; render(); }
+    }, function () { stop = null; playBtn.textContent = "Play"; });
+  });
+
+  var scen = [
+    ["Trough (Q15)", 15],
+    ["Early recovery (Q18)", 18],
+    ["Late expansion (Q8)", 8],
+    ["Peak (Q10)", 10],
+    ["First quarter of decline (Q11)", 11],
+    ["Recession under way (Q13)", 13],
+    ["Back at potential (Q38)", 38]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { setQ(x[1]); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Identify-the-phase drill ----------
+  var CH = ["Expansion", "Peak", "Contraction (recession)", "Trough"];
+  var ITEMS = [
+    { t: "Real GDP grew for the sixth straight quarter, and firms in most industries report they are hiring.", a: 0, w: "Real GDP keeps rising and hiring is picking up. That is an expansion." },
+    { t: "Real GDP reached its highest level of the cycle this quarter. Data for the next quarter show the first decline.", a: 1, w: "The highest point of real GDP, just before it starts to fall, is the peak." },
+    { t: "Real GDP fell for the second quarter in a row, and layoffs rose in manufacturing and construction.", a: 2, w: "Falling real GDP and rising layoffs describe a contraction. Two quarters of decline also meets the common rule of thumb for a recession." },
+    { t: "After a year of declines, real GDP stopped falling this quarter. Unemployment is high, but new orders for equipment have started to tick up.", a: 3, w: "Real GDP has hit bottom and is about to rise, with unemployment still high. That is the trough." },
+    { t: "Retail sales and business investment are rising, and the unemployment rate has fallen from 7% to 6% over the past year.", a: 0, w: "Rising spending and falling unemployment describe an expansion. Unemployment may still be above the natural rate, so the economy can be expanding with a recessionary gap." },
+    { t: "Car dealers report sales down sharply, unsold inventories are piling up, and factories are cutting shifts as real output falls.", a: 2, w: "Falling real output and production cuts describe a contraction." },
+    { t: "Unemployment has stopped rising and sits at its highest level in years. Next quarter, real GDP posts its first gain after three quarters of decline.", a: 3, w: "The lowest point of real GDP, with unemployment at its highest, just before growth resumes, is the trough." },
+    { t: "Unemployment has climbed above the natural rate and keeps rising as real GDP shrinks.", a: 2, w: "Shrinking real GDP and rising cyclical unemployment describe a contraction." },
+    { t: "Real GDP is still growing and has moved above potential output. Job openings outnumber job seekers, and inflation is creeping up.", a: 0, w: "Real GDP is still rising, so this is an expansion. Output above potential means the expansion has opened an inflationary gap." },
+    { t: "Inflation is slowing, home building has dropped for three straight quarters, and real GDP is declining.", a: 2, w: "Declining real GDP with slowing inflation fits a contraction." },
+    { t: "Output hit a record high this quarter and then slipped the following quarter. At the top, unemployment was well below the natural rate.", a: 1, w: "A record high in real GDP followed by a decline marks the peak. Unemployment is usually lowest near the peak." },
+    { t: "Factories are running flat out and wages are rising fast. Real GDP is the highest it has been, and economists report growth has come to a stop before a downturn.", a: 1, w: "Real GDP at its high point, with resources stretched and growth stopping before a decline, is the peak." },
+    { t: "Real GDP grew this quarter for the first time after a long slump, though it is still well below potential output.", a: 0, w: "Once real GDP starts rising after the trough, the economy is in an expansion, even with a recessionary gap still open. The trough was the quarter before." }
+  ];
+  var G;
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+  function newGame() { G = { order: shuffle(ITEMS.map(function (_, i) { return i; })), pos: 0, right: 0, done: 0, answered: false }; drawItem(); }
+  var gc = document.getElementById("g-choices"), gfb = document.getElementById("g-fb");
+  function drawItem() {
+    var fin = G.pos >= ITEMS.length;
+    document.getElementById("g-pos").textContent = fin ? "All " + ITEMS.length + " reports done" : "Report " + (G.pos + 1) + " of " + ITEMS.length;
+    document.getElementById("g-score").textContent = G.right + " / " + G.done + " correct";
+    document.getElementById("g-item").textContent = fin ? "You identified every report. You got " + G.right + " of " + ITEMS.length + ". Reshuffle to play again." : ITEMS[G.order[G.pos]].t;
+    gc.innerHTML = "";
+    G.answered = false;
+    gfb.className = "fb"; gfb.textContent = fin ? "Tip: decide first whether real GDP is rising or falling, then check whether it is at a turning point." : "Read the report, then pick the phase it describes.";
+    document.getElementById("g-next").disabled = fin;
+    if (fin) return;
+    CH.forEach(function (c, j) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = c;
+      b.addEventListener("click", function () { answer(j); });
+      gc.appendChild(b);
+    });
+  }
+  function answer(j) {
+    if (G.answered) return;
+    var it = ITEMS[G.order[G.pos]], bs = gc.querySelectorAll("button");
+    G.answered = true; G.done++;
+    bs.forEach(function (b) { b.disabled = true; });
+    bs[it.a].classList.add("right");
+    if (j === it.a) { G.right++; gfb.className = "fb ok"; gfb.innerHTML = "<b style='color:var(--good)'>Correct.</b> " + it.w; }
+    else { bs[j].classList.add("wrong"); gfb.className = "fb no"; gfb.innerHTML = "<b style='color:var(--bad)'>Not quite.</b> The answer is " + CH[it.a] + ". " + it.w; }
+    document.getElementById("g-score").textContent = G.right + " / " + G.done + " correct";
+  }
+  document.getElementById("g-next").addEventListener("click", function () { G.pos++; drawItem(); });
+  document.getElementById("g-shuffle").addEventListener("click", newGame);
+  newGame();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Immediately after the trough of a business cycle, the economy enters which phase?", o: ["Peak", "Contraction", "Expansion", "Recession"], c: 2, w: "The trough is the lowest point of real GDP. After it, real GDP starts rising, which is an expansion. Contraction and recession come after a peak." },
+    { s: "An economy's actual real GDP is $950 billion and its potential real GDP is $1,000 billion. Which describes its output gap?", o: ["+$50 billion, an inflationary gap", "−$50 billion (−5% of potential), a recessionary gap", "−5% of potential, an inflationary gap", "$1,950 billion, a recessionary gap"], c: 1, w: "Output gap = actual − potential = 950 − 1,000 = −$50 billion. As a percent, −50 ÷ 1,000 × 100 = −5%. A negative gap means output is below potential, which is a recessionary gap." },
+    { s: "An economy's real GDP (in billions) over five quarters is Q1: 500, Q2: 510, Q3: 505, Q4: 498, Q5: 502. Which statement is correct?", o: ["The peak occurred in Q4.", "The trough occurred in Q2.", "The economy was in an expansion during Q3.", "Real GDP fell in Q3 and Q4, so the economy meets the common two-quarter rule of thumb for a recession."], c: 3, w: "Real GDP fell from 510 to 505 and then to 498, two consecutive quarters of decline. Q2 (510) is the peak and Q4 (498) is the trough. Q3 is part of the contraction, so C is wrong." },
+    { s: "On a production possibilities curve, an economy in a recession is best shown as:", o: ["A point inside the PPC", "A point on the PPC", "A point outside the PPC", "An inward shift of the PPC"], c: 0, w: "In a recession, workers and capital sit idle, so the economy produces less than it could. That is a point inside the PPC. The curve does not shift because the economy's resources and technology have not changed." },
+    { s: "When an economy has an inflationary gap, the unemployment rate is:", o: ["Above the natural rate of unemployment", "Equal to zero", "Below the natural rate of unemployment", "Equal to the natural rate of unemployment"], c: 2, w: "Output above potential means firms are hiring more workers than at full employment, so unemployment falls below the natural rate. It never reaches zero, because some frictional unemployment always remains." },
+    { s: "Which statement best describes the idea that a recession is two consecutive quarters of falling real GDP?", o: ["It is the legal definition every country must use.", "It means unemployment cannot rise until the second quarter of decline.", "It is measured using nominal GDP.", "It is a common rule of thumb; official dating also considers indicators such as employment, income, and production."], c: 3, w: "The two-quarter idea is a rule of thumb. Official recession dating, such as by the NBER committee in the United States, weighs a broad set of indicators. The rule uses real GDP, not nominal GDP." },
+    { s: "Potential output is the level of real GDP produced when:", o: ["Unemployment equals the natural rate of unemployment", "Unemployment is zero", "Real GDP reaches its highest point in the business cycle", "The price level is at its lowest point"], c: 0, w: "Potential output, also called full-employment output, is produced when the only unemployment is frictional and structural. A peak can be above potential, so C is not the definition." },
+    { s: "Real GDP has risen for three straight quarters but is still below potential output. Which describes the economy?", o: ["A contraction with an inflationary gap", "An expansion with a recessionary gap", "A peak with no output gap", "An expansion with unemployment below the natural rate"], c: 1, w: "Rising real GDP means an expansion. Output below potential means a recessionary gap, so unemployment is still above the natural rate. The phase tells the direction of real GDP; the gap tells the level compared with potential." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("2.7");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [2], topic: "2.7", compact: true, storageKey: "topic-2.7" });</script>
+</body>
+</html>

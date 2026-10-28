@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demand Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub-h { font-size: 1.2rem; }
+.lab .graph-card { align-content: start; }
+.side { display: grid; gap: 16px; align-content: start; }
+.side .controls { grid-template-columns: 1fr 1fr; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+select { font: inherit; font-size: .9rem; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); width: 100%; }
+select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.pill + .pill { margin-left: 4px; }
+.stat .v .pill { font-family: var(--body); }
+.game { display: grid; gap: 14px; align-content: start; }
+.g-count2 { font-family: var(--mono); font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.mkt { font-family: var(--mono); font-size: .76rem; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+.item { font-family: var(--display); font-size: 1.22rem; font-weight: 600; line-height: 1.35; min-height: 2.8em; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.choices button { text-align: left; border-radius: 8px; }
+.choices button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choices button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choices button:disabled { cursor: default; }
+.fb { border-left: 4px solid var(--rule); padding: 8px 12px; font-size: .93rem; background: var(--paper); border-radius: 0 8px 8px 0; }
+.fb.ok { border-left-color: var(--good); }
+.fb.no { border-left-color: var(--bad); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.rules { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .92rem; }
+@media (max-width: 520px) { .choices, .side .controls { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 1 · Topic 1.4</span>
+  <h1>Demand Study Lab</h1>
+  <p class="lede">Demand shows how much of a good buyers are willing and able to buy at each price. A change in the good's own price moves buyers along the demand curve, while a change in anything else that affects buyers shifts the whole curve. Slide the price, try each determinant, then drill until you can tell a shift from a movement every time.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Movement or shift?</h2>
+    <p>The sample good is pizza, sold by the slice. Burgers are a substitute and soda is a complement. The dashed grey line and point show where the market started: $5.00 a slice and 500 slices a day.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>The market for pizza <small>demand only</small></h3>
+      <svg class="chart" id="dg" role="img" aria-label="Demand curve for pizza with price on the vertical axis and quantity on the horizontal axis"></svg>
+      <div class="legend"><span class="l-ad">Demand now</span><span class="l-ghost">Starting demand</span><span class="l-c3">Movement along the curve</span></div>
+    </div>
+
+    <div class="card side">
+      <div>
+        <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+        <div class="scenarios" id="scenarios"></div>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label for="s-price">Price of pizza <output id="o-price"></output></label>
+          <input type="range" id="s-price" min="3" max="7" step="0.25">
+          <span class="hint">Own price: moves along the curve</span>
+        </div>
+        <div class="ctl">
+          <label for="sel-det">Determinant</label>
+          <select id="sel-det"></select>
+          <span class="hint">Non-price factors shift the curve</span>
+        </div>
+        <div class="ctl">
+          <label for="s-chg">Change <output id="o-chg"></output></label>
+          <input type="range" id="s-chg" min="-2" max="2" step="1">
+          <span class="hint" id="h-chg">Left = falls, right = rises</span>
+        </div>
+        <div class="ctl">
+          <span style="font-size:.86rem; font-weight:500;">For buyers, pizza is a</span>
+          <div class="seg" role="group" aria-label="Normal or inferior good">
+            <button type="button" id="mode-n" aria-pressed="true">Normal good</button>
+            <button type="button" id="mode-i" aria-pressed="false">Inferior good</button>
+          </div>
+          <span class="hint">Only matters for income</span>
+        </div>
+      </div>
+      <div class="btnrow"><button type="button" id="btn-reset">Reset to start</button></div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Change type</div><div class="v" id="r-type">None</div></div>
+    <div class="stat"><div class="k">Direction</div><div class="v" id="r-dir">None</div></div>
+    <div class="stat"><div class="k">Price per slice</div><div class="v" id="r-p">$5.00</div></div>
+    <div class="stat"><div class="k">Quantity demanded</div><div class="v" id="r-q">500</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <h3 class="sub-h">Drill: shift or movement, and which way?</h3>
+  <div class="lab">
+    <div class="card game">
+      <div class="g-count2"><span id="g-pos">Case 1 of 15</span><span id="g-score">0 / 0 correct</span></div>
+      <span class="mkt" id="g-mkt"></span>
+      <p class="item" id="g-item"></p>
+      <div class="choices" id="g-choices" role="group" aria-label="Choose what happens to demand"></div>
+      <div class="fb" id="g-fb" aria-live="polite">Pick an answer. Think about the good named in the market, then ask: did its own price change, or did something else change?</div>
+      <div class="btnrow">
+        <button type="button" class="primary" id="g-next">Next case</button>
+        <button type="button" id="g-shuffle">Reshuffle and restart</button>
+      </div>
+    </div>
+    <div class="card game">
+      <h3>How to decide</h3>
+      <ol class="rules">
+        <li>Find the good whose market you are graphing.</li>
+        <li>Did <b>that good's own price</b> change? Then it is a <b>movement along</b> the demand curve. A higher price means up the curve (quantity demanded falls). A lower price means down the curve (quantity demanded rises).</li>
+        <li>Did anything else change? Check the determinants: tastes, prices of related goods, income, number of buyers, expectations. Then the <b>whole curve shifts</b>. More wanted at every price is right; less is left.</li>
+        <li>Related goods: a substitute's price and demand for this good move the <b>same</b> way. A complement's price and demand for this good move in <b>opposite</b> ways.</li>
+        <li>Income: demand for a normal good moves the same way as income. Demand for an inferior good moves the opposite way.</li>
+        <li>A change in supply changes the price, so on the demand side it is only a movement along the curve.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Two words, two meanings</span><h3>Demand vs. quantity demanded</h3><p><b>Demand</b> is the whole curve: how much buyers want at every price. <b>Quantity demanded</b> is one point on it: how much they want at one price. A price change changes quantity demanded. A determinant changes demand.</p></div>
+    <div class="card"><span class="tag">Law of demand</span><h3>Price and quantity move opposite</h3><p>Other things equal, a higher price lowers quantity demanded and a lower price raises it, so the demand curve slopes down. How much quantity responds is called elasticity, which you study in microeconomics.</p></div>
+    <div class="card"><span class="tag">Why it slopes down</span><h3>Three reasons</h3><p><b>Substitution effect:</b> a higher price makes other goods relatively cheaper, so buyers switch. <b>Income effect:</b> a higher price shrinks what your income can buy. <b>Diminishing marginal utility:</b> each extra unit adds less satisfaction, so buyers buy more only at a lower price.</p></div>
+    <div class="card"><span class="tag">TRIBE</span><h3>Determinants of demand</h3><p><b>T</b>astes, <b>R</b>elated goods' prices, <b>I</b>ncome, number of <b>B</b>uyers, <b>E</b>xpectations. A change in any of these shifts the curve. Right is an increase in demand; left is a decrease.</p></div>
+    <div class="card"><span class="tag">Income</span><h3>Normal and inferior goods</h3><p>For a <b>normal good</b>, higher income raises demand. For an <b>inferior good</b>, such as bus rides or store-brand ramen for many buyers, higher income lowers demand because buyers switch to something they like better.</p></div>
+    <div class="card"><span class="tag">Related goods</span><h3>Substitutes and complements</h3><p><b>Substitutes</b> replace each other (burgers and pizza): a higher burger price raises demand for pizza. <b>Complements</b> go together (soda and pizza): a higher soda price lowers demand for pizza.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Demand cheat sheet</h2>
+    <p>Every row is about the market for pizza. Memorize the pattern, then check it against the lab.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>What changed</th><th>Effect</th><th>On the graph</th></tr></thead>
+    <tbody>
+      <tr><td>The price of pizza falls</td><td>Own price</td><td>Quantity demanded ↑</td><td><span class="lshift">Move down along D</span></td></tr>
+      <tr><td>The price of pizza rises</td><td>Own price</td><td>Quantity demanded ↓</td><td><span class="lshift">Move up along D</span></td></tr>
+      <tr><td>Pizza becomes more popular</td><td>Tastes</td><td>Demand ↑</td><td><b>D shifts right</b></td></tr>
+      <tr><td>A new college brings more students to town</td><td>Number of buyers</td><td>Demand ↑</td><td><b>D shifts right</b></td></tr>
+      <tr><td>Incomes rise, pizza is a normal good</td><td>Income</td><td>Demand ↑</td><td><b>D shifts right</b></td></tr>
+      <tr><td>Incomes rise, pizza is an inferior good</td><td>Income</td><td>Demand ↓</td><td><span class="shift">D shifts left</span></td></tr>
+      <tr><td>The price of burgers (a substitute) rises</td><td>Price of a related good</td><td>Demand ↑</td><td><b>D shifts right</b></td></tr>
+      <tr><td>The price of soda (a complement) rises</td><td>Price of a related good</td><td>Demand ↓</td><td><span class="shift">D shifts left</span></td></tr>
+      <tr><td>Buyers expect the price of pizza to rise next week</td><td>Expectations</td><td>Demand today ↑</td><td><b>D shifts right</b></td></tr>
+      <tr><td>Buyers expect their incomes to fall (normal good)</td><td>Expectations</td><td>Demand today ↓</td><td><span class="shift">D shifts left</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price</b> (or P). Horizontal axis: <b>Quantity</b> (or Q). Write the good's name above the graph when the question names one.</li>
+        <li>Draw demand sloping down and label it D or D₁.</li>
+        <li>For a shift, draw the new curve, label it D₂, and add an arrow from D₁ to D₂.</li>
+        <li>Mark points on the axes: P₁ and Q₁ at the start, Q₂ (and P₂ if price changed) after.</li>
+        <li>In words, use the exact phrase: "demand increases" or "demand decreases" for a shift; "quantity demanded increases" or "decreases" for a price change.</li>
+        <li>When you explain, name the determinant: "Burgers are a substitute for pizza, so a higher burger price increases the demand for pizza."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Writing "the price fell, so demand increased." A lower price raises <b>quantity demanded</b>. The curve stays put.</li>
+        <li>Shifting demand when supply changes. A supply shift changes the price, which only moves buyers along the demand curve.</li>
+        <li>Calling a shift "up" or "down." Say right (increase) or left (decrease).</li>
+        <li>Getting complements backward. A higher price for soda lowers the demand for pizza; it does not raise it.</li>
+        <li>Assuming higher income always raises demand. For an inferior good, demand falls.</li>
+        <li>Reversing expectations. If buyers expect a higher price later, they buy more <b>now</b>, so today's demand rises.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 1.4. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-1.html">Unit 1 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var K = 0.8, P0 = 5;
+  var BASE = { P: 5, det: "tastes", chg: 0, inferior: false };
+  var S = Object.assign({}, BASE);
+  var f = Lab.fmt;
+
+  // ---------- Determinants ----------
+  // sgn: does a RISE in this factor shift demand for pizza right (+1) or left (-1)?
+  var DET = {
+    tastes: { name: "Tastes and preferences", up: "more popular", down: "less popular", hint: "Left = less popular, right = more popular",
+      sgn: function () { return 1; },
+      say: function (u) { return u ? "Pizza becomes more popular (tastes change in its favor)" : "Pizza falls out of favor (tastes turn against it)"; },
+      why: function (u) { return u ? "Buyers like pizza more, so they want more slices at every price." : "Buyers like pizza less, so they want fewer slices at every price."; } },
+    buyers: { name: "Number of buyers", up: "more buyers", down: "fewer buyers", hint: "Left = fewer buyers, right = more buyers",
+      sgn: function () { return 1; },
+      say: function (u) { return u ? "More buyers enter the market (a new college opens nearby)" : "Buyers leave the market (people move out of town)"; },
+      why: function (u) { return u ? "More buyers means more slices wanted at every price." : "Fewer buyers means fewer slices wanted at every price."; } },
+    income: { name: "Buyers' income", up: "income rises", down: "income falls", hint: "Left = income falls, right = income rises",
+      sgn: function (s) { return s.inferior ? -1 : 1; },
+      say: function (u, s) { return (u ? "Buyers' incomes rise" : "Buyers' incomes fall") + " and pizza is " + (s.inferior ? "an inferior good" : "a normal good"); },
+      why: function (u, s) {
+        if (!s.inferior) return u ? "For a normal good, more income means buyers want more at every price." : "For a normal good, less income means buyers want less at every price.";
+        return u ? "For an inferior good, buyers with more income switch to goods they like better, so they want less pizza at every price." : "For an inferior good, buyers with less income switch toward it, so they want more pizza at every price.";
+      } },
+    sub: { name: "Price of a substitute (burgers)", up: "burgers cost more", down: "burgers cost less", hint: "Left = burger price falls, right = it rises",
+      sgn: function () { return 1; },
+      say: function (u) { return u ? "The price of burgers, a substitute, rises" : "The price of burgers, a substitute, falls"; },
+      why: function (u) { return u ? "Burgers are now relatively expensive, so some buyers switch to pizza. Substitute price and demand move the same way." : "Burgers are now relatively cheap, so some buyers switch away from pizza. Substitute price and demand move the same way."; } },
+    comp: { name: "Price of a complement (soda)", up: "soda costs more", down: "soda costs less", hint: "Left = soda price falls, right = it rises",
+      sgn: function () { return -1; },
+      say: function (u) { return u ? "The price of soda, a complement, rises" : "The price of soda, a complement, falls"; },
+      why: function (u) { return u ? "Pizza with soda now costs more as a pair, so buyers want less pizza at every price. Complement price and demand move in opposite directions." : "Pizza with soda now costs less as a pair, so buyers want more pizza at every price. Complement price and demand move in opposite directions."; } },
+    expect: { name: "Expected future price of pizza", up: "expect higher", down: "expect lower", hint: "Left = expect lower price, right = expect higher",
+      sgn: function () { return 1; },
+      say: function (u) { return u ? "Buyers expect the price of pizza to rise next week" : "Buyers expect the price of pizza to fall next week"; },
+      why: function (u) { return u ? "Buyers would rather buy before the price goes up, so demand today increases." : "Buyers would rather wait for the lower price, so demand today decreases."; } }
+  };
+
+  function shiftOf(s) { return s.chg * DET[s.det].sgn(s); }
+  function qAt(P, sh) { return 5 + sh + (P0 - P) / K; }       // demand: P = 5 - K(Q - 5 - sh)
+  function units(q) { return Math.round(q * 100); }           // slices per day
+  function money(p) { return "$" + p.toFixed(2); }
+
+  function model(s) {
+    var sh = shiftOf(s);
+    return { sh: sh, q0: qAt(P0, 0), qMid: qAt(P0, sh), q: qAt(s.P, sh), moved: Math.abs(s.P - P0) > 1e-9, shifted: Math.abs(sh) > 1e-9 };
+  }
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("dg");
+  function draw(m, s) {
+    Lab.market(svg, {
+      xLabel: "Quantity", yLabel: "Price",
+      demand: { shift: m.sh, label: m.shifted ? "D₂" : "D₁" },
+      start: { demand: 0 },
+      arrows: true,
+      extra: function (F) {
+        if (m.shifted) Lab.tag(F, 9.6, 5 - K * 4.6 + 0.3, "D₁", "var(--muted)", "end");
+        // starting point
+        var anyChange = m.shifted || m.moved;
+        var sameP = !m.moved, sameQ = Math.abs(m.q - m.q0) < 1e-6;
+        if (anyChange) {
+          Lab.dot(F, m.q0, P0, "var(--ghost)", true, Math.abs(m.q - m.q0) >= 0.45 || sameQ ? "Q₁" : null, Math.abs(s.P - P0) >= 0.45 || sameP ? "P₁" : null);
+          if (m.shifted && m.moved) Lab.dot(F, m.qMid, P0, "var(--ghost)", false);
+        }
+        // movement along the current curve
+        if (m.moved) {
+          var ox = 0.28, oy = 0.35;
+          var fromQ = m.qMid, toQ = m.q, dx = toQ - fromQ, dy = s.P - P0, L = Math.hypot(dx, dy);
+          var trim = Math.min(0.45, L * 0.3);
+          Lab.arrow(F, fromQ + ox, P0 + oy, toQ - dx / L * trim + ox, s.P - dy / L * trim + oy, "var(--c3)");
+        }
+        if (!anyChange) Lab.dot(F, m.q, s.P, "var(--ink)", true, "Q₁", "P₁");
+        else Lab.dot(F, m.q, s.P, "var(--ink)", true, sameQ ? null : "Q₂", sameP ? null : "P₂");
+      }
+    });
+  }
+
+  // ---------- Story ----------
+  function lawOfDemand(up) {
+    if (up) return "<ul><li><b>Substitution effect:</b> pizza is now expensive compared with burgers and other foods, so some buyers switch.</li>" +
+      "<li><b>Income effect:</b> the same income buys fewer slices, so buyers cut back.</li>" +
+      "<li><b>Diminishing marginal utility:</b> each extra slice adds less satisfaction. At a higher price, fewer extra slices are worth it.</li></ul>";
+    return "<ul><li><b>Substitution effect:</b> pizza is now cheap compared with burgers and other foods, so some buyers switch to pizza.</li>" +
+      "<li><b>Income effect:</b> the same income buys more slices, so buyers can afford more.</li>" +
+      "<li><b>Diminishing marginal utility:</b> each extra slice adds less satisfaction, so buyers take more slices only when the price falls.</li></ul>";
+  }
+  function story(m, s) {
+    var html = "";
+    if (!m.shifted && !m.moved) {
+      return "<p><b>Starting point.</b> At " + money(P0) + " a slice, buyers want " + units(m.q0) + " slices a day. That is one point on the demand curve D₁.</p>" +
+        "<p>Move the <b>price</b> slider to see a change in quantity demanded: buyers slide along the curve and the curve stays put. Pick a <b>determinant</b> and change it to see a change in demand: the whole curve shifts.</p>" +
+        "<p>The curve slopes down because of the <b>law of demand</b>: other things equal, a higher price lowers quantity demanded.</p>";
+    }
+    var up = m.sh > 0, d = DET[s.det];
+    if (m.shifted) {
+      html += "<p><b>" + d.say(s.chg > 0, s) + ".</b> " + d.why(s.chg > 0, s) + "</p>";
+      html += "<p>This is a <b>change in demand</b>. A non-price determinant changed, so the whole curve shifts <b>" + (up ? "right" : "left") + "</b> from D₁ to D₂. At " + money(P0) +
+        " buyers now want " + units(m.qMid) + " slices instead of " + units(m.q0) + ".</p>";
+    }
+    if (m.moved) {
+      var pu = s.P > P0;
+      html += "<p><b>The price of pizza " + (pu ? "rises" : "falls") + " from " + money(P0) + " to " + money(s.P) + ".</b> Price is not a determinant of demand, so the curve does not move. Buyers slide <b>" + (pu ? "up" : "down") + "</b> along " +
+        (m.shifted ? "D₂" : "the demand curve") + " and quantity demanded " + (pu ? "falls" : "rises") + " from " + units(m.qMid) + " to " + units(m.q) + " slices. This is a <b>change in quantity demanded</b>, and the law of demand explains it:</p>";
+      html += lawOfDemand(pu);
+    }
+    var ap;
+    if (m.shifted && m.moved) {
+      ap = "Two things changed, so keep them apart. The shift from D₁ to D₂ is the change in demand. The slide along D₂ is the change in quantity demanded. Overall, quantity went from " + units(m.q0) + " to " + units(m.q) + ".";
+    } else if (m.shifted) {
+      ap = "\"Demand for pizza " + (up ? "increases" : "decreases") + " (the demand curve shifts " + (up ? "right" : "left") + ") because " + d.why(s.chg > 0, s).charAt(0).toLowerCase() + d.why(s.chg > 0, s).slice(1) + "\"";
+    } else {
+      ap = "\"Quantity demanded " + (s.P > P0 ? "decreases" : "increases") + "; demand does not change.\" Never write that demand " + (s.P > P0 ? "fell" : "rose") + " because the price changed.";
+    }
+    html += "<p><b>On an AP answer:</b> " + ap + "</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elP = document.getElementById("s-price"), elDet = document.getElementById("sel-det"), elC = document.getElementById("s-chg");
+  var bN = document.getElementById("mode-n"), bI = document.getElementById("mode-i");
+  Object.keys(DET).forEach(function (k) { var o = document.createElement("option"); o.value = k; o.textContent = DET[k].name; elDet.appendChild(o); });
+
+  function render() {
+    var m = model(S), d = DET[S.det];
+    elP.value = S.P; elDet.value = S.det; elC.value = S.chg;
+    bN.setAttribute("aria-pressed", !S.inferior); bI.setAttribute("aria-pressed", S.inferior);
+    document.getElementById("o-price").textContent = money(S.P);
+    document.getElementById("o-chg").textContent = S.chg === 0 ? "no change" : (Math.abs(S.chg) === 2 ? "big: " : "small: ") + (S.chg > 0 ? d.up : d.down);
+    document.getElementById("h-chg").textContent = d.hint;
+    draw(m, S);
+    var type, dir = [];
+    if (m.shifted && m.moved) type = "Shift + movement";
+    else if (m.shifted) type = "Shift of D";
+    else if (m.moved) type = "Movement along D";
+    else type = "None";
+    if (m.shifted) dir.push(m.sh > 0 ? '<span class="pill lr">Right: demand ↑</span>' : '<span class="pill infl">Left: demand ↓</span>');
+    if (m.moved) dir.push(S.P > P0 ? '<span class="pill rec">Up: Qd ↓</span>' : '<span class="pill rec">Down: Qd ↑</span>');
+    document.getElementById("r-type").textContent = type;
+    document.getElementById("r-dir").innerHTML = dir.length ? dir.join("") : "None";
+    document.getElementById("r-p").textContent = money(S.P);
+    document.getElementById("r-q").textContent = units(m.q);
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  elP.addEventListener("input", function () { S.P = parseFloat(elP.value); render(); });
+  elDet.addEventListener("change", function () { S.det = elDet.value; S.chg = 0; render(); });
+  elC.addEventListener("input", function () { S.chg = parseInt(elC.value, 10); render(); });
+  bN.addEventListener("click", function () { S.inferior = false; render(); });
+  bI.addEventListener("click", function () { S.inferior = true; S.det = "income"; if (S.chg === 0) S.chg = 2; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Price of pizza falls to $3.50", { P: 3.5 }],
+    ["Price of pizza rises to $6.50", { P: 6.5 }],
+    ["Pizza goes viral online", { det: "tastes", chg: 2 }],
+    ["A college opens next door", { det: "buyers", chg: 2 }],
+    ["Incomes rise (normal good)", { det: "income", chg: 2 }],
+    ["Incomes rise (inferior good)", { det: "income", chg: 2, inferior: true }],
+    ["Burger prices rise", { det: "sub", chg: 2 }],
+    ["Soda prices rise", { det: "comp", chg: 2 }],
+    ["Buyers expect a price hike next week", { det: "expect", chg: 2 }],
+    ["Pizza gets more popular, then the price rises", { det: "tastes", chg: 2, P: 6 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Drill ----------
+  var CH = ["Demand shifts right (increase)", "Demand shifts left (decrease)", "Movement down along D (Qd rises)", "Movement up along D (Qd falls)"];
+  var ITEMS = [
+    { m: "Coffee", e: "The price of coffee rises.", a: 3, w: "Coffee's own price changed, so buyers move up along the demand curve and quantity demanded falls. Demand itself does not change." },
+    { m: "Coffee", e: "The price of tea, a substitute for coffee, rises.", a: 0, w: "Tea is now relatively expensive, so some buyers switch to coffee. A higher substitute price increases demand." },
+    { m: "Hot dogs", e: "The price of hot dog buns, a complement, rises.", a: 1, w: "Hot dogs and buns are used together. A higher price for buns makes the pair cost more, so demand for hot dogs decreases." },
+    { m: "Used cars (an inferior good)", e: "Consumers' incomes rise.", a: 1, w: "For an inferior good, higher income lowers demand. Buyers switch to new cars, so demand for used cars shifts left." },
+    { m: "New cars (a normal good)", e: "A recession lowers consumers' incomes.", a: 1, w: "For a normal good, lower income lowers demand. The curve shifts left." },
+    { m: "Gasoline", e: "Drivers expect the price of gasoline to jump next week.", a: 0, w: "Buyers fill up now before the price rises. Expectations of a higher future price increase demand today." },
+    { m: "Sneakers", e: "A famous athlete starts wearing the brand and it becomes a must-have.", a: 0, w: "Tastes shifted toward the sneakers, so buyers want more at every price. Demand increases." },
+    { m: "Haircuts in a small town", e: "A new factory opens and the town's population doubles.", a: 0, w: "More people means more buyers. An increase in the number of buyers increases demand." },
+    { m: "Movie tickets", e: "The theater cuts the ticket price on Tuesdays.", a: 2, w: "Only the good's own price changed. A lower price moves buyers down along the demand curve, so quantity demanded rises." },
+    { m: "Video game consoles", e: "The price of video games, a complement, falls.", a: 0, w: "Games and consoles go together. Cheaper games make owning a console more attractive, so demand for consoles increases." },
+    { m: "Butter", e: "The price of margarine, a substitute, falls.", a: 1, w: "Margarine is now relatively cheap, so some buyers switch away from butter. A lower substitute price decreases demand." },
+    { m: "Instant ramen (an inferior good)", e: "Consumers' incomes fall.", a: 0, w: "For an inferior good, lower income raises demand. Buyers who cut back switch toward ramen, so the curve shifts right." },
+    { m: "Smartphones", e: "Buyers expect prices to drop next month when a new model comes out.", a: 1, w: "Buyers wait for the lower price. Expecting a lower future price decreases demand today." },
+    { m: "Strawberries", e: "A widely reported study links strawberries to health problems.", a: 1, w: "Tastes turned against strawberries, so buyers want fewer at every price. Demand decreases." },
+    { m: "Oranges", e: "A frost destroys much of the orange crop, and the price of oranges rises.", a: 3, w: "The frost shifts supply, which raises the price. On the demand side nothing else changed, so buyers move up along the demand curve and quantity demanded falls. Demand does not shift." }
+  ];
+  var G, order;
+  var elItem = document.getElementById("g-item"), elMkt = document.getElementById("g-mkt"), elCh = document.getElementById("g-choices"), elFb = document.getElementById("g-fb");
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function setFb(html, cls) { elFb.className = "fb" + (cls ? " " + cls : ""); elFb.innerHTML = html; }
+  function showItem() {
+    var fin = G.pos >= ITEMS.length;
+    document.getElementById("g-pos").textContent = fin ? "All " + ITEMS.length + " cases done" : "Case " + (G.pos + 1) + " of " + ITEMS.length;
+    document.getElementById("g-score").textContent = G.right + " / " + G.done + " correct";
+    elCh.innerHTML = "";
+    if (fin) {
+      elMkt.textContent = "";
+      elItem.textContent = "You finished every case. Reshuffle to try again.";
+      setFb("Final score: <b>" + G.right + " of " + ITEMS.length + "</b>. " + (G.right === ITEMS.length ? "Perfect." : "Review the cases you missed using the rules on the right."), G.right === ITEMS.length ? "ok" : "");
+      document.getElementById("g-next").disabled = true;
+      return;
+    }
+    var it = ITEMS[order[G.pos]];
+    elMkt.textContent = "Market for " + it.m;
+    elItem.textContent = it.e;
+    CH.forEach(function (t, j) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = t;
+      b.addEventListener("click", function () { answer(j); });
+      elCh.appendChild(b);
+    });
+    setFb("Pick an answer. Ask first: did the good's own price change, or did something else change?", "");
+    document.getElementById("g-next").disabled = false;
+  }
+  function answer(j) {
+    if (G.answered) return;
+    var it = ITEMS[order[G.pos]], bs = elCh.querySelectorAll("button");
+    G.answered = true; G.done++;
+    bs.forEach(function (b) { b.disabled = true; });
+    bs[it.a].classList.add("right");
+    if (j === it.a) { G.right++; setFb("<b style='color:var(--good)'>Correct.</b> " + it.w, "ok"); }
+    else { bs[j].classList.add("wrong"); setFb("<b style='color:var(--bad)'>Not quite.</b> The answer is " + CH[it.a].toLowerCase() + ". " + it.w, "no"); }
+    document.getElementById("g-score").textContent = G.right + " / " + G.done + " correct";
+  }
+  function restart() { G = { pos: 0, right: 0, done: 0, answered: false }; order = shuffle(ITEMS.map(function (_, i) { return i; })); showItem(); }
+  document.getElementById("g-next").addEventListener("click", function () { G.pos++; G.answered = false; showItem(); });
+  document.getElementById("g-shuffle").addEventListener("click", restart);
+  restart();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following causes a movement along the demand curve for apples, with no shift of the curve?", o: ["An increase in the price of pears, a substitute", "A decrease in the price of apples", "An increase in consumers' incomes", "A report that apples improve health"], c: 1, w: "Only a change in the good's own price moves buyers along its demand curve. The other three are determinants of demand (related goods, income, tastes), so they shift the curve." },
+    { s: "Pizza and soda are complements. If the price of soda rises, what happens in the market for pizza?", o: ["Quantity demanded of pizza falls, but demand does not change", "Demand for pizza increases", "Demand for soda decreases", "Demand for pizza decreases"], c: 3, w: "A higher soda price makes the pizza-and-soda pair more expensive, so buyers want less pizza at every price. Demand for pizza shifts left. Option C is tempting, but a higher soda price lowers the quantity demanded of soda; it does not shift soda's demand curve." },
+    { s: "Bus rides are an inferior good for most buyers. If consumers' incomes rise, the demand for bus rides will:", o: ["Decrease, shifting the demand curve left", "Increase, shifting the demand curve right", "Not change, because the price of bus rides did not change", "Decrease, causing a movement up along the demand curve"], c: 0, w: "For an inferior good, demand moves opposite to income. Higher income lowers demand, so the curve shifts left. Option D mixes up a shift with a movement." },
+    { s: "The demand schedule for movie tickets shows 300 tickets demanded at $10 and 400 tickets demanded at $8. If the price falls from $10 to $8, which of the following is true?", o: ["Demand increases by 100 tickets", "Demand decreases because the theater earns less per ticket", "Quantity demanded increases by 100 tickets, a movement down along the demand curve", "The demand curve shifts right by 100 tickets"], c: 2, w: "Both points are on the same demand schedule. The price change moves buyers down along the curve, so quantity demanded rises from 300 to 400. Demand, the whole curve, is unchanged." },
+    { s: "Which of the following best explains why the demand curve slopes downward?", o: ["Higher prices raise sellers' incomes, so they buy more", "As price rises, firms are willing to produce more", "Demand for a normal good rises when income rises", "As price rises, buyers switch to substitutes and their income buys less"], c: 3, w: "The substitution effect and the income effect (along with diminishing marginal utility) explain the law of demand. Option B describes the law of supply. Option C describes a shift caused by income, not the slope." },
+    { s: "At $5 a slice, buyers want 500 slices of pizza a day. A new college opens, and buyers now want 150 more slices at every price. Then the price rises to $6, which lowers quantity demanded by 125 slices along the new demand curve. How many slices are demanded at $6?", o: ["525", "375", "650", "625"], c: 0, w: "The shift adds 150 at every price: 500 + 150 = 650 at $5 on D₂. The price rise moves buyers up along D₂: 650 − 125 = 525. Option B ignores the shift, and option C ignores the price change." },
+    { s: "Consumers expect the price of gasoline to rise sharply next week. What happens to the demand for gasoline this week?", o: ["Quantity demanded falls because gasoline will cost more", "Demand decreases, shifting the curve left", "Demand increases, shifting the curve right", "Nothing, because the price has not changed yet"], c: 2, w: "Buyers want to fill up before the price rises, so they want more gasoline at every current price. Expecting a higher future price increases demand today." },
+    { s: "On a graph of the coffee market, the demand curve shifts from D₁ to D₂, which lies to the left of D₁. Which of the following could have caused this shift?", o: ["An increase in the price of coffee", "A decrease in the price of tea, a substitute for coffee", "An increase in income, if coffee is a normal good", "A decrease in the price of cream, a complement to coffee"], c: 1, w: "A leftward shift is a decrease in demand. Cheaper tea pulls buyers away from coffee, so demand for coffee falls. Option A is a movement along the curve. Options C and D would increase demand and shift it right." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("1.4");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [1], topic: "1.4", compact: true, storageKey: "topic-1.4" });</script>
+</body>
+</html>

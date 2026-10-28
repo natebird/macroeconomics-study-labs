@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Loanable Funds Market Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { justify-self: start; display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.side-card { display: grid; gap: 14px; align-content: start; }
+.calc .row span:last-child { font-family: var(--mono); text-align: right; }
+.nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nums input { font: inherit; font-family: var(--mono); width: 100%; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.problem { font-size: .95rem; background: var(--paper); border-left: 4px solid var(--c3); padding: 10px 12px; border-radius: 0 8px 8px 0; }
+.sources { display: grid; gap: 10px; }
+.sources p { font-size: .9rem; }
+@media (max-width: 520px) { .nums { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 4 · Topic 4.7</span>
+  <h1>The Loanable Funds Market Study Lab</h1>
+  <p class="lede">The loanable funds market brings together savers, who supply funds, and borrowers, who demand them. Their meeting point sets the real interest rate and the amount of private investment. Shift saving, investment demand, the government budget, and foreign capital to see which curve moves, then practice the national saving identity with the calculator.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Loanable funds graph</h2>
+    <p>The market starts at a 5.0% real interest rate with $500 billion lent and borrowed, all of it for private investment, and a balanced government budget. Dashed grey lines show the starting position once something moves.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Loanable funds market <small>real interest rate vs. quantity</small></h3>
+      <svg class="chart" id="lf" role="img" aria-label="Loanable funds market graph with supply of loanable funds sloping up and demand for loanable funds sloping down"></svg>
+    </div>
+    <div class="card side-card">
+      <h3>Where the curves come from</h3>
+      <div class="sources">
+        <p><b style="color:var(--srpc)">Supply of loanable funds (S<sub>LF</sub>)</b> comes from saving: private saving by households and firms, public saving when the government runs a surplus, and foreign saving that flows in. It slopes up because a higher real interest rate rewards saving.</p>
+        <p><b style="color:var(--accent)">Demand for loanable funds (D<sub>LF</sub>)</b> comes from borrowers: firms that want to invest in capital, and the government when it runs a deficit. It slopes down because fewer investment projects pay off at a higher real interest rate.</p>
+        <p><b>Price on the vertical axis:</b> the <b>real</b> interest rate. A change in the rate moves along the curves; a change in saving or investment plans shifts them.</p>
+      </div>
+      <div>
+        <div class="tag" style="margin-bottom:8px;">Show the government budget as a shift of</div>
+        <div class="seg" role="group" aria-label="How to show the government budget">
+          <button type="button" id="mode-d" aria-pressed="true">Demand (government borrowing)</button>
+          <button type="button" id="mode-s" aria-pressed="false">Supply (public saving)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Demand for loanable funds</span><span class="l-srpc">Supply of loanable funds</span><span class="l-c3">Private investment demand only</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <label for="s-ps">Private saving <output id="o-ps"></output></label>
+        <input type="range" id="s-ps" min="-200" max="200" step="50">
+        <span class="hint">Households save more or less at every rate</span>
+      </div>
+      <div class="ctl">
+        <label for="s-b">Government budget <output id="o-b"></output></label>
+        <input type="range" id="s-b" min="-200" max="200" step="50">
+        <span class="hint">Right = deficit, left = surplus</span>
+      </div>
+      <div class="ctl">
+        <label for="s-id">Investment demand <output id="o-id"></output></label>
+        <input type="range" id="s-id" min="-200" max="200" step="50">
+        <span class="hint">Tax credits, business optimism or pessimism</span>
+      </div>
+      <div class="ctl">
+        <label for="s-fx">Foreign capital flow <output id="o-fx"></output></label>
+        <input type="range" id="s-fx" min="-200" max="200" step="50">
+        <span class="hint">Right = inflow, left = outflow</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real interest rate</div><div class="v" id="r-r"></div></div>
+    <div class="stat"><div class="k">Quantity of loanable funds</div><div class="v" id="r-q"></div></div>
+    <div class="stat"><div class="k">Private investment</div><div class="v" id="r-i"></div></div>
+    <div class="stat"><div class="k">Public saving (T − G)</div><div class="v" id="r-pub"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="sec-head" style="margin-top:8px;">
+    <h3>National saving calculator</h3>
+    <p>National saving is the domestic source of loanable funds. Pick an AP-style preset or type your own numbers (in billions of dollars). The work is shown the way you would write it on the exam.</p>
+  </div>
+  <div class="lab">
+    <div class="card side-card">
+      <div><span class="formula">National saving = private saving + public saving</span></div>
+      <div>
+        <div class="tag" style="margin-bottom:8px;">AP-style presets</div>
+        <div class="scenarios" id="presets"></div>
+      </div>
+      <div class="problem" id="problem"></div>
+      <div class="nums">
+        <div class="ctl"><label for="c-yd">Disposable income</label><input type="number" id="c-yd" step="10"></div>
+        <div class="ctl"><label for="c-c">Consumption (C)</label><input type="number" id="c-c" step="10"></div>
+        <div class="ctl"><label for="c-t">Tax revenue (T)</label><input type="number" id="c-t" step="10"></div>
+        <div class="ctl"><label for="c-g">Government spending and transfers (G)</label><input type="number" id="c-g" step="10"></div>
+        <div class="ctl"><label for="c-k">Net capital inflow</label><input type="number" id="c-k" step="10"></div>
+      </div>
+    </div>
+    <div class="card side-card">
+      <h3>Show your work</h3>
+      <div class="calc" id="c-steps" aria-live="polite"></div>
+      <p id="c-say" style="font-size:.94rem;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">The market</span><h3>Loanable funds market</h3><p>Savers lend and borrowers borrow, usually through banks and bond markets. The price of a loan is the real interest rate. Equilibrium sets the real interest rate and the quantity of loanable funds.</p></div>
+    <div class="card"><span class="tag">Supply side</span><h3>Supply of loanable funds</h3><p>Supply comes from national saving plus foreign saving. More private saving, a bigger budget surplus, or an inflow of foreign financial capital shifts S<sub>LF</sub> right and lowers the real interest rate.</p></div>
+    <div class="card"><span class="tag">Demand side</span><h3>Demand for loanable funds</h3><p>Demand comes from firms that borrow to invest and from a government that borrows to cover a deficit. An investment tax credit or business optimism shifts D<sub>LF</sub> right and raises the real interest rate.</p></div>
+    <div class="card"><span class="tag">NS = private + public</span><h3>National saving</h3><p>Private saving is disposable income minus consumption. Public saving is the budget balance, T − G. A deficit is negative public saving, so it pulls national saving down.</p></div>
+    <div class="card"><span class="tag">Two ways to draw it</span><h3>A budget deficit</h3><p>Show a deficit as D<sub>LF</sub> shifting right (the government borrows) or as S<sub>LF</sub> shifting left (public saving falls). Both raise the real interest rate and lower private investment. AP accepts either if you label it.</p></div>
+    <div class="card"><span class="tag">Real vs. nominal</span><h3>Not the money market</h3><p>The loanable funds market sets the <b>real</b> interest rate and both curves slope. The money market sets the <b>nominal</b> interest rate and has a vertical money supply set by the central bank. Pick the graph that matches the question.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Loanable funds cheat sheet</h2>
+    <p>Memorize which curve each event shifts. Then the real interest rate and private investment follow from the graph.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Curve and direction</th><th>Real interest rate</th><th>Quantity of loanable funds</th><th>Private investment</th></tr></thead>
+    <tbody>
+      <tr><td>Households save more</td><td><span class="shift">Supply right</span></td><td>↓</td><td>↑</td><td>↑</td></tr>
+      <tr><td>Households save less (consumer spending up)</td><td><span class="shift">Supply left</span></td><td>↑</td><td>↓</td><td>↓</td></tr>
+      <tr><td>Government budget deficit (or bigger deficit)</td><td><b>Demand right</b>, or <span class="shift">supply left</span></td><td>↑</td><td>↑ if drawn as demand right; ↓ if drawn as supply left</td><td>↓ (crowding out)</td></tr>
+      <tr><td>Government budget surplus</td><td><span class="shift">Supply right</span>, or <b>demand left</b></td><td>↓</td><td>↑ if drawn as supply right; ↓ if drawn as demand left</td><td>↑</td></tr>
+      <tr><td>Investment tax credit or business optimism</td><td><b>Demand right</b></td><td>↑</td><td>↑</td><td>↑</td></tr>
+      <tr><td>Business pessimism</td><td><b>Demand left</b></td><td>↓</td><td>↓</td><td>↓</td></tr>
+      <tr><td>Inflow of foreign financial capital</td><td><span class="shift">Supply right</span></td><td>↓</td><td>↑</td><td>↑</td></tr>
+      <tr><td>Outflow of financial capital</td><td><span class="shift">Supply left</span></td><td>↑</td><td>↓</td><td>↓</td></tr>
+      <tr><td>Business optimism and more saving at once</td><td><b>Demand right</b> and <span class="shift">supply right</span></td><td>Indeterminate</td><td>↑</td><td>↑</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. On the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>How to earn the points</h3>
+      <ul>
+        <li>Label the vertical axis <b>Real interest rate</b> and the horizontal axis <b>Quantity of loanable funds</b>.</li>
+        <li>Draw S<sub>LF</sub> sloping up and D<sub>LF</sub> sloping down. Mark the starting equilibrium r₁ and Q₁ on the axes.</li>
+        <li>Draw the new curve, label it (D<sub>LF2</sub> or S<sub>LF2</sub>), and mark the new r₂ and Q₂. Show r₂ clearly above or below r₁.</li>
+        <li>For a deficit, either shift is accepted. Pick one and stay consistent. Do not shift both curves for the same deficit.</li>
+        <li>When asked about investment, finish the chain in words: "The real interest rate rises, so private investment decreases."</li>
+        <li>For national saving, write the formula first: national saving = private saving + public saving = 200 + (−50) = 150.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Mixing up the two interest rate graphs. Loanable funds shows the <b>real</b> interest rate and an upward-sloping supply of saving. The money market shows the <b>nominal</b> interest rate and a vertical money supply. A question about saving, borrowing, or crowding out wants loanable funds.</li>
+        <li>Shifting supply right for a deficit. A deficit lowers public saving, so if you shift supply it goes <b>left</b>.</li>
+        <li>Saying private investment rises when households save less. Less saving raises the real interest rate, so investment falls.</li>
+        <li>Shifting a curve when the interest rate changes. A change in the real interest rate is a movement along both curves.</li>
+        <li>Calling public saving G − T. Public saving is T − G; a deficit makes it negative.</li>
+        <li>Stating both the rate and quantity when both curves shift. One of them is indeterminate unless the question gives sizes.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 4.7. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-4.html">Unit 4 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  // Slider values are in billions of dollars. Lab.market space: 1 unit on x = $100 billion; y = real interest rate (%).
+  var BASE = { ps: 0, b: 0, id: 0, fx: 0, mode: "d" };
+  var S = Object.assign({}, BASE);
+  var K = 0.8;
+  var stopAnim = null;
+
+  // ---------- Model ----------
+  // Private investment demand: x = 5 + id + (5 - r)/K. Private + foreign saving: x = 5 + ps + fx + (r - 5)/K.
+  // A deficit b adds b to demand (mode d) or removes b from supply (mode s). The real rate is the same either way.
+  function model(s) {
+    var id = s.id / 100, ps = s.ps / 100, fx = s.fx / 100, b = s.b / 100;
+    var ds = id + (s.mode === "d" ? b : 0);
+    var ss = ps + fx - (s.mode === "s" ? b : 0);
+    var r = 5 + K * (ds - ss) / 2;
+    var q = 5 + (ds + ss) / 2;
+    var inv = 5 + id + (5 - r) / K;
+    return { ds: ds, ss: ss, r: r, q: q, inv: inv, idp: id };
+  }
+
+  var f = Lab.fmt;
+  function bn(x) { return "$" + f(100 * x, 0) + "B"; }
+  function bnLong(v) { return "$" + Math.abs(v) + " billion"; }
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("lf");
+  function draw(m, s) {
+    var dMoved = Math.abs(m.ds) > 1e-9, sMoved = Math.abs(m.ss) > 1e-9;
+    var moved = dMoved || sMoved;
+    var sameR = Math.abs(m.r - 5) < 0.3,   // hide r₂ when it would sit on top of r₁
+        sameQ = Math.abs(m.q - 5) < 1e-6;
+    var showPriv = s.mode === "d" && Math.abs(s.b) > 1e-9;
+    Lab.market(svg, {
+      xLabel: "Quantity of loanable funds", yLabel: "Real interest rate",
+      demand: { shift: m.ds, label: dMoved ? "DLF₂" : "DLF" },
+      supply: { shift: m.ss, label: sMoved ? "SLF₂" : "SLF" },
+      start: { demand: 0, supply: 0 },
+      slope: K,
+      startLabels: ["Q₁", "r₁"],
+      eqLabels: moved ? [sameQ ? null : "Q₂", sameR ? null : "r₂"] : ["Q₁", "r₁"],
+      extra: function (F, eq, C) {
+        if (dMoved) Lab.tag(F, 1.0, C.D(0)(1.0) + (m.ds > 0 ? -0.75 : 0.45), "DLF₁", "var(--muted)", "middle");
+        if (sMoved) Lab.tag(F, 1.6, C.S(0)(1.6) + (m.ss > 0 ? 0.45 : -0.75), "SLF₁", "var(--muted)", "middle");
+        if (showPriv) {
+          Lab.fn(F, C.D(m.idp), "var(--c3)", 2, "4 4", 2);
+          Lab.dot(F, m.inv, m.r, "var(--c3)", false);
+          var yI = 1.0, xI = 5 + m.idp + (5 - yI) / K;
+          Lab.tag(F, xI - 0.5, yI, "Private investment", "var(--c3)", "end");
+          if (s.b > 0) Lab.line(F, [[m.inv, m.r], [m.q, m.r]], "var(--c3)", 2, "2 3");
+        }
+      }
+    });
+  }
+
+  // ---------- Story ----------
+  function story(m, s) {
+    var lines = [];
+    if (s.ps > 0) lines.push("Households save " + bnLong(s.ps) + " more at every real interest rate. More saving means more funds to lend, so S<sub>LF</sub> shifts right.");
+    if (s.ps < 0) lines.push("Households save " + bnLong(s.ps) + " less at every real interest rate. Fewer funds are available to lend, so S<sub>LF</sub> shifts left.");
+    if (s.b > 0) lines.push(s.mode === "d"
+      ? "The government runs a " + bnLong(s.b) + " deficit and borrows to cover it. Its borrowing adds to the demand for loanable funds, so D<sub>LF</sub> shifts right. (The other accepted way: public saving falls, so S<sub>LF</sub> shifts left. Use the toggle to compare.)"
+      : "The government runs a " + bnLong(s.b) + " deficit. A deficit is negative public saving, so national saving falls and S<sub>LF</sub> shifts left. (The other accepted way: government borrowing shifts D<sub>LF</sub> right. Use the toggle to compare.)");
+    if (s.b < 0) lines.push(s.mode === "s"
+      ? "The government runs a " + bnLong(s.b) + " surplus. Public saving rises, so national saving rises and S<sub>LF</sub> shifts right. This is the most common way to draw a surplus."
+      : "The government runs a " + bnLong(s.b) + " surplus and uses it to pay down debt instead of borrowing. Demand for loanable funds falls, so D<sub>LF</sub> shifts left. Most textbooks draw a surplus as S<sub>LF</sub> shifting right; use the toggle to see it.");
+    if (s.id > 0) lines.push("Firms expect higher returns on new capital (an investment tax credit or business optimism). They want to borrow " + bnLong(s.id) + " more at every real interest rate, so D<sub>LF</sub> shifts right.");
+    if (s.id < 0) lines.push("Firms turn pessimistic about returns on new capital. They want to borrow " + bnLong(s.id) + " less at every real interest rate, so D<sub>LF</sub> shifts left.");
+    if (s.fx > 0) lines.push("Foreign savers send " + bnLong(s.fx) + " of financial capital into the country. Foreign saving adds to the funds available to lend, so S<sub>LF</sub> shifts right.");
+    if (s.fx < 0) lines.push("Financial capital flows out of the country (" + bnLong(s.fx) + "). Fewer funds are available to lend here, so S<sub>LF</sub> shifts left.");
+
+    if (!lines.length) {
+      return "<p><b>The loanable funds market is in equilibrium.</b> S<sub>LF</sub> crosses D<sub>LF</sub> at a real interest rate of 5.0% and a quantity of $500 billion. The budget is balanced, so every dollar borrowed goes to private investment. Pick a scenario or move a slider to shift a curve.</p>";
+    }
+    var html = "<p><b>What changed:</b></p><ul>" + lines.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+
+    var dr = m.r - 5, dq = 100 * (m.q - 5), di = 100 * (m.inv - 5);
+    var rTxt = Math.abs(dr) < 0.005 ? "stays at <b>5.0%</b>" : (dr > 0 ? "rises" : "falls") + " from 5.0% to <b>" + f(m.r) + "%</b>";
+    var qTxt = Math.abs(dq) < 0.5 ? "stays at $500 billion" : (dq > 0 ? "rises" : "falls") + " to $" + f(100 * m.q, 0) + " billion";
+    var iTxt = Math.abs(di) < 0.5 ? "stays at $500 billion" : (di > 0 ? "rises" : "falls") + " to <b>$" + f(100 * m.inv, 0) + " billion</b>";
+    html += "<p><b>Result:</b> the real interest rate " + rTxt + ". The quantity of loanable funds " + qTxt + ". Private investment " + iTxt + ".</p>";
+
+    var notes = [];
+    if (s.b > 0 && di < -0.5) notes.push("Private investment fell because the higher real interest rate made some projects unprofitable. That is <b>crowding out</b> (topic 5.5).");
+    if (s.b > 0 && s.mode === "d") notes.push("On the graph, the gap between the dot on the private investment line and the equilibrium point is the government's " + bnLong(s.b) + " of borrowing.");
+    if (s.b > 0 && s.mode === "s") notes.push("In the supply-side picture, government borrowing is netted out of S<sub>LF</sub>, so the equilibrium quantity is the funds that go to private investment.");
+    if (s.b < 0 && s.mode === "d") notes.push("In the demand-side picture, the surplus is netted out of D<sub>LF</sub>, so the equilibrium quantity is smaller than private investment.");
+    if (s.id > 0 && di > 0.5) notes.push("The real interest rate rose, yet private investment rose too. The demand curve itself moved, and the higher rate only limits how much investment grows. This is not crowding out.");
+    if ((s.ps > 0 || s.fx > 0 || s.b < 0) && dr < -0.005 && di > 0.5) notes.push("A lower real interest rate makes more investment projects profitable, so firms move down along D<sub>LF</sub> and borrow more.");
+    if ((s.ps < 0 || s.fx < 0) && dr > 0.005 && di < -0.5 && !(s.b > 0)) notes.push("A higher real interest rate makes some projects unprofitable, so firms move up along D<sub>LF</sub> and borrow less.");
+
+    // Both curves shifted: AP says one outcome is indeterminate unless sizes are given.
+    var dMoved = Math.abs(m.ds) > 1e-9, sMoved = Math.abs(m.ss) > 1e-9;
+    if (dMoved && sMoved) {
+      var same = (m.ds > 0) === (m.ss > 0);
+      notes.push("<b>Both curves shifted.</b> " + (same
+        ? "They moved in the same direction, so the quantity of loanable funds " + (m.ds > 0 ? "rises" : "falls") + " for sure, but the change in the real interest rate is <b>indeterminate</b> on the AP exam. It depends on which shift is bigger."
+        : "They moved in opposite directions, so the real interest rate " + (m.ds > 0 ? "rises" : "falls") + " for sure, but the change in the quantity of loanable funds is <b>indeterminate</b> on the AP exam. It depends on which shift is bigger.") + " The lab uses set sizes, so it shows one possible result.");
+    }
+    if (notes.length) html += "<ul>" + notes.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var els = { ps: document.getElementById("s-ps"), b: document.getElementById("s-b"), id: document.getElementById("s-id"), fx: document.getElementById("s-fx") };
+  var bD = document.getElementById("mode-d"), bS = document.getElementById("mode-s");
+  function signed(v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + "$" + Math.abs(Math.round(v)) + "B"; }
+  function render(drawState) {
+    var m = model(S), dm = drawState ? model(drawState) : m;
+    Object.keys(els).forEach(function (k) { els[k].value = S[k]; });
+    bD.setAttribute("aria-pressed", S.mode === "d"); bS.setAttribute("aria-pressed", S.mode === "s");
+    document.getElementById("o-ps").textContent = S.ps === 0 ? "start" : signed(S.ps);
+    document.getElementById("o-b").textContent = S.b > 0 ? "deficit $" + S.b + "B" : S.b < 0 ? "surplus $" + (-S.b) + "B" : "balanced";
+    document.getElementById("o-id").textContent = S.id === 0 ? "start" : signed(S.id);
+    document.getElementById("o-fx").textContent = S.fx > 0 ? "inflow $" + S.fx + "B" : S.fx < 0 ? "outflow $" + (-S.fx) + "B" : "none";
+    draw(dm, drawState || S);
+    document.getElementById("r-r").textContent = f(m.r) + "%";
+    document.getElementById("r-q").textContent = bn(m.q);
+    var di = 100 * (m.inv - 5);
+    document.getElementById("r-i").innerHTML = bn(m.inv) + (Math.abs(di) < 0.5 ? "" : di > 0 ? ' <span class="pill lr">up</span>' : ' <span class="pill infl">down</span>');
+    var pub = -S.b;
+    document.getElementById("r-pub").innerHTML = pub === 0 ? "$0B" : (pub > 0 ? "+$" + pub + "B" : "−$" + (-pub) + "B") + (pub > 0 ? ' <span class="pill lr">surplus</span>' : ' <span class="pill infl">deficit</span>');
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  function go(target) {
+    if (stopAnim) stopAnim();
+    var from = Object.assign({}, S);
+    S = target;
+    stopAnim = Lab.animate(450, function (t) {
+      var mid = { mode: S.mode };
+      ["ps", "b", "id", "fx"].forEach(function (k) { mid[k] = from[k] + (S[k] - from[k]) * t; });
+      if (from.mode !== S.mode) mid = Object.assign({}, S, { ps: mid.ps, id: mid.id, fx: mid.fx, b: mid.b });
+      render(t < 1 ? mid : null);
+    });
+  }
+  Object.keys(els).forEach(function (k) {
+    els[k].addEventListener("input", function () { if (stopAnim) stopAnim(); S[k] = parseFloat(els[k].value); render(); });
+  });
+  bD.addEventListener("click", function () { if (stopAnim) stopAnim(); S.mode = "d"; render(); });
+  bS.addEventListener("click", function () { if (stopAnim) stopAnim(); S.mode = "s"; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { go(Object.assign({}, BASE, { mode: S.mode })); });
+
+  var scen = [
+    ["Households save more", { ps: 150 }],
+    ["Government runs a budget deficit", { b: 150 }],
+    ["Investment tax credit / business optimism", { id: 150 }],
+    ["Foreign capital inflow", { fx: 150 }],
+    ["Government runs a surplus", { b: -150, mode: "s" }],
+    ["Optimism and more saving (both shift)", { id: 200, ps: 50 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { go(Object.assign({}, BASE, { mode: S.mode }, x[1])); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- National saving calculator ----------
+  var PRE = [
+    ["Deficit year", [1000, 800, 400, 450, 0], "Disposable income is $1,000 billion and consumption is $800 billion. The government collects $400 billion in taxes and spends $450 billion. Find private saving, public saving, and national saving."],
+    ["Surplus year", [900, 750, 500, 460, 0], "Disposable income is $900 billion and consumption is $750 billion. Tax revenue is $500 billion and government spending is $460 billion. Find national saving."],
+    ["Open economy", [1200, 900, 350, 470, 50], "Households have $1,200 billion of disposable income and consume $900 billion. Taxes are $350 billion and government spending is $470 billion. Foreign financial capital flows in, $50 billion net. How much investment can be financed?"],
+    ["Balanced budget", [800, 680, 300, 300, 0], "Disposable income is $800 billion, consumption is $680 billion, and the government budget is balanced at $300 billion. Find national saving."]
+  ];
+  var cIds = ["c-yd", "c-c", "c-t", "c-g", "c-k"];
+  var cEls = cIds.map(function (id) { return document.getElementById(id); });
+  var CV = PRE[0][1].slice(), CT = PRE[0][2];
+  function sg(v) { return v < 0 ? "(−" + Math.abs(v) + ")" : String(v); }
+  function money(v) { return (v < 0 ? "−$" : "$") + Math.abs(v) + "B"; }
+  function renderCalc() {
+    cEls.forEach(function (e, i) { if (document.activeElement !== e) e.value = CV[i]; });
+    document.getElementById("problem").textContent = CT || "Your numbers (billions of dollars).";
+    var yd = CV[0], c = CV[1], t = CV[2], g = CV[3], k = CV[4];
+    var priv = yd - c, pub = t - g, ns = priv + pub, inv = ns + k;
+    var rows = [
+      ["Private saving = disposable income − C", yd + " − " + c + " = " + money(priv)],
+      ["Public saving = T − G", t + " − " + g + " = " + money(pub)],
+      ["Budget status", pub < 0 ? "deficit of $" + (-pub) + "B" : pub > 0 ? "surplus of $" + pub + "B" : "balanced"],
+      ["National saving = private + public", priv + " + " + sg(pub) + " = " + money(ns)],
+      ["Investment = national saving + net capital inflow", ns + " + " + sg(k) + " = " + money(inv)]
+    ];
+    document.getElementById("c-steps").innerHTML = rows.map(function (r) { return '<div class="row"><span>' + r[0] + "</span><span>" + r[1] + "</span></div>"; }).join("");
+    var say = pub < 0
+      ? "The deficit is negative public saving, so national saving ($" + ns + "B) is less than private saving ($" + priv + "B). On the graph, this is the deficit drawn as Sₗƒ shifting left."
+      : pub > 0 ? "The surplus is positive public saving, so national saving ($" + ns + "B) is more than private saving ($" + priv + "B). More saving shifts the supply of loanable funds right."
+      : "With a balanced budget, public saving is zero and national saving equals private saving.";
+    say = say.replace("Sₗƒ", "the supply of loanable funds");
+    if (k !== 0) say += " " + (k > 0 ? "The capital inflow adds foreign saving, so more investment can be financed than national saving alone." : "The capital outflow sends saving abroad, so less investment is financed at home.");
+    say += " In a closed economy (no capital flows), national saving equals investment.";
+    document.getElementById("c-say").textContent = say;
+  }
+  cEls.forEach(function (e, i) {
+    e.addEventListener("input", function () { var v = parseFloat(e.value); if (isFinite(v)) { CV[i] = Math.max(-100000, Math.min(100000, Math.round(v))); CT = ""; renderCalc(); } });
+  });
+  var pr = document.getElementById("presets");
+  PRE.forEach(function (p) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p[0];
+    b.addEventListener("click", function () { CV = p[1].slice(); CT = p[2]; renderCalc(); });
+    pr.appendChild(b);
+  });
+  renderCalc();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Households decide to save a larger share of their income. In the loanable funds market, what happens?", o: ["Demand for loanable funds increases and the real interest rate rises", "Supply of loanable funds increases, the real interest rate falls, and the quantity of loanable funds rises", "Supply of loanable funds decreases and the real interest rate rises", "Demand for loanable funds decreases, the real interest rate falls, and the quantity falls"], c: 1, w: "Saving is the source of loanable funds, so more saving shifts supply right. The real interest rate falls and the equilibrium quantity rises. Saving does not shift demand, so A and D move the wrong curve." },
+    { s: "The government increases its budget deficit and borrows to finance it. Which of the following is the correct effect in the loanable funds market?", o: ["Demand for loanable funds decreases and private investment rises", "Supply of loanable funds increases and the real interest rate falls", "The money supply increases and the nominal interest rate falls", "Demand for loanable funds increases, the real interest rate rises, and private investment falls"], c: 3, w: "Government borrowing adds to demand for loanable funds, so the real interest rate rises and private investment falls (crowding out). Showing the deficit as a leftward shift of supply (lower public saving) gives the same rise in the rate and is also accepted. C describes the money market, which is the wrong graph." },
+    { s: "Private saving is $400 billion. Tax revenue is $300 billion and government spending is $360 billion. What is national saving?", o: ["$340 billion", "$460 billion", "$400 billion", "$60 billion"], c: 0, w: "Public saving = T − G = 300 − 360 = −60. National saving = private saving + public saving = 400 + (−60) = $340 billion. Choice B adds the deficit instead of subtracting it." },
+    { s: "On a correctly labeled loanable funds graph, the vertical axis measures the:", o: ["nominal interest rate", "price level", "real interest rate", "quantity of money"], c: 2, w: "The loanable funds market sets the real interest rate, because savers and borrowers care about purchasing power. The nominal interest rate belongs on the money market graph, which is the tempting wrong answer." },
+    { s: "Foreign investors increase their purchases of U.S. bonds, causing an inflow of financial capital into the United States. In the U.S. loanable funds market:", o: ["Demand for loanable funds increases and the real interest rate rises", "Supply of loanable funds decreases and the real interest rate rises", "Nothing changes, because foreign funds affect only the foreign exchange market", "Supply of loanable funds increases, the real interest rate falls, and private investment rises"], c: 3, w: "Foreign saving flowing in adds to the funds available to lend, so supply shifts right. The real interest rate falls and firms borrow more for investment. The inflow also affects the foreign exchange market, but that does not stop it from shifting loanable funds supply." },
+    { s: "Congress passes an investment tax credit at the same time households increase their saving. What happens to the equilibrium real interest rate and quantity of loanable funds?", o: ["The real interest rate rises and the quantity is indeterminate", "The quantity rises and the real interest rate is indeterminate", "Both the real interest rate and the quantity rise", "Both the real interest rate and the quantity are indeterminate"], c: 1, w: "The tax credit shifts demand right and more saving shifts supply right. Both shifts raise the quantity. Demand right pushes the rate up while supply right pushes it down, so without sizes the change in the real interest rate is indeterminate." },
+    { s: "On a loanable funds graph, the real interest rate rises from r₁ to r₂ and the quantity of loanable funds rises from Q₁ to Q₂. Which event could cause this?", o: ["Firms become more optimistic about future returns on investment", "Households increase their saving", "The government moves from a deficit to a surplus", "Foreign financial capital flows into the country"], c: 0, w: "A higher rate and a higher quantity together mean demand shifted right. Business optimism raises investment demand. B, C, and D all shift supply right, which lowers the real interest rate." },
+    { s: "The government moves from a balanced budget to a $50 billion surplus. Private saving does not change. Which of the following is true?", o: ["National saving falls by $50 billion and the real interest rate rises", "Demand for loanable funds increases and private investment falls", "National saving rises by $50 billion, supply of loanable funds shifts right, and private investment rises", "Public saving falls, supply of loanable funds shifts left, and the real interest rate rises"], c: 2, w: "A surplus is positive public saving (T − G > 0), so national saving rises by $50 billion. Supply of loanable funds shifts right, the real interest rate falls, and private investment rises. A and D treat the surplus as if it were a deficit." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("4.7");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [4], topic: "4.7", compact: true, storageKey: "topic-4.7" });</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Foreign Exchange Market and Net Exports Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.readout.six { grid-template-columns: repeat(3, minmax(0,1fr)); }
+@media (max-width: 720px) { .readout.six { grid-template-columns: 1fr 1fr; } }
+.stat .sub { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+.controls.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+@media (max-width: 720px) { .controls.three { grid-template-columns: 1fr; } }
+.scenarios button[aria-pressed="true"] { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 6 · Topic 6.5</span>
+  <h1>The Foreign Exchange Market and Net Exports Study Lab</h1>
+  <p class="lede">When the dollar's value changes, the prices of U.S. exports and imports change too. That moves net exports, and net exports are part of aggregate demand. Pick a cause in the market for dollars or move the exchange rate directly, then follow the chain to real GDP and the price level.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Linked graphs</h2>
+    <p>Dashed grey lines show the starting position: €0.80 per dollar, net exports of −40 billion, and an economy at full employment. Solid lines show where things are now.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Market for U.S. dollars <small>euros per dollar vs. quantity of dollars</small></h3>
+      <svg class="chart" id="fx" role="img" aria-label="Foreign exchange market for U.S. dollars"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>U.S. AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="U.S. aggregate demand and aggregate supply graph"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Demand for dollars / AD</span><span class="l-srpc">Supply of dollars / SRAS</span><span class="l-lrpc">LRAS</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a cause</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls three">
+      <div class="ctl">
+        <label for="s-pct">Dollar value <output id="o-pct"></output></label>
+        <input type="range" id="s-pct" min="-12" max="12" step="1">
+        <span class="hint">Right = dollar appreciates, left = depreciates</span>
+      </div>
+      <div class="ctl">
+        <label for="s-dd">Demand for dollars <output id="o-dd"></output></label>
+        <input type="range" id="s-dd" min="-3" max="3" step="0.5">
+        <span class="hint">Foreigners buying U.S. goods and assets</span>
+      </div>
+      <div class="ctl">
+        <label for="s-sd">Supply of dollars <output id="o-sd"></output></label>
+        <input type="range" id="s-sd" min="-3" max="3" step="0.5">
+        <span class="hint">Americans buying foreign goods and assets</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout six">
+    <div class="stat"><div class="k">Exchange rate</div><div class="v" id="r-e">€0.80</div><div class="sub" id="r-e2">per dollar</div></div>
+    <div class="stat"><div class="k">U.S. exports</div><div class="v" id="r-x">300</div><div class="sub" id="r-x2">no change</div></div>
+    <div class="stat"><div class="k">U.S. imports</div><div class="v" id="r-m">340</div><div class="sub" id="r-m2">no change</div></div>
+    <div class="stat"><div class="k">Net exports (trade balance)</div><div class="v" id="r-xn">−40</div><div class="sub" id="r-xn2">no change</div></div>
+    <div class="stat"><div class="k">Aggregate demand</div><div class="v" id="r-ad">No shift</div><div class="sub" id="r-ad2">through net exports</div></div>
+    <div class="stat"><div class="k">Real GDP / price level</div><div class="v" id="r-y">1000 / 100</div><div class="sub" id="r-y2">at full employment</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Depreciation</span><h3>A weaker dollar helps exports</h3><p>When the dollar depreciates, each dollar buys fewer euros. U.S. goods get cheaper for Europeans, so U.S. exports rise. European goods get more expensive for Americans, so U.S. imports fall. Net exports increase.</p></div>
+    <div class="card"><span class="tag">Appreciation</span><h3>A stronger dollar helps imports</h3><p>When the dollar appreciates, U.S. goods get more expensive abroad and foreign goods get cheaper at home. U.S. exports fall, imports rise, and net exports decrease.</p></div>
+    <div class="card"><span class="tag">AD = C + I + G + Xn</span><h3>Net exports shift AD</h3><p>Net exports are a component of aggregate demand. A depreciation raises net exports and shifts AD right, so real GDP and the price level rise in the short run. An appreciation shifts AD left, so both fall.</p></div>
+    <div class="card"><span class="tag">Balance of payments</span><h3>The current account moves with net exports</h3><p>The balance of trade (net exports of goods and services) is the largest part of the current account. A depreciation moves the current account toward surplus. Because the balance of payments sums to zero, the capital and financial account moves by the same amount in the other direction.</p></div>
+    <div class="card"><span class="tag">Two currencies</span><h3>One rises, the other falls</h3><p>If the dollar appreciates against the euro, the euro depreciates against the dollar. Europe's net exports to the U.S. then rise while U.S. net exports fall.</p></div>
+    <div class="card"><span class="tag">Shift vs. slide</span><h3>Not the foreign purchases effect</h3><p>A change in the U.S. price level changes net exports and moves the economy along AD. A change in the exchange rate from some other cause, like interest rates or asset preferences, shifts the whole AD curve.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Exchange rate to AD cheat sheet</h2>
+    <p>Each row is a chain to write out on an FRQ: shift in the market for dollars, then the dollar, then trade, then AD, then output and prices.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Market for dollars</th><th>Dollar</th><th>U.S. exports / imports</th><th>Net exports and current account</th><th>U.S. AD, real GDP, price level</th></tr></thead>
+    <tbody>
+      <tr><td>U.S. real interest rates rise relative to other countries</td><td><b>Demand right</b></td><td>Appreciates</td><td>Exports ↓, imports ↑</td><td>↓, current account toward deficit</td><td>AD left; real GDP ↓, price level ↓</td></tr>
+      <tr><td>Fed lowers interest rates (expansionary monetary policy)</td><td><b>Demand left</b> (and <span class="shift">supply right</span>)</td><td>Depreciates</td><td>Exports ↑, imports ↓</td><td>↑, current account toward surplus</td><td>AD right; adds to the boost from more investment</td></tr>
+      <tr><td>Foreign investors want more U.S. stocks and bonds</td><td><b>Demand right</b></td><td>Appreciates</td><td>Exports ↓, imports ↑</td><td>↓; the financial account inflow is matched by a current account fall</td><td>AD left; real GDP ↓, price level ↓</td></tr>
+      <tr><td>Americans buy more foreign financial assets</td><td><span class="shift">Supply right</span></td><td>Depreciates</td><td>Exports ↑, imports ↓</td><td>↑, current account toward surplus</td><td>AD right; real GDP ↑, price level ↑</td></tr>
+      <tr><td>Expansionary fiscal policy raises U.S. real interest rates</td><td><b>Demand right</b></td><td>Appreciates</td><td>Exports ↓, imports ↑</td><td>↓</td><td>Lower net exports partly offset the AD increase from fiscal policy</td></tr>
+      <tr><td>Speculators expect the dollar to fall</td><td><b>Demand left</b> and <span class="shift">supply right</span></td><td>Depreciates</td><td>Exports ↑, imports ↓</td><td>↑</td><td>AD right; real GDP ↑, price level ↑</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Market for dollars: horizontal axis <b>Quantity of dollars</b>, vertical axis the price of the dollar in the other currency, such as <b>Euros per dollar</b>. Label the curves D$ and S$.</li>
+        <li>Show the new curve with an arrow and mark the old and new exchange rates on the vertical axis (e₁ and e₂).</li>
+        <li>Use the words <b>appreciates</b> or <b>depreciates</b>. "The dollar gets stronger" may not earn the point.</li>
+        <li>Finish the chain in words: the dollar appreciates, so U.S. exports decrease and imports increase, so net exports decrease, so AD decreases.</li>
+        <li>On the AD–AS graph, label the axes <b>Real GDP</b> and <b>Price level</b>, draw LRAS at Y<sub>f</sub>, shift AD, and mark the new real GDP and price level (Y₂, PL₂).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Reversing the export effect. A <b>depreciation</b> makes exports <b>cheaper</b> to foreigners, so exports rise.</li>
+        <li>Labeling the vertical axis "Price" or "Exchange rate" alone. Say whose currency is priced in which: "Euros per dollar".</li>
+        <li>Shifting both curves when one is enough. If the question only says foreigners want more U.S. assets, shift demand for dollars only.</li>
+        <li>Calling the exchange rate effect on AD a movement along AD. A price-level change slides along AD; an exchange rate change from another cause shifts AD.</li>
+        <li>Forgetting the other currency. If the dollar appreciates against the yen, the yen depreciates against the dollar.</li>
+        <li>Saying the current account and the capital and financial account move together. They move in opposite directions.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 6.5. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-6.html">Unit 6 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+  var K = 0.8;                       // slope used by Lab.market
+  var E0 = 0.80, X0 = 300, M0 = 340; // starting euros per dollar, exports, imports (billions)
+
+  // ---------- Model ----------
+  // Market for dollars: equilibrium height y = 5 + K*(dd - sd)/2. Dollar value change pct = 0.1*(y - 5).
+  // Exports fall and imports rise one for one with the percent appreciation (teaching numbers).
+  // AD shift in graph units = change in net exports / 40. Real GDP = 1000 + 25*(x - 5), price level = 100 + 5*(y - 5).
+  function model(s) {
+    var pct = 0.1 * K * (s.dd - s.sd) / 2;
+    var e = E0 * (1 + pct);
+    var X = X0 * (1 - pct), M = M0 * (1 + pct), Xn = X - M, dXn = Xn - (X0 - M0);
+    var ad = dXn / 40;
+    var ax = 5 + ad / 2, ay = 5 + K * ad / 2;
+    return { pct: pct, e: e, X: X, M: M, Xn: Xn, dXn: dXn, ad: ad, Y: 1000 + 25 * (ax - 5), PL: 100 + 5 * (ay - 5) };
+  }
+
+  // ---------- Graphs ----------
+  var svgFX = document.getElementById("fx"), svgAD = document.getElementById("adas");
+  function euro(v) { return "€" + v.toFixed(2); }
+  function sub(n) { return String(n).replace(/[0-9]/g, function (d) { return "₀₁₂₃₄₅₆₇₈₉"[d]; }); }
+
+  function drawFX(s, m) {
+    var x1 = 5 + (s.dd + s.sd) / 2, y1 = 5 + K * (s.dd - s.sd) / 2;
+    var xSame = Math.abs(x1 - 5) < 0.6, ySame = Math.abs(y1 - 5) < 0.6;
+    var moved = Math.abs(s.dd) > 1e-9 || Math.abs(s.sd) > 1e-9;
+    Lab.market(svgFX, {
+      xLabel: "Quantity of dollars", yLabel: "Euros per dollar",
+      demand: { shift: s.dd, label: Math.abs(s.dd) > 1e-9 ? "D$₂" : "D$" },
+      supply: { shift: s.sd, label: Math.abs(s.sd) > 1e-9 ? "S$₂" : "S$" },
+      start: { demand: 0, supply: 0 }, slope: K,
+      eqLabels: moved ? [xSame ? null : "Q₂", ySame ? null : "e₂"] : ["Q₁", "e₁"],
+      startLabels: ["Q₁", "e₁"],
+      extra: function (F, eq) { Lab.tag(F, eq.x + 0.3, eq.y + 0.35, euro(m.e), "var(--ink)"); }
+    });
+  }
+
+  function drawAD(m) {
+    var moved = Math.abs(m.ad) > 1e-6;
+    var ax = 5 + m.ad / 2, ay = 5 + K * m.ad / 2;
+    var xSame = Math.abs(ax - 5) < 0.6, ySame = Math.abs(ay - 5) < 0.6;
+    Lab.market(svgAD, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: m.ad, label: moved ? "AD₂" : "AD" },
+      supply: { shift: 0, label: "SRAS" },
+      longRun: { shift: 0, label: "LRAS" },
+      start: { demand: 0 }, slope: K,
+      eqLabels: moved ? [xSame ? null : "Y₂", ySame ? null : "PL₂"] : ["Yf", "PL₁"],
+      startLabels: ["Yf", "PL₁"],
+      extra: function (F, eq) {
+        if (!moved || Math.abs(m.ad) < 0.3) return;
+        var infl = m.ad > 0;
+        Lab.tag(F, infl ? eq.x + 0.15 : eq.x - 0.15, 1.0, infl ? "inflationary gap" : "recessionary gap", infl ? "var(--bad)" : "var(--accent)", infl ? "start" : "end");
+      }
+    });
+  }
+
+  // ---------- Story ----------
+  var CAUSE = {
+    rates: "U.S. real interest rates rise relative to Europe. European investors want U.S. bonds, so they need dollars: <b>demand for dollars shifts right</b>. (Some texts also shift the supply of dollars left as Americans keep more savings at home. That pushes the dollar the same way.)",
+    fed: "The Fed lowers interest rates. U.S. bonds pay less, so foreigners want fewer dollars: <b>demand for dollars shifts left</b>. Lower rates also raise U.S. investment, which shifts AD right too. This lab shows only the exchange rate channel.",
+    assets: "Foreign investors decide to buy more U.S. stocks and real estate. To pay for them they need dollars: <b>demand for dollars shifts right</b>. This is a capital inflow, so the U.S. financial account moves toward surplus.",
+    abroad: "Americans buy more foreign stocks and bonds. To pay for them they sell dollars for euros: <b>supply of dollars shifts right</b>. This is a capital outflow.",
+    spec: "Speculators expect the dollar to lose value. Foreigners want to hold fewer dollars (<b>demand shifts left</b>) and Americans swap dollars for euros (<b>supply shifts right</b>). Both shifts push the dollar down, so its depreciation is certain. The change in the quantity of dollars depends on the sizes of the shifts, so AP calls it indeterminate."
+  };
+
+  function shiftWords(s) {
+    var parts = [];
+    if (s.dd > 0) parts.push("demand for dollars shifts right"); else if (s.dd < 0) parts.push("demand for dollars shifts left");
+    if (s.sd > 0) parts.push("supply of dollars shifts right"); else if (s.sd < 0) parts.push("supply of dollars shifts left");
+    var t = "In the market for dollars, " + parts.join(" and ") + ".";
+    if (s.dd !== 0 && s.sd !== 0) {
+      if ((s.dd > 0) === (s.sd > 0)) t += " Both curves move the same way, so the quantity of dollars definitely " + (s.dd > 0 ? "rises" : "falls") + ". The change in the exchange rate depends on which shift is larger, so on its own AP would call it indeterminate.";
+      else t += " Both shifts push the exchange rate the same way. The change in the quantity of dollars depends on the sizes of the shifts, so AP calls it indeterminate.";
+    }
+    return t;
+  }
+
+  function story(s, m) {
+    var p = m.pct, html = "";
+    if (Math.abs(p) < 0.0005) {
+      html += "<p><b>Starting point.</b> The dollar trades at €0.80. A $100 U.S. good costs €80 in Europe, and an €80 European good costs $100 in the U.S. The U.S. exports 300 billion and imports 340 billion, so net exports are <b>−40 billion</b> (a trade deficit). Real GDP is at full employment (Y<sub>f</sub>).</p>";
+      if (s.dd !== 0 || s.sd !== 0) html += "<p>" + shiftWords(s) + " In this case the shifts cancel, so the exchange rate does not change and neither do net exports.</p>";
+      else html += "<p>Pick a cause above or slide the dollar's value to see how a change in the exchange rate reaches aggregate demand.</p>";
+      return html;
+    }
+    var up = p > 0, pctTxt = f(Math.abs(p) * 100, 0) + "%";
+    var lead = s.cause ? CAUSE[s.cause] : (s.direct ? "You set the dollar's value directly. On the graph this shows up as a change in demand for dollars." : shiftWords(s));
+    html += "<p>" + lead + "</p>";
+    var usGood = 100 * m.e, euGood = 80 / m.e;
+    var items = [];
+    items.push("<b>The dollar " + (up ? "appreciates" : "depreciates") + "</b> by " + pctTxt + ", from €0.80 to " + euro(m.e) + " per dollar. The euro " + (up ? "depreciates" : "appreciates") + ": a euro now costs $" + (1 / m.e).toFixed(2) + " instead of $1.25.");
+    items.push("A $100 U.S. good now costs <b>€" + f(usGood, 0) + "</b> in Europe. U.S. exports are " + (up ? "more expensive" : "cheaper") + " for Europeans, so exports " + (up ? "fall" : "rise") + " to " + f(m.X, 0) + " billion.");
+    items.push("An €80 European good now costs <b>$" + f(euGood, 0) + "</b> in the U.S. Imports are " + (up ? "cheaper" : "more expensive") + " for Americans, so imports " + (up ? "rise" : "fall") + " to " + f(m.M, 0) + " billion.");
+    items.push("Net exports " + (up ? "fall" : "rise") + " from −40 to <b>" + sgn(m.Xn) + " billion</b>. The current account (mostly the balance of trade) moves toward " + (up ? "a bigger deficit" : "surplus") + ", and the capital and financial account moves the opposite way by the same amount.");
+    html += "<ul>" + items.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    var gap = up ? "recessionary gap" : "inflationary gap";
+    html += "<p><b>AD:</b> net exports are part of AD, so AD shifts <b>" + (up ? "left" : "right") + "</b>. In the short run real GDP " + (up ? "falls" : "rises") + " to " + f(m.Y, 0) + " and the price level " + (up ? "falls" : "rises") + " to " + f(m.PL, 1) + ". Starting from full employment, that opens " + (up ? "a " : "an ") + gap + ".</p>";
+    html += "<p><b>AP answer:</b> \"The dollar " + (up ? "appreciates" : "depreciates") + ", so U.S. exports " + (up ? "decrease" : "increase") + " and imports " + (up ? "increase" : "decrease") + ". Net exports " + (up ? "decrease" : "increase") + ", so AD " + (up ? "decreases" : "increases") + ", and real GDP and the price level " + (up ? "decrease" : "increase") + ".\"</p>";
+    return html;
+  }
+  function sgn(v) { var r = Math.round(v); return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r); }
+
+  // ---------- Controls ----------
+  var BASE = { dd: 0, sd: 0, cause: null, direct: false };
+  var S = Object.assign({}, BASE), shown = { dd: 0, sd: 0 }, stop = null;
+  var elP = document.getElementById("s-pct"), elD = document.getElementById("s-dd"), elS = document.getElementById("s-sd");
+  var scBtns = [];
+
+  function drawAt(dd, sd) {
+    var s = { dd: dd, sd: sd };
+    var m = model(s);
+    drawFX(s, m); drawAD(m);
+  }
+  function pill(v, goodUp) {
+    if (Math.abs(v) < 0.5) return "no change";
+    return '<span class="pill ' + ((v > 0) === goodUp ? "lr" : "infl") + '">' + sgn(v) + "</span>";
+  }
+  function render(animate) {
+    var m = model(S);
+    elD.value = S.dd; elS.value = S.sd; elP.value = Math.round(m.pct * 100);
+    document.getElementById("o-pct").textContent = Math.abs(m.pct) < 0.0005 ? "no change" : (m.pct > 0 ? "+" : "−") + f(Math.abs(m.pct) * 100, 0) + "%";
+    document.getElementById("o-dd").textContent = S.dd === 0 ? "start" : (S.dd > 0 ? "right " : "left ") + Math.abs(S.dd);
+    document.getElementById("o-sd").textContent = S.sd === 0 ? "start" : (S.sd > 0 ? "right " : "left ") + Math.abs(S.sd);
+    scBtns.forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.key === (S.cause || "")); });
+
+    document.getElementById("r-e").textContent = euro(m.e);
+    document.getElementById("r-e2").innerHTML = Math.abs(m.pct) < 0.0005 ? "per dollar" : '<span class="pill ' + (m.pct > 0 ? "rec" : "infl") + '">dollar ' + (m.pct > 0 ? "appreciates " : "depreciates ") + f(Math.abs(m.pct) * 100, 0) + "%</span>";
+    document.getElementById("r-x").textContent = f(m.X, 0);
+    document.getElementById("r-x2").innerHTML = pill(m.X - X0, true);
+    document.getElementById("r-m").textContent = f(m.M, 0);
+    document.getElementById("r-m2").innerHTML = pill(m.M - M0, false);
+    document.getElementById("r-xn").textContent = sgn(m.Xn);
+    document.getElementById("r-xn2").innerHTML = pill(m.dXn, true);
+    document.getElementById("r-ad").textContent = Math.abs(m.ad) < 1e-6 ? "No shift" : m.ad > 0 ? "Shifts right" : "Shifts left";
+    document.getElementById("r-ad2").textContent = Math.abs(m.ad) < 1e-6 ? "through net exports" : (m.ad > 0 ? "Xn up" : "Xn down") + ", so AD " + (m.ad > 0 ? "increases" : "decreases");
+    document.getElementById("r-y").textContent = f(m.Y, 0) + " / " + f(m.PL, 1);
+    document.getElementById("r-y2").textContent = Math.abs(m.ad) < 0.3 ? (Math.abs(m.ad) < 1e-6 ? "at full employment" : "close to full employment") : m.ad > 0 ? "above Yf: inflationary gap" : "below Yf: recessionary gap";
+    document.getElementById("story").innerHTML = story(S, m);
+
+    if (stop) stop();
+    if (animate) {
+      var a = { dd: shown.dd, sd: shown.sd }, b = { dd: S.dd, sd: S.sd };
+      stop = Lab.animate(600, function (t) {
+        shown.dd = a.dd + (b.dd - a.dd) * t; shown.sd = a.sd + (b.sd - a.sd) * t;
+        drawAt(shown.dd, shown.sd);
+      }, function () { shown = { dd: S.dd, sd: S.sd }; drawAt(S.dd, S.sd); });
+    } else { shown = { dd: S.dd, sd: S.sd }; drawAt(S.dd, S.sd); }
+  }
+
+  elP.addEventListener("input", function () {
+    var p = parseFloat(elP.value) / 100;
+    S = { dd: Math.round(p / (0.1 * K / 2) * 100) / 100, sd: 0, cause: null, direct: true };
+    render(false);
+  });
+  // Keep the net shift within the dollar-value slider's range (plus or minus 12%).
+  elD.addEventListener("input", function () { S.dd = parseFloat(elD.value); S.sd = Math.max(S.dd - 3, Math.min(S.dd + 3, S.sd)); S.cause = null; S.direct = false; render(false); });
+  elS.addEventListener("input", function () { S.sd = parseFloat(elS.value); S.dd = Math.max(S.sd - 3, Math.min(S.sd + 3, S.dd)); S.cause = null; S.direct = false; render(false); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(true); });
+
+  var scen = [
+    ["rates", "U.S. interest rates rise", { dd: 2 }],
+    ["fed", "Fed lowers interest rates", { dd: -2 }],
+    ["assets", "Foreigners buy more U.S. assets", { dd: 2.5 }],
+    ["abroad", "Americans buy more foreign assets", { sd: 2 }],
+    ["spec", "Dollar expected to fall", { dd: -1.5, sd: 1.5 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[1]; b.dataset.key = x[0];
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, x[2], { cause: x[0] }); render(true); });
+    sc.appendChild(b); scBtns.push(b);
+  });
+  render(false);
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The U.S. dollar depreciates against the euro. All else equal, what happens to U.S. exports to Europe and U.S. imports from Europe?", o: ["Exports decrease and imports increase", "Exports increase and imports increase", "Exports increase and imports decrease", "Exports decrease and imports decrease"], c: 2, w: "A weaker dollar makes U.S. goods cheaper for Europeans, so exports rise. It also makes European goods more expensive for Americans, so imports fall. Option A describes an appreciation." },
+    { s: "The exchange rate falls from 0.80 euros per dollar to 0.64 euros per dollar. A U.S.-made bicycle sells for $500. What happens to its price in euros?", o: ["It falls from €400 to €320", "It rises from €625 to €781", "It falls from €400 to €360", "It stays at €500 because the dollar price did not change"], c: 0, w: "Multiply the dollar price by euros per dollar: 500 × 0.80 = €400 and 500 × 0.64 = €320. The dollar depreciated, so U.S. goods got cheaper for Europeans. Option B divides instead of multiplying." },
+    { s: "The U.S. economy is at full employment when the dollar appreciates sharply. In the short run, what happens in the U.S. AD–AS model?", o: ["AD shifts right; real GDP and the price level rise", "SRAS shifts left; real GDP falls and the price level rises", "LRAS shifts left; real GDP falls", "AD shifts left; real GDP and the price level fall"], c: 3, w: "Appreciation lowers U.S. exports and raises imports, so net exports fall. Net exports are part of AD, so AD shifts left, and real GDP and the price level both fall. A recessionary gap opens." },
+    { s: "Real interest rates in the United States rise relative to those in Europe. In the foreign exchange market for dollars, with euros per dollar on the vertical axis, which is most likely?", o: ["Supply of dollars increases, the dollar depreciates, and U.S. net exports rise", "Demand for dollars increases, the dollar appreciates, and U.S. net exports fall", "Demand for dollars decreases, the dollar depreciates, and U.S. net exports rise", "Demand for dollars increases, the dollar appreciates, and U.S. net exports rise"], c: 1, w: "European investors want higher-yielding U.S. assets, so they demand more dollars. The demand curve shifts right and the dollar appreciates. A stronger dollar lowers U.S. net exports, so D has the wrong trade effect." },
+    { s: "A country has a current account deficit. Its currency then depreciates. All else equal, what happens to its current account?", o: ["The deficit grows because imports become cheaper", "It does not change because the current account records only asset trades", "The deficit shrinks because net exports rise", "It turns into a capital and financial account deficit of the same size"], c: 2, w: "Depreciation raises exports and lowers imports, so the balance of trade improves. The balance of trade is the main part of the current account, so the current account deficit shrinks. Asset trades belong in the capital and financial account, so B is wrong." },
+    { s: "Which of the following shifts the U.S. aggregate demand curve rather than causing a movement along it?", o: ["A higher U.S. price level makes U.S. goods more expensive relative to foreign goods", "A lower U.S. price level raises the real value of household wealth", "A higher U.S. price level raises the demand for money and interest rates", "The dollar depreciates because Americans buy more foreign financial assets"], c: 3, w: "A change in the exchange rate caused by something other than the U.S. price level changes net exports at every price level, so AD shifts. Options A, B, and C are the foreign purchases, wealth, and interest rate effects, which explain the slope of AD and are movements along it." },
+    { s: "Congress cuts taxes, and the larger budget deficit raises the U.S. real interest rate. Through the foreign exchange market, what is the most likely effect?", o: ["The dollar appreciates and net exports fall, partly offsetting the increase in AD", "The dollar depreciates and net exports rise, adding to the increase in AD", "The dollar appreciates and net exports rise, adding to the increase in AD", "The dollar does not change because fiscal policy does not affect interest rates"], c: 0, w: "A higher real interest rate attracts foreign financial capital, so demand for dollars rises and the dollar appreciates. That lowers net exports and shrinks the AD increase from the tax cut. Option C pairs appreciation with the wrong trade effect." },
+    { s: "A country exports 300 billion and imports 340 billion. After its currency depreciates, exports rise to 330 billion and imports fall to 323 billion. By how much do net exports change?", o: ["Decrease of 47 billion", "Increase of 47 billion", "Increase of 7 billion", "Increase of 30 billion"], c: 1, w: "Net exports start at 300 − 340 = −40 and end at 330 − 323 = +7. The change is +7 − (−40) = +47 billion. Option C is the new level of net exports, not the change." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("6.5");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [6], topic: "6.5", compact: true, storageKey: "topic-6.5" });</script>
+</body>
+</html>

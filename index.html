@@ -3,20 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AP Macro Unit 5 Study Labs</title>
+<title>AP Macroeconomics Study Labs</title>
+<meta name="description" content="Interactive study labs and terminology guides for every unit of AP Macroeconomics.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/lab.css">
 <style>
-.labs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-.lab-card { display: grid; gap: 8px; text-decoration: none; color: var(--ink); align-content: start; transition: border-color .15s; }
+.labs { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.lab-card { display: grid; gap: 8px; text-decoration: none; color: var(--ink); align-content: start; }
 .lab-card:hover { border-color: var(--accent); }
 .lab-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.lab-card .num { font-family: var(--mono); font-size: .8rem; color: var(--accent); }
+.lab-card .num, .unit-head .num { font-family: var(--mono); font-size: .8rem; color: var(--accent); }
 .lab-card p { color: var(--muted); font-size: .94rem; }
 .lab-card .go { color: var(--accent); font-weight: 500; font-size: .9rem; }
-.thread { max-width: 72ch; display: grid; gap: 10px; }
+.unit-head { display: grid; gap: 4px; border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+.unit-head .meta { font-size: .88rem; color: var(--muted); }
+.unit-head a, .soon a, .jump a { color: var(--accent); }
+.soon { color: var(--muted); }
+.jump { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .92rem; }
+.unit { scroll-margin-top: 16px; }
 footer { color: var(--muted); font-size: .86rem; border-top: 1px solid var(--rule); padding-top: 16px; }
 </style>
 </head>
@@ -24,28 +30,16 @@ footer { color: var(--muted); font-size: .86rem; border-top: 1px solid var(--rul
 <div class="wrap">
 
 <header>
-  <span class="kicker">AP Macroeconomics · Unit 5</span>
-  <h1>Long-Run Consequences of Stabilization Policies</h1>
-  <p class="lede">Seven interactive study labs, one for each topic in the unit. Each lab has graphs you can move, a running explanation of what changed and why, a reference table, FRQ graphing tips, and eight practice questions.</p>
+  <span class="kicker">AP Macroeconomics</span>
+  <h1>AP Macroeconomics Study Labs</h1>
+  <p class="lede">Interactive study labs for the AP Macroeconomics course, one for each topic. Each lab has graphs you can move, a running explanation of what changed and why, a reference table, FRQ tips, practice questions, and the key terms for that topic.</p>
+  <nav class="jump" aria-label="Jump to a unit"><a href="#unit-1">Unit 1</a> <a href="#unit-2">Unit 2</a> <a href="#unit-3">Unit 3</a> <a href="#unit-4">Unit 4</a> <a href="#unit-5">Unit 5</a> <a href="#unit-6">Unit 6</a> <a href="terms/index.html">All terms</a></nav>
 </header>
-
-<section aria-labelledby="labs-h">
-  <h2 id="labs-h" style="font-size:1.3rem;">The labs</h2>
-  <div class="labs">
-    <a class="card lab-card" href="labs/5-1-policy-actions-short-run.html"><span class="num">Topic 5.1</span><h3>Fiscal &amp; Monetary Policy in the Short Run</h3><p>Combine fiscal and monetary policy on linked AD–AS and money market graphs. See when the result is clear and when it depends on size.</p><span class="go">Open lab →</span></a>
-    <a class="card lab-card" href="labs/5-2-phillips-curve.html"><span class="num">Topic 5.2</span><h3>The Phillips Curve</h3><p>Watch the AD–AS graph and the Phillips curve move together, then let expectations adjust in the long run.</p><span class="go">Open lab →</span></a>
-    <a class="card lab-card" href="labs/5-3-money-growth-inflation.html"><span class="num">Topic 5.3</span><h3>Money Growth and Inflation</h3><p>Use MV = PY to connect money growth to inflation, and see why money is neutral in the long run.</p><span class="go">Open lab →</span></a>
-    <a class="card lab-card" href="labs/5-4-deficits-national-debt.html"><span class="num">Topic 5.4</span><h3>Government Deficits and the National Debt</h3><p>Run a 10-year budget and watch yearly deficits pile up into debt. Flow versus stock, made visible.</p><span class="go">Open lab →</span></a>
-    <a class="card lab-card" href="labs/5-5-crowding-out.html"><span class="num">Topic 5.5</span><h3>Crowding Out</h3><p>Government borrowing in the loanable funds market, higher real interest rates, and less private investment.</p><span class="go">Open lab →</span></a>
-    <a class="card lab-card" href="labs/5-6-economic-growth.html"><span class="num">Topic 5.6</span><h3>Economic Growth</h3><p>Shift the PPC and LRAS with capital, skills, and technology. Try the Rule of 70 and see how growth compounds.</p><span class="go">Open lab →</span></a>
-    <a class="card lab-card" href="labs/5-7-public-policy-growth.html"><span class="num">Topic 5.7</span><h3>Public Policy and Economic Growth</h3><p>Test policies on a workbench and compare their short-run demand effects with their long-run growth effects.</p><span class="go">Open lab →</span></a>
-  </div>
-</section>
 
 <section aria-labelledby="terms-h">
   <div style="display:grid; gap:6px;">
     <h2 id="terms-h" style="font-size:1.3rem;">Terminology guides</h2>
-    <p style="color:var(--muted); max-width:70ch;">Every key term in AP Macroeconomics, with search, flashcards, and a self-quiz. Start with the master guide to search the whole course, or open one unit at a time.</p>
+    <p style="color:var(--muted); max-width:70ch;">Every key term in the course, with search, flashcards, and a self-quiz.</p>
   </div>
   <div class="unit-cards">
     <a class="card" href="terms/index.html"><span class="num">All units</span><b>Master terminology guide</b><span class="meta">Search and study every term in the course</span></a>
@@ -58,14 +52,98 @@ footer { color: var(--muted); font-size: .86rem; border-top: 1px solid var(--rul
   </div>
 </section>
 
-<section aria-labelledby="thread-h">
-  <div class="thread">
-    <h2 id="thread-h" style="font-size:1.3rem;">The question behind the whole unit</h2>
-    <p>Units 3 and 4 asked what fiscal and monetary policy do right away. Unit 5 asks what happens after the economy adjusts. For almost every question in this unit, answer two things: the short-run effect, and the long-run effect once wages and expectations catch up.</p>
+<section aria-labelledby="unit-1" class="unit">
+  <div class="unit-head">
+    <h2 id="unit-1" style="font-size:1.4rem;"><span class="num">Unit 1</span> Basic Economic Concepts</h2>
+    <span class="meta">5–10% of the multiple-choice section · <a href="terms/unit-1.html">Unit 1 terms</a></span>
+  </div>
+  <div class="labs">
+    <a class="card lab-card" href="labs/1-1-scarcity.html"><span class="num">Topic 1.1</span><h3>Scarcity</h3><p>Scarcity means our wants are unlimited but the resources to satisfy them are limited, so every person and every society has to choose.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/1-2-opportunity-cost-ppc.html"><span class="num">Topic 1.2</span><h3>Opportunity Cost and the PPC</h3><p>Every choice has an opportunity cost: the next best thing you give up.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/1-3-comparative-advantage.html"><span class="num">Topic 1.3</span><h3>Comparative Advantage and Gains from Trade</h3><p>A country has a comparative advantage in a good when it can make that good at a lower opportunity cost than another country.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/1-4-demand.html"><span class="num">Topic 1.4</span><h3>Demand</h3><p>Demand shows how much of a good buyers are willing and able to buy at each price.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/1-5-supply.html"><span class="num">Topic 1.5</span><h3>Supply</h3><p>Supply shows how much sellers are willing and able to offer at each price.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/1-6-market-equilibrium.html"><span class="num">Topic 1.6</span><h3>Market Equilibrium and Changes in Equilibrium</h3><p>A market is in equilibrium when quantity demanded equals quantity supplied.</p><span class="go">Open lab →</span></a>
+  </div>
+</section>
+<section aria-labelledby="unit-2" class="unit">
+  <div class="unit-head">
+    <h2 id="unit-2" style="font-size:1.4rem;"><span class="num">Unit 2</span> Economic Indicators and the Business Cycle</h2>
+    <span class="meta">12–17% of the multiple-choice section · <a href="terms/unit-2.html">Unit 2 terms</a></span>
+  </div>
+  <div class="labs">
+    <a class="card lab-card" href="labs/2-1-circular-flow-gdp.html"><span class="num">Topic 2.1</span><h3>The Circular Flow and GDP</h3><p>The circular flow model shows how money, products, and resources move between households, firms, the government, and the rest of the world.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/2-2-limitations-of-gdp.html"><span class="num">Topic 2.2</span><h3>Limitations of GDP</h3><p>GDP measures the market value of final goods and services produced inside a country in a year.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/2-3-unemployment.html"><span class="num">Topic 2.3</span><h3>Unemployment</h3><p>The unemployment rate counts people who have no job and are actively looking, as a share of the labor force.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/2-4-price-indices-inflation.html"><span class="num">Topic 2.4</span><h3>Price Indices and Inflation</h3><p>A price index like the consumer price index (CPI) tracks what a fixed market basket of goods costs over time, compared with a base year set to 100.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/2-5-costs-of-inflation.html"><span class="num">Topic 2.5</span><h3>Costs of Inflation</h3><p>Inflation erodes the purchasing power of money, and when it is unanticipated it moves purchasing power from some people to others.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/2-6-real-vs-nominal-gdp.html"><span class="num">Topic 2.6</span><h3>Real vs. Nominal GDP</h3><p>Nominal GDP values output at the prices of the year it was produced, so it rises when prices rise even if the economy makes nothing extra.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/2-7-business-cycles.html"><span class="num">Topic 2.7</span><h3>Business Cycles</h3><p>Real GDP does not grow in a straight line.</p><span class="go">Open lab →</span></a>
+  </div>
+</section>
+<section aria-labelledby="unit-3" class="unit">
+  <div class="unit-head">
+    <h2 id="unit-3" style="font-size:1.4rem;"><span class="num">Unit 3</span> National Income and Price Determination</h2>
+    <span class="meta">17–27% of the multiple-choice section · <a href="terms/unit-3.html">Unit 3 terms</a></span>
+  </div>
+  <div class="labs">
+    <a class="card lab-card" href="labs/3-1-aggregate-demand.html"><span class="num">Topic 3.1</span><h3>Aggregate Demand</h3><p>Aggregate demand (AD) is the total amount of real GDP that households, firms, the government, and foreign buyers want to buy at each price level: AD = C + I + G + Xn.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-2-multipliers.html"><span class="num">Topic 3.2</span><h3>Multipliers</h3><p>One person's spending is another person's income, so a change in spending ripples through the economy and changes real GDP by more than the first dollar spent.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-3-short-run-aggregate-supply.html"><span class="num">Topic 3.3</span><h3>Short-Run Aggregate Supply</h3><p>Short-run aggregate supply (SRAS) shows how much real GDP firms produce at each price level while nominal wages and some other input prices are still stuck.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-4-long-run-aggregate-supply.html"><span class="num">Topic 3.4</span><h3>Long-Run Aggregate Supply</h3><p>Long-run aggregate supply (LRAS) shows how much real GDP the economy produces once every price and wage has adjusted.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-5-ad-as-equilibrium.html"><span class="num">Topic 3.5</span><h3>Equilibrium in the AD–AS Model</h3><p>Short-run equilibrium is where aggregate demand crosses short-run aggregate supply.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-6-short-run-changes-ad-as.html"><span class="num">Topic 3.6</span><h3>Changes in the AD–AS Model in the Short Run</h3><p>A shock to aggregate demand or short-run aggregate supply moves the economy away from full employment.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-7-long-run-self-adjustment.html"><span class="num">Topic 3.7</span><h3>Long-Run Self-Adjustment</h3><p>When AD shifts, the economy can land in a recessionary or inflationary gap.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-8-fiscal-policy.html"><span class="num">Topic 3.8</span><h3>Fiscal Policy</h3><p>Fiscal policy is the government's use of spending, taxes, and transfer payments to shift aggregate demand.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/3-9-automatic-stabilizers.html"><span class="num">Topic 3.9</span><h3>Automatic Stabilizers</h3><p>Automatic stabilizers are tax and transfer rules that push against the business cycle on their own, with no new law.</p><span class="go">Open lab →</span></a>
+  </div>
+</section>
+<section aria-labelledby="unit-4" class="unit">
+  <div class="unit-head">
+    <h2 id="unit-4" style="font-size:1.4rem;"><span class="num">Unit 4</span> Financial Sector</h2>
+    <span class="meta">18–23% of the multiple-choice section · <a href="terms/unit-4.html">Unit 4 terms</a></span>
+  </div>
+  <div class="labs">
+    <a class="card lab-card" href="labs/4-1-financial-assets.html"><span class="num">Topic 4.1</span><h3>Financial Assets</h3><p>People store wealth in financial assets such as cash, bank deposits, bonds, and stocks, and each one trades off liquidity, rate of return, and risk.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/4-2-nominal-vs-real-interest-rates.html"><span class="num">Topic 4.2</span><h3>Nominal vs. Real Interest Rates</h3><p>The nominal interest rate is the rate written on the loan.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/4-3-money.html"><span class="num">Topic 4.3</span><h3>Definition, Measurement, and Functions of Money</h3><p>Money is any asset people widely accept as payment.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/4-4-banking-money-supply.html"><span class="num">Topic 4.4</span><h3>Banking and the Expansion of the Money Supply</h3><p>Banks keep only a fraction of their deposits as reserves and lend out the rest, and those loans create new money.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/4-5-money-market.html"><span class="num">Topic 4.5</span><h3>The Money Market</h3><p>The money market is where the demand for money meets the supply of money set by the central bank, and together they determine the nominal interest rate.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/4-6-monetary-policy.html"><span class="num">Topic 4.6</span><h3>Monetary Policy</h3><p>Monetary policy is how the central bank changes interest rates to push aggregate demand toward full employment and stable prices.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/4-7-loanable-funds-market.html"><span class="num">Topic 4.7</span><h3>The Loanable Funds Market</h3><p>The loanable funds market brings together savers, who supply funds, and borrowers, who demand them.</p><span class="go">Open lab →</span></a>
+  </div>
+</section>
+<section aria-labelledby="unit-5" class="unit">
+  <div class="unit-head">
+    <h2 id="unit-5" style="font-size:1.4rem;"><span class="num">Unit 5</span> Long-Run Consequences of Stabilization Policies</h2>
+    <span class="meta">20–30% of the multiple-choice section · <a href="terms/unit-5.html">Unit 5 terms</a></span>
+  </div>
+  <div class="labs">
+    <a class="card lab-card" href="labs/5-1-policy-actions-short-run.html"><span class="num">Topic 5.1</span><h3>Fiscal &amp; Monetary Policy in the Short Run</h3><p>Congress controls fiscal policy (government spending and taxes).</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/5-2-phillips-curve.html"><span class="num">Topic 5.2</span><h3>The Phillips Curve</h3><p>The Phillips curve shows the trade-off between inflation and unemployment.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/5-3-money-growth-inflation.html"><span class="num">Topic 5.3</span><h3>Money Growth and Inflation</h3><p>In the long run, inflation is driven by how fast the money supply grows.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/5-4-deficits-national-debt.html"><span class="num">Topic 5.4</span><h3>Government Deficits and the National Debt</h3><p>A budget deficit is what the government is short in one year.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/5-5-crowding-out.html"><span class="num">Topic 5.5</span><h3>Crowding Out</h3><p>When the government borrows to cover a budget deficit, it competes with businesses for the same pool of saving.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/5-6-economic-growth.html"><span class="num">Topic 5.6</span><h3>Economic Growth</h3><p>Economic growth means the economy can produce more than before.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/5-7-public-policy-growth.html"><span class="num">Topic 5.7</span><h3>Public Policy and Economic Growth</h3><p>Some policies only push aggregate demand.</p><span class="go">Open lab →</span></a>
+  </div>
+</section>
+<section aria-labelledby="unit-6" class="unit">
+  <div class="unit-head">
+    <h2 id="unit-6" style="font-size:1.4rem;"><span class="num">Unit 6</span> Open Economy—International Trade and Finance</h2>
+    <span class="meta">10–13% of the multiple-choice section · <a href="terms/unit-6.html">Unit 6 terms</a></span>
+  </div>
+  <div class="labs">
+    <a class="card lab-card" href="labs/6-1-balance-of-payments.html"><span class="num">Topic 6.1</span><h3>Balance of Payments Accounts</h3><p>The balance of payments records every transaction between a country's residents and the rest of the world.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/6-2-exchange-rates.html"><span class="num">Topic 6.2</span><h3>Exchange Rates</h3><p>An exchange rate is the price of one currency in terms of another.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/6-3-foreign-exchange-market.html"><span class="num">Topic 6.3</span><h3>The Foreign Exchange Market</h3><p>In the foreign exchange market, people trade one currency for another so they can buy goods, services, and assets from another country.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/6-4-fx-market-shifts.html"><span class="num">Topic 6.4</span><h3>Policy and Economic Changes in the Foreign Exchange Market</h3><p>The value of the dollar moves when something changes how many dollars foreigners want to buy or how many dollars Americans want to sell.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/6-5-fx-and-net-exports.html"><span class="num">Topic 6.5</span><h3>The Foreign Exchange Market and Net Exports</h3><p>When the dollar's value changes, the prices of U.S.</p><span class="go">Open lab →</span></a>
+    <a class="card lab-card" href="labs/6-6-real-interest-rates-capital-flows.html"><span class="num">Topic 6.6</span><h3>Real Interest Rates and International Capital Flows</h3><p>Financial capital flows toward the country that pays the higher real interest rate.</p><span class="go">Open lab →</span></a>
   </div>
 </section>
 
-<footer>The graphs use simplified teaching models. The direction of every change matches the AP Macroeconomics course framework, but the exact numbers are illustrative, not real data.</footer>
+<footer>The graphs use simplified teaching models. The direction of every change follows the AP Macroeconomics course framework, but the exact numbers are illustrative, not real data. 42 labs are live.</footer>
 
 </div>
 </body>

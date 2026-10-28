@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Monetary Policy Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: end; }
+.toggles .grp { display: grid; gap: 6px; }
+.toggles .grp > span { font-size: .86rem; font-weight: 500; }
+[hidden] { display: none !important; }
+.chain { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 4 · Topic 4.6</span>
+  <h1>The Monetary Policy Study Lab</h1>
+  <p class="lede">Monetary policy is how the central bank changes interest rates to push aggregate demand toward full employment and stable prices. AP teaches two ways to do it: the limited-reserves tools that change the money supply, and the ample-reserves tools that set administered rates. Switch between the two frameworks, use the tools to close a recessionary or inflationary gap, and follow the chain from the tool to the interest rate to AD.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Run monetary policy</h2>
+    <p>The left graph shows how the tool moves the interest rate. The right graph shows what that rate change does to AD, real GDP, and the price level. Dashed grey lines show where things were before the policy.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3 id="left-h">Money market <small>limited reserves</small></h3>
+      <svg class="chart" id="pm" viewBox="0 0 440 330" role="img" aria-label="Graph of the market where the central bank sets the interest rate"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>AD–AS <small>real GDP and the price level</small></h3>
+      <svg class="chart" id="adas" viewBox="0 0 440 330" role="img" aria-label="Aggregate demand and aggregate supply graph with long-run aggregate supply"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="toggles">
+      <div class="grp">
+        <span>Framework</span>
+        <div class="seg" role="group" aria-label="Monetary policy framework">
+          <button type="button" id="fw-l" aria-pressed="true">Limited reserves</button>
+          <button type="button" id="fw-a" aria-pressed="false">Ample reserves</button>
+        </div>
+      </div>
+      <div class="grp">
+        <span>The economy starts in</span>
+        <div class="seg" role="group" aria-label="Starting state of the economy">
+          <button type="button" id="ec-r" aria-pressed="true">Recessionary gap</button>
+          <button type="button" id="ec-f" aria-pressed="false">Full employment</button>
+          <button type="button" id="ec-i" aria-pressed="false">Inflationary gap</button>
+        </div>
+      </div>
+    </div>
+    <div class="controls" id="ctl-l" style="grid-template-columns: repeat(3, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-omo">Open market operations <output id="o-omo"></output></label>
+        <input type="range" id="s-omo" min="-40" max="40" step="10">
+        <span class="hint">Right = buy bonds, left = sell bonds</span>
+      </div>
+      <div class="ctl">
+        <label for="s-dr">Discount rate <output id="o-dr"></output></label>
+        <input type="range" id="s-dr" min="4" max="8" step="0.5">
+        <span class="hint">Rate the Fed charges banks for loans of reserves</span>
+      </div>
+      <div class="ctl">
+        <label for="s-rr">Required reserve ratio <output id="o-rr"></output></label>
+        <input type="range" id="s-rr" min="5" max="15" step="1">
+        <span class="hint">Share of deposits banks must hold as reserves</span>
+      </div>
+    </div>
+    <div class="controls" id="ctl-a" style="grid-template-columns: repeat(2, minmax(0,1fr));" hidden>
+      <div class="ctl">
+        <label for="s-ior">Interest on reserves (IOR) <output id="o-ior"></output></label>
+        <input type="range" id="s-ior" min="2.5" max="7.5" step="0.1">
+        <span class="hint">An administered rate; the Fed moves the overnight reverse repo rate with it</span>
+      </div>
+      <div class="ctl">
+        <label for="s-res">Quantity of reserves <output id="o-res"></output></label>
+        <input type="range" id="s-res" min="1" max="9" step="0.5">
+        <span class="hint">Bond purchases add reserves; sales remove them</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button type="button" id="btn-reset">Reset tools</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k" id="k-rate">Nominal interest rate</div><div class="v" id="r-rate">5.0%</div></div>
+    <div class="stat"><div class="k">Investment and consumption</div><div class="v" id="r-ic">No change</div></div>
+    <div class="stat"><div class="k">Real GDP</div><div class="v" id="r-y">$900B</div></div>
+    <div class="stat"><div class="k">Price level</div><div class="v" id="r-pl">92.0</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Goals</span><h3>The dual mandate</h3><p>The Federal Reserve is the U.S. central bank. Congress gave it two goals: maximum employment and stable prices. In a recession it fights unemployment; when the economy overheats it fights inflation.</p></div>
+    <div class="card"><span class="tag">Direction</span><h3>Expansionary vs. contractionary</h3><p>Expansionary monetary policy <b>lowers</b> interest rates to raise spending and shift AD right. Use it to close a recessionary gap. Contractionary policy <b>raises</b> interest rates to shift AD left. Use it to close an inflationary gap.</p></div>
+    <div class="card"><span class="tag">Limited reserves</span><h3>Three tools that change the money supply</h3><p>When reserves are scarce, small changes in reserves move rates. Buying bonds, lowering the discount rate, or lowering the required reserve ratio gives banks more to lend, so the money supply shifts right and the nominal interest rate falls. Open market operations are the tool used most.</p></div>
+    <div class="card"><span class="tag">Ample reserves</span><h3>Administered rates</h3><p>When banks hold plenty of reserves, reserve supply crosses the flat part of reserve demand. Adding or removing reserves leaves the rate unchanged. The Fed moves the policy rate by setting administered rates: interest on reserves and the overnight reverse repurchase (ON RRP) rate. Banks will not lend reserves for less than they can earn at the Fed.</p></div>
+    <div class="card"><span class="tag">The chain</span><h3>Monetary transmission mechanism</h3><p>Tool → interest rate → investment and interest-sensitive consumption → AD → real GDP and the price level. AP free-response answers earn points for each link, so write every step in order.</p></div>
+    <div class="card"><span class="tag">Bank math</span><h3>Money multiplier</h3><p>In the limited-reserves model, the money multiplier is 1 ÷ required reserve ratio. A 10% ratio gives a multiplier of 10. Lowering the ratio raises the multiplier, so each dollar of reserves supports more loans and deposits.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Monetary policy cheat sheet</h2>
+    <p>Each row is one tool used in one direction. The last four columns are the AP chain.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Central bank action</th><th>Framework</th><th>Graph shift</th><th>Interest rate</th><th>I and C</th><th>AD</th><th>Real GDP, price level</th></tr></thead>
+    <tbody>
+      <tr><td>Buy government bonds (open market purchase)</td><td>Limited</td><td><span class="shift">MS right</span></td><td>↓</td><td>↑</td><td>Right</td><td>↑, ↑</td></tr>
+      <tr><td>Sell government bonds (open market sale)</td><td>Limited</td><td><span class="shift">MS left</span></td><td>↑</td><td>↓</td><td>Left</td><td>↓, ↓</td></tr>
+      <tr><td>Lower the discount rate</td><td>Limited</td><td><span class="shift">MS right</span></td><td>↓</td><td>↑</td><td>Right</td><td>↑, ↑</td></tr>
+      <tr><td>Raise the discount rate</td><td>Limited</td><td><span class="shift">MS left</span></td><td>↑</td><td>↓</td><td>Left</td><td>↓, ↓</td></tr>
+      <tr><td>Lower the required reserve ratio</td><td>Limited</td><td><span class="shift">MS right</span></td><td>↓</td><td>↑</td><td>Right</td><td>↑, ↑</td></tr>
+      <tr><td>Raise the required reserve ratio</td><td>Limited</td><td><span class="shift">MS left</span></td><td>↑</td><td>↓</td><td>Left</td><td>↓, ↓</td></tr>
+      <tr><td>Lower interest on reserves (and ON RRP rate)</td><td>Ample</td><td><b>Reserve demand down</b></td><td>↓</td><td>↑</td><td>Right</td><td>↑, ↑</td></tr>
+      <tr><td>Raise interest on reserves (and ON RRP rate)</td><td>Ample</td><td><b>Reserve demand up</b></td><td>↑</td><td>↓</td><td>Left</td><td>↓, ↓</td></tr>
+      <tr><td>Buy or sell bonds while reserves stay ample</td><td>Ample</td><td><span class="shift">Reserve supply shifts</span> along the flat part</td><td>No change</td><td>No change</td><td>No change</td><td>No change</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Money market: vertical axis <b>Nominal interest rate</b>, horizontal axis <b>Quantity of money</b>. MS is vertical, MD slopes down.</li>
+        <li>Reserve market (ample reserves): vertical axis <b>Policy rate</b> (or federal funds rate), horizontal axis <b>Quantity of reserves</b>. Draw reserve demand sloping down, then flat; draw supply vertical where demand is flat.</li>
+        <li>For an IOR change, shift the reserve demand curve up or down and mark the new policy rate on the vertical axis. Leave the supply of reserves where it was.</li>
+        <li>On the AD–AS graph, label the axes <b>Price level</b> and <b>Real GDP</b>, draw LRAS at Y<sub>f</sub>, show AD₁ and AD₂ with an arrow, and mark PL₁, PL₂, Y₁, and Y₂.</li>
+        <li>Name the exact action: "The Fed should buy bonds" or "lower the interest rate on reserves." Writing "increase the money supply" alone may not earn the point when the question asks for an open market operation.</li>
+        <li>Write the full chain: interest rate falls, investment and consumption rise, AD increases, real GDP and the price level rise.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Buying bonds for an inflationary gap. Buying adds reserves and money, which is expansionary. To fight inflation, the Fed sells bonds.</li>
+        <li>Saying expansionary policy raises rates. Expansionary monetary policy lowers interest rates.</li>
+        <li>Shifting reserve supply to change the rate in an ample-reserves graph. On the flat part, the rate stays at IOR no matter how many reserves there are.</li>
+        <li>Confusing monetary and fiscal policy. Taxes and government spending are fiscal policy, set by Congress and the President. The central bank uses rates and reserves.</li>
+        <li>Shifting SRAS or LRAS with monetary policy. In the short run, monetary policy shifts AD only.</li>
+        <li>Mixing up the discount rate and the federal funds rate. The discount rate is what the Fed charges banks. The federal funds rate is what banks charge each other.</li>
+        <li>Getting the reserve requirement backwards. A higher required reserve ratio means less lending, a smaller money multiplier, and a smaller money supply.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 4.6. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-4.html">Unit 4 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var TOOLS = { omo: 0, dr: 6, rr: 10, ior: 5, res: 6.5 };
+  var S = Object.assign({ fw: "l", econ: "rec" }, TOOLS);
+  var K = 0.8;              // slope of MD and AD/SRAS in Lab.market space
+  var KINK = 4, STEEP = 1.2; // reserve demand: flat at IOR for reserves >= KINK, slopes down to the left of it
+  var R0 = 5;               // starting interest rate (%) in both frameworks
+  var GAP = { rec: -2, full: 0, infl: 2 }; // starting AD shift for each economy
+  var C = 1.25;             // AD shift per percentage point fall in the rate
+
+  // ---------- Model ----------
+  // Limited: MS shift = 0.5 per $10B of bonds bought + 0.25 per point cut in the discount rate + 0.1 per point cut in the RRR.
+  // Money market: rate = 5 - K * MS shift (MD fixed). Quantity of money = $100B per graph unit.
+  // Ample: policy rate = IOR when reserves are on the flat part, higher when reserves are scarce.
+  function msShift(s) { return 0.05 * s.omo + 0.25 * (6 - s.dr) + 0.1 * (10 - s.rr); }
+  function ampleRate(ior, res) { return ior + (res < KINK ? STEEP * (KINK - res) : 0); }
+  function model(s) {
+    var ms = msShift(s);
+    var rate = s.fw === "l" ? R0 - K * ms : ampleRate(s.ior, s.res);
+    var d = rate - R0;
+    var b = GAP[s.econ];
+    var ad = b - C * d;
+    var x0 = 5 + b / 2, x1 = 5 + ad / 2;
+    var y0 = 5 + K * b / 2, y1 = 5 + K * ad / 2;
+    return { ms: ms, rate: rate, d: d, b: b, ad: ad, x0: x0, x1: x1, y0: y0, y1: y1,
+             Y0: gdp(x0), Y1: gdp(x1), P0: pl(y0), P1: pl(y1) };
+  }
+  function gdp(x) { return 1000 + 100 * (x - 5); }
+  function pl(y) { return 100 + 10 * (y - 5); }
+
+  var f = Lab.fmt;
+  function near(a, b) { return Math.abs(a - b) < 1e-6; }
+  function bil(v) { return "$" + Math.round(v).toLocaleString("en-US") + "B"; }
+  function pct(v) { return f(v) + "%"; }
+
+  // ---------- Graphs ----------
+  var svgP = document.getElementById("pm"), svgA = document.getElementById("adas");
+
+  function drawMoney(m) {
+    var moved = Math.abs(m.ms) > 1e-6;
+    Lab.market(svgP, {
+      xLabel: "Quantity of money", yLabel: "Nominal interest rate",
+      demand: { shift: 0, label: "MD" },
+      supply: { shift: m.ms, label: moved ? "MS₂" : "MS₁", vertical: true },
+      start: { supply: 0 },
+      slope: K,
+      startLabels: ["Q₁", "i₁"],
+      eqLabels: moved ? ["Q₂", "i₂"] : ["Q₁", "i₁"],
+      extra: function (F) {
+        if (moved) {
+          var right = m.ms > 0;
+          Lab.tag(F, right ? 4.85 : 5.15, 9.5, "MS₁", "var(--muted)", right ? "end" : "start");
+          Lab.arrow(F, 5, 8.6, 5 + m.ms + (right ? -0.12 : 0.12), 8.6, "var(--muted)");
+        }
+      }
+    });
+  }
+
+  function demandPts(ior) {
+    var p = [];
+    for (var x = 0; x <= KINK; x += 0.25) p.push([x, ior + STEEP * (KINK - x)]);
+    p.push([10, ior]);
+    return p;
+  }
+  function drawReserves(m, s) {
+    var F = Lab.frame(svgP, { x: [0, 10], y: [0, 10], xLabel: "Quantity of reserves", yLabel: "Policy rate", xTicks: [], yTicks: [] });
+    var dMoved = !near(s.ior, TOOLS.ior), sMoved = !near(s.res, TOOLS.res);
+    var r0 = ampleRate(TOOLS.ior, TOOLS.res);
+    if (dMoved) Lab.line(F, demandPts(TOOLS.ior), "var(--ghost)", 2, "6 5");
+    if (sMoved) Lab.vline(F, TOOLS.res, "var(--ghost)", 2, "6 5");
+    if (dMoved || sMoved) Lab.dot(F, TOOLS.res, r0, "var(--ghost)", true, null, near(m.rate, r0) ? null : "i₁");
+    // current curves
+    Lab.vline(F, s.res, "var(--srpc)", 3);
+    Lab.line(F, demandPts(s.ior), "var(--accent)", 3);
+    Lab.tag(F, s.res + 0.15, 9.5, sMoved ? "RS₂" : "RS₁", "var(--srpc)");
+    if (sMoved) {
+      var right = s.res > TOOLS.res;
+      Lab.tag(F, TOOLS.res + (right ? -0.15 : 0.15), 9.5, "RS₁", "var(--muted)", right ? "end" : "start");
+      Lab.arrow(F, TOOLS.res, 8.6, s.res + (right ? -0.12 : 0.12), 8.6, "var(--muted)");
+    }
+    Lab.tag(F, 9.6, s.ior + 0.3, dMoved ? "RD₂" : "RD₁", "var(--accent)", "end");
+    Lab.tag(F, KINK + 0.2, s.ior - 0.6, "IOR = " + pct(s.ior), "var(--accent)");
+    if (s.res >= KINK) Lab.tag(F, 1.9, Math.min(9.4, s.ior + STEEP * 2.1 + 0.2), "scarce reserves", "var(--muted)");
+    if (dMoved) {
+      Lab.tag(F, 9.6, TOOLS.ior + (s.ior > TOOLS.ior ? -0.6 : 0.3), "RD₁", "var(--muted)", "end");
+      Lab.arrow(F, 8.4, TOOLS.ior, 8.4, s.ior + (s.ior > TOOLS.ior ? -0.15 : 0.15), "var(--muted)");
+    }
+    var lbl = dMoved || sMoved ? (near(m.rate, r0) ? "i₁" : "i₂") : "i₁";
+    Lab.dot(F, s.res, m.rate, "var(--ink)", true, null, lbl);
+  }
+
+  function drawADAS(m) {
+    var moved = Math.abs(m.x1 - m.x0) > 1e-6;
+    var closed = Math.abs(m.x1 - 5) < 0.02;
+    var xl = closed ? (moved ? "Y₂ = Yf" : "Y₁ = Yf") : moved ? "Y₂" : "Y₁";
+    Lab.market(svgA, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: m.ad, label: moved ? "AD₂" : "AD₁" },
+      supply: { shift: 0, label: "SRAS" },
+      longRun: { shift: 0, label: "LRAS" },
+      start: { demand: m.b },
+      slope: K,
+      eqLabels: [xl, moved ? "PL₂" : "PL₁"],
+      startLabels: [Math.abs(m.x0 - 5) < 0.02 ? "Y₁ = Yf" : "Y₁", "PL₁"],
+      extra: function (F) {
+        if (Math.abs(m.x1 - 5) > 0.7 && (!moved || Math.abs(m.x0 - 5) > 0.7))
+          Lab.el("text", { x: F.sx(5), y: F.H - F.M.b + 16, "text-anchor": "middle", style: "fill:var(--lrpc); font-weight:600" }, F.svg, "Yf");
+        if (!closed) {
+          var col = m.x1 < 5 ? "var(--accent)" : "var(--bad)";
+          Lab.line(F, [[m.x1, 0.7], [5, 0.7]], col, 4);
+          Lab.tag(F, (m.x1 + 5) / 2, 1.05, m.x1 < 5 ? "recessionary gap" : "inflationary gap", col, "middle");
+        }
+        if (moved) {
+          var lx = Math.min(9.2, 5 + m.b + 3.9 / K);
+          Lab.tag(F, Math.min(9.6, lx), Math.max(0.4, 5 - K * (lx - 5 - m.b)) + 0.3, "AD₁", "var(--muted)", "end");
+        }
+      }
+    });
+  }
+
+  function legend(s) {
+    var el = document.getElementById("legend");
+    el.innerHTML = s.fw === "l"
+      ? '<span class="l-ad">Money demand (MD), AD</span><span class="l-srpc">Money supply (MS), SRAS</span><span class="l-lrpc">LRAS</span><span class="l-ghost">Before the policy</span>'
+      : '<span class="l-ad">Reserve demand (RD), AD</span><span class="l-srpc">Reserve supply (RS), SRAS</span><span class="l-lrpc">LRAS</span><span class="l-ghost">Before the policy</span>';
+  }
+
+  // ---------- Story ----------
+  function li(a) { return a.length ? "<ul>" + a.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" : ""; }
+  function story(m, s) {
+    var html = "", econ;
+    if (s.econ === "rec") econ = "<b>The economy starts in a recessionary gap.</b> Real GDP is " + bil(m.Y0) + ", below full-employment output of $1,000B, so unemployment is above its natural rate. The Fed's dual mandate is maximum employment and stable prices, so the AP answer is <b>expansionary</b> monetary policy: lower interest rates.";
+    else if (s.econ === "infl") econ = "<b>The economy starts in an inflationary gap.</b> Real GDP is " + bil(m.Y0) + ", above full-employment output of $1,000B, and the price level is pushed up. To keep prices stable, the AP answer is <b>contractionary</b> monetary policy: raise interest rates.";
+    else econ = "<b>The economy starts at full employment</b> with real GDP at $1,000B. There is no gap to close, so any policy change here will create one.";
+    html += "<p>" + econ + "</p>";
+
+    var acts = [], dir;
+    if (s.fw === "l") {
+      if (s.omo > 0) acts.push("The Fed <b>buys $" + s.omo + "B of bonds</b>. Banks gain reserves, lend more, and the money supply shifts right.");
+      if (s.omo < 0) acts.push("The Fed <b>sells $" + (-s.omo) + "B of bonds</b>. Banks lose reserves, lend less, and the money supply shifts left.");
+      if (s.dr < 6) acts.push("The Fed <b>lowers the discount rate</b> to " + pct(s.dr) + ". Borrowing reserves from the Fed is cheaper, so banks borrow and lend more. The money supply shifts right.");
+      if (s.dr > 6) acts.push("The Fed <b>raises the discount rate</b> to " + pct(s.dr) + ". Borrowing reserves from the Fed costs more, so banks borrow and lend less. The money supply shifts left.");
+      if (s.rr !== 10) {
+        var mm = 100 / s.rr;
+        acts.push("The Fed " + (s.rr < 10 ? "<b>lowers" : "<b>raises") + " the required reserve ratio</b> to " + s.rr + "%. The money multiplier changes from 1 ÷ 0.10 = 10 to 1 ÷ " + f(s.rr / 100, 2) + " = " + f(mm) + ", so banks can lend " + (s.rr < 10 ? "more" : "less") + " of each deposit. The money supply shifts " + (s.rr < 10 ? "right." : "left."));
+      }
+      var signs = [Math.sign(s.omo), Math.sign(6 - s.dr), Math.sign(10 - s.rr)].filter(function (v) { return v !== 0; });
+      if (signs.indexOf(1) >= 0 && signs.indexOf(-1) >= 0) acts.push("These tools push in opposite directions. Only the net shift in the money supply matters for the interest rate.");
+      if (Math.abs(m.ms) > 1e-6) dir = "In the money market, MS shifts " + (m.ms > 0 ? "right" : "left") + ", so the <b>nominal interest rate " + (m.d < 0 ? "falls" : "rises") + " from 5.0% to " + pct(m.rate) + "</b>.";
+      else if (acts.length) dir = "The tools cancel out, so the money supply and the nominal interest rate stay where they started.";
+    } else {
+      var rrp = s.ior - 0.1;
+      if (!near(s.ior, TOOLS.ior)) acts.push("The Fed <b>" + (s.ior < TOOLS.ior ? "lowers" : "raises") + " interest on reserves to " + pct(s.ior) + "</b> and moves the overnight reverse repo rate with it, to " + pct(rrp) + ". Banks will not lend reserves for less than they can earn at the Fed, so the flat part of reserve demand shifts " + (s.ior < TOOLS.ior ? "down." : "up."));
+      if (!near(s.res, TOOLS.res)) {
+        var t = "Reserves " + (s.res > TOOLS.res ? "rise" : "fall") + " from $" + f(TOOLS.res * 0.5, 2) + " trillion to $" + f(s.res * 0.5, 2) + " trillion" + (s.res > TOOLS.res ? " (the Fed buys bonds)." : " (the Fed sells bonds).");
+        if (s.res >= KINK) t += " Supply still crosses the <b>flat</b> part of reserve demand, so the policy rate does not change. With ample reserves, changing the quantity of reserves is not how the Fed moves rates.";
+        else t += " Reserves are now so low that supply crosses the <b>downward-sloping</b> part of demand. Reserves are scarce, so the policy rate rises above IOR. This is how a limited-reserves system behaves.";
+        acts.push(t);
+      }
+      if (Math.abs(m.d) > 1e-6) dir = "The <b>policy rate " + (m.d < 0 ? "falls" : "rises") + " from 5.0% to " + pct(m.rate) + "</b>, and other short-term interest rates, such as rates on business and car loans, follow it " + (m.d < 0 ? "down." : "up.");
+      else if (acts.length) dir = "The policy rate stays at 5.0%.";
+    }
+    if (!acts.length) {
+      html += "<p>No tool has moved yet, so the interest rate is still 5.0% and AD has not shifted. " +
+        (s.econ === "rec" ? "Try " + (s.fw === "l" ? "buying bonds" : "lowering interest on reserves") + "." : s.econ === "infl" ? "Try " + (s.fw === "l" ? "selling bonds" : "raising interest on reserves") + "." : "") + "</p>";
+      return html;
+    }
+    html += li(acts);
+    if (dir) html += "<p>" + dir + "</p>";
+
+    if (Math.abs(m.d) > 1e-6) {
+      var down = m.d < 0;
+      var tool = s.fw === "l" ? (down ? "Expansionary tools" : "Contractionary tools") : (m.d < 0 ? "Lower IOR" : (!near(s.ior, TOOLS.ior) && s.ior > TOOLS.ior ? "Higher IOR" : "Scarce reserves"));
+      html += '<p class="chain">AP chain: ' + tool + " → interest rate " + (down ? "↓" : "↑") + " → investment and consumption " + (down ? "↑" : "↓") +
+        " → AD shifts " + (down ? "right" : "left") + " → real GDP " + (down ? "↑" : "↓") + " to " + bil(m.Y1) + ", price level " + (down ? "↑" : "↓") + " to " + f(m.P1) + ".</p>";
+      html += "<p>" + (down ? "A lower interest rate makes borrowing cheaper, so firms invest more in equipment and buildings and households buy more on credit, such as cars and homes." : "A higher interest rate makes borrowing more expensive, so firms invest less and households buy fewer cars, homes, and other things on credit.") + "</p>";
+      var verdict;
+      var gap1 = m.x1 - 5, gap0 = m.x0 - 5;
+      if (Math.abs(gap1) < 0.02) verdict = "<b>The gap is closed.</b> Real GDP is back at full employment ($1,000B).";
+      else if (Math.abs(gap0) < 0.02) verdict = "<b>The policy created " + (gap1 < 0 ? "a recessionary" : "an inflationary") + " gap</b> in an economy that was already at full employment.";
+      else if (gap0 * gap1 < 0) verdict = "<b>The policy overshot.</b> The economy moved past full employment into " + (gap1 > 0 ? "an inflationary" : "a recessionary") + " gap. A smaller change would have been enough.";
+      else if (Math.abs(gap1) > Math.abs(gap0)) verdict = "<b>Wrong direction.</b> This policy makes the gap bigger. " + (s.econ === "rec" ? "A recession needs lower rates." : "An inflationary gap needs higher rates.");
+      else verdict = "<b>The gap is smaller but not closed.</b> Real GDP is " + bil(m.Y1) + ". The Fed would need a " + (s.econ === "rec" ? "lower" : "higher") + " rate to reach $1,000B.";
+      html += "<p>" + verdict + "</p>";
+    }
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var ids = ["omo", "dr", "rr", "ior", "res"];
+  var inputs = {};
+  ids.forEach(function (k) {
+    inputs[k] = document.getElementById("s-" + k);
+    inputs[k].addEventListener("input", function () { S[k] = parseFloat(inputs[k].value); render(); });
+  });
+  var fwL = document.getElementById("fw-l"), fwA = document.getElementById("fw-a");
+  var ecs = { rec: document.getElementById("ec-r"), full: document.getElementById("ec-f"), infl: document.getElementById("ec-i") };
+
+  function render() {
+    var m = model(S);
+    ids.forEach(function (k) { inputs[k].value = S[k]; });
+    document.getElementById("o-omo").textContent = S.omo > 0 ? "buy $" + S.omo + "B" : S.omo < 0 ? "sell $" + (-S.omo) + "B" : "none";
+    document.getElementById("o-dr").textContent = pct(S.dr);
+    document.getElementById("o-rr").textContent = S.rr + "%";
+    document.getElementById("o-ior").textContent = pct(S.ior);
+    document.getElementById("o-res").textContent = "$" + f(S.res * 0.5, 2) + "T";
+    fwL.setAttribute("aria-pressed", S.fw === "l"); fwA.setAttribute("aria-pressed", S.fw === "a");
+    Object.keys(ecs).forEach(function (k) { ecs[k].setAttribute("aria-pressed", S.econ === k); });
+    document.getElementById("ctl-l").hidden = S.fw !== "l";
+    document.getElementById("ctl-a").hidden = S.fw !== "a";
+    var h = document.getElementById("left-h");
+    h.innerHTML = S.fw === "l" ? "Money market <small>limited reserves</small>" : "Reserve market <small>ample reserves</small>";
+    if (S.fw === "l") drawMoney(m); else drawReserves(m, S);
+    drawADAS(m);
+    legend(S);
+    document.getElementById("k-rate").textContent = S.fw === "l" ? "Nominal interest rate" : "Policy rate";
+    document.getElementById("r-rate").textContent = pct(m.rate);
+    document.getElementById("r-ic").innerHTML = m.d < -1e-6 ? '<span class="pill lr">Rise</span>' : m.d > 1e-6 ? '<span class="pill infl">Fall</span>' : "No change";
+    var gap = m.Y1 - 1000;
+    document.getElementById("r-y").innerHTML = bil(m.Y1) + " " + (Math.abs(gap) < 2 ? '<span class="pill lr">at Yf</span>' : gap < 0 ? '<span class="pill rec">gap ' + f(gap, 0).replace("-", "−") + "</span>" : '<span class="pill infl">gap +' + f(gap, 0) + "</span>");
+    document.getElementById("r-pl").textContent = f(m.P1);
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  fwL.addEventListener("click", function () { S.fw = "l"; render(); });
+  fwA.addEventListener("click", function () { S.fw = "a"; render(); });
+  Object.keys(ecs).forEach(function (k) { ecs[k].addEventListener("click", function () { S.econ = k; render(); }); });
+  document.getElementById("btn-reset").addEventListener("click", function () { Object.assign(S, TOOLS); render(); });
+
+  // Each scenario: economy, framework (null keeps the current one), tool settings per framework.
+  var scen = [
+    ["Recession, no action yet", "rec", null, {}, {}],
+    ["Close a recessionary gap", "rec", null, { omo: 40 }, { ior: 3.4 }],
+    ["Inflation, no action yet", "infl", null, {}, {}],
+    ["Close an inflationary gap", "infl", null, { omo: -40 }, { ior: 6.6 }],
+    ["Lower the reserve requirement", "rec", "l", { rr: 6 }, {}],
+    ["Ample reserves: Fed buys bonds", "rec", "a", {}, { res: 8.5 }],
+    ["Wrong way: raise rates in a recession", "rec", null, { omo: -40 }, { ior: 6.6 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () {
+      var fw = x[2] || S.fw;
+      S = Object.assign({ fw: fw, econ: x[1] }, TOOLS, fw === "l" ? x[3] : x[4]);
+      render();
+    });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The economy is in a recessionary gap, and the central bank operates with limited reserves. Which open market operation is appropriate?", o: ["Sell government bonds to reduce bank reserves", "Raise the required reserve ratio", "Buy government bonds to increase bank reserves", "Raise the discount rate"], c: 2, w: "Buying bonds adds reserves, so banks lend more, the money supply shifts right, and the nominal interest rate falls. Investment and consumption rise and AD shifts right. Selling bonds and raising either rate are all contractionary." },
+    { s: "The central bank operates with ample reserves and wants to raise the policy rate. What should it do?", o: ["Raise the interest rate it pays on reserves", "Sell a small amount of bonds to reduce reserves", "Lower the discount rate", "Lower the overnight reverse repurchase rate"], c: 0, w: "With ample reserves, the policy rate sits at the level of interest on reserves. Raising IOR shifts reserve demand up and the policy rate rises with it. A small bond sale leaves reserves on the flat part of demand, so the rate would not change." },
+    { s: "In an ample-reserves graph, reserve supply crosses reserve demand on its flat part at a policy rate of 4%, equal to interest on reserves. The central bank buys bonds and adds reserves. What happens to the policy rate?", o: ["It rises above 4%", "It falls below 4%", "It falls to zero", "It stays at 4%"], c: 3, w: "Reserve supply shifts right along the flat part of demand, so the equilibrium rate is still 4%. Banks will not lend reserves for less than the 4% they earn from the central bank. To lower the rate, the central bank must lower IOR." },
+    { s: "The required reserve ratio is 10%. The central bank buys $20 million of government bonds from commercial banks. What is the maximum possible increase in the money supply?", o: ["$2 million", "$200 million", "$20 million", "$180 million"], c: 1, w: "The banks swap bonds for $20 million of reserves, and all of it is excess reserves because no new deposits were created. The money multiplier is 1 ÷ 0.10 = 10, so the maximum increase is $20 million × 10 = $200 million. $180 million is the loan figure for a purchase from the public, where $2 million of the new $20 million deposit must be held as required reserves." },
+    { s: "The Federal Reserve's dual mandate refers to which two goals?", o: ["Low interest rates and a balanced federal budget", "A stable exchange rate and balanced trade", "Maximum employment and stable prices", "Full employment and a balanced federal budget"], c: 2, w: "Congress directs the Fed to pursue maximum employment and stable prices. The budget is fiscal policy and is not the Fed's job." },
+    { s: "Which sequence correctly describes contractionary monetary policy?", o: ["Interest rate falls, investment rises, AD shifts right", "Interest rate rises, investment and consumption fall, AD shifts left, the price level falls", "Interest rate rises, SRAS shifts left, the price level rises", "Money supply rises, interest rate rises, AD shifts left"], c: 1, w: "Contractionary policy raises interest rates. Borrowing costs more, so investment and interest-sensitive consumption fall, AD shifts left, and real GDP and the price level fall. Monetary policy shifts AD, not SRAS." },
+    { s: "With limited reserves, which combination of actions would both increase the money supply?", o: ["Sell bonds and raise the discount rate", "Buy bonds and raise the required reserve ratio", "Sell bonds and lower the required reserve ratio", "Buy bonds and lower the discount rate"], c: 3, w: "Buying bonds adds reserves, and a lower discount rate makes it cheaper for banks to borrow reserves. Both shift the money supply right. The other choices include at least one contractionary tool." },
+    { s: "On an AD–AS graph, the economy is in a short-run equilibrium below full-employment output. The central bank uses expansionary monetary policy that closes the gap. Compared with the starting equilibrium, what happens?", o: ["Real GDP rises to full-employment output and the price level rises", "Real GDP rises and the price level falls", "Real GDP stays the same and the price level rises", "LRAS shifts right and the price level falls"], c: 0, w: "Lower interest rates raise investment and consumption, so AD shifts right along the upward-sloping SRAS. Both real GDP and the price level rise. LRAS does not move in the short run." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("4.6");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [4], topic: "4.6", compact: true, storageKey: "topic-4.6" });</script>
+</body>
+</html>

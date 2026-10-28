@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aggregate Demand Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.effects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.effect { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: var(--surface); display: grid; gap: 4px; align-content: start; }
+.effect h4 { margin: 0; font-family: var(--display); font-size: 1rem; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.effect h4 span { font-family: var(--mono); font-size: .74rem; color: var(--c3); white-space: nowrap; }
+.effect p { font-size: .9rem; }
+.effect.on { border-color: var(--c3); }
+.scen-group { display: grid; gap: 6px; }
+.scen-group .tag { margin-bottom: 0; }
+.legend .l-c3b::before, .legend .l-adb::before { height: 10px; width: 12px; }
+.legend .l-c3b { color: var(--c3); } .legend .l-adb { color: var(--accent); }
+@media (max-width: 860px) { .effects { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.1</span>
+  <h1>The Aggregate Demand Study Lab</h1>
+  <p class="lede">Aggregate demand (AD) is the total amount of real GDP that households, firms, the government, and foreign buyers want to buy at each price level: AD = C + I + G + Xn. A change in the price level moves the economy along AD, while a change in anything else that affects spending shifts the whole curve. Use the lab to try both and see which part of spending changes.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Movement along AD vs. a shift of AD</h2>
+    <p>The economy starts at a price level of 100 with 1,000 billion of real GDP demanded (point A on AD₀). Move the price level slider to slide along the curve, or pick a scenario to shift it. Dashed grey shows the starting position.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Aggregate demand <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="ad" role="img" aria-label="Aggregate demand graph with the price level on the vertical axis and real GDP on the horizontal axis"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Which part of C + I + G + Xn changed? <small>billions, at the current price level</small></h3>
+      <svg class="chart" id="bars" role="img" aria-label="Bar chart of the change in consumption, investment, government spending, and net exports"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">AD now</span><span class="l-ghost">Starting AD₀ and point A</span><span class="l-c3b">Change from the price level (along AD)</span><span class="l-adb">Change from a determinant (shifts AD)</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div class="controls" style="grid-template-columns: minmax(0,2fr) minmax(0,1fr);">
+      <div class="ctl">
+        <label for="s-pl">Price level <output id="o-pl"></output></label>
+        <input type="range" id="s-pl" min="80" max="120" step="2">
+        <span class="hint">Changing the price level moves along AD. It never shifts AD.</span>
+      </div>
+      <div class="ctl" style="align-content:end;">
+        <button id="btn-reset" type="button">Reset to start</button>
+      </div>
+    </div>
+    <div class="scen-group">
+      <div class="tag">Change only the price level (movement along AD)</div>
+      <div class="scenarios" id="scen-move"></div>
+    </div>
+    <div class="scen-group">
+      <div class="tag">Change a determinant (shift AD) · price level held at 100</div>
+      <div class="scenarios" id="scen-shift"></div>
+    </div>
+  </div>
+
+  <div class="effects" id="effects" aria-live="polite"></div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Price level</div><div class="v" id="r-pl">100</div></div>
+    <div class="stat"><div class="k">Real GDP demanded</div><div class="v" id="r-y">1,000</div></div>
+    <div class="stat"><div class="k">AD curve</div><div class="v" id="r-ad">AD₀</div></div>
+    <div class="stat"><div class="k">What happened</div><div class="v" id="r-what">Start</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">AD = C + I + G + Xn</span><h3>What AD measures</h3><p>Aggregate demand is the quantity of real GDP that all buyers in the economy plan to purchase at each price level. It adds up consumption (C), investment (I), government spending (G), and net exports (Xn = exports − imports).</p></div>
+    <div class="card"><span class="tag">Downward slope</span><h3>Three reasons AD slopes down</h3><p>When the price level rises: the <b>wealth effect</b> lowers the purchasing power of household wealth, so C falls; the <b>interest rate effect</b> raises money demand and interest rates, so I falls; the <b>exchange rate (foreign purchases) effect</b> makes domestic goods more expensive than foreign goods, so Xn falls.</p></div>
+    <div class="card"><span class="tag">Along vs. shift</span><h3>Movement along AD</h3><p>The price level is on the vertical axis, so a change in the price level moves the economy along the existing AD curve. That is a change in the <b>quantity of real GDP demanded</b>, not a change in AD.</p></div>
+    <div class="card"><span class="tag">Determinants</span><h3>What shifts AD</h3><p>Anything other than the price level that changes C, I, G, or Xn shifts AD. More spending at every price level shifts AD right. Less spending at every price level shifts AD left.</p></div>
+    <div class="card"><span class="tag">Watch the cause</span><h3>Interest rates both ways</h3><p>If interest rates rise <b>because the price level rose</b>, that is the interest rate effect: a movement along AD. If interest rates rise for another reason, such as a central bank action, investment falls at every price level and AD shifts left.</p></div>
+    <div class="card"><span class="tag">Preview of 3.2</span><h3>The multiplier</h3><p>A first change in spending creates income for others, who then spend part of it. So the final shift in AD is larger than the first change. This lab draws the shift equal to the first change to keep the numbers simple.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. AD shifters cheat sheet</h2>
+    <p>For each event, name the component of spending first, then the direction of the AD shift. That two-step chain is what FRQ graders look for.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Component</th><th>Why</th><th>Effect on AD</th></tr></thead>
+    <tbody>
+      <tr><td>Price level rises</td><td>C, I, and Xn</td><td>Wealth, interest rate, and exchange rate effects</td><td><b>Movement up along AD</b> (no shift)</td></tr>
+      <tr><td>Price level falls</td><td>C, I, and Xn</td><td>The same three effects in reverse</td><td><b>Movement down along AD</b> (no shift)</td></tr>
+      <tr><td>Consumer confidence rises</td><td>C ↑</td><td>Households expect higher future income</td><td><span class="shift">Right</span></td></tr>
+      <tr><td>Stock or home prices fall (household wealth falls)</td><td>C ↓</td><td>Households feel poorer and spend less</td><td><b>Left</b></td></tr>
+      <tr><td>Household debt rises sharply</td><td>C ↓</td><td>More income goes to debt payments</td><td><b>Left</b></td></tr>
+      <tr><td>Personal income taxes cut (or transfers rise)</td><td>C ↑</td><td>Disposable income rises</td><td><span class="shift">Right</span></td></tr>
+      <tr><td>Business expectations improve</td><td>I ↑</td><td>Firms expect higher future sales and profits</td><td><span class="shift">Right</span></td></tr>
+      <tr><td>Interest rates rise (not caused by the price level)</td><td>I ↓</td><td>Borrowing for new capital costs more</td><td><b>Left</b></td></tr>
+      <tr><td>Business taxes cut or investment tax credit</td><td>I ↑</td><td>Investment becomes more profitable</td><td><span class="shift">Right</span></td></tr>
+      <tr><td>Government spending increases</td><td>G ↑</td><td>Government buys more goods and services</td><td><span class="shift">Right</span></td></tr>
+      <tr><td>Incomes abroad rise</td><td>Xn ↑</td><td>Foreigners buy more of our exports</td><td><span class="shift">Right</span></td></tr>
+      <tr><td>Domestic currency appreciates</td><td>Xn ↓</td><td>Exports cost more abroad; imports cost less here</td><td><b>Left</b></td></tr>
+      <tr><td>Domestic currency depreciates</td><td>Xn ↑</td><td>Exports cost less abroad; imports cost more here</td><td><span class="shift">Right</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price level</b> (PL). Horizontal axis: <b>Real GDP</b> (or real output). Never "Price" and "Quantity".</li>
+        <li>Draw AD sloping down and label it <b>AD</b>. Label a shifted curve <b>AD₁</b> or <b>AD₂</b> and add an arrow showing the direction.</li>
+        <li>For a shift, name the component: "Government spending is a component of AD, so AD shifts right."</li>
+        <li>For a tax change, write the full chain: lower taxes, higher disposable income, higher consumption, AD shifts right.</li>
+        <li>When asked why AD slopes down, name one effect and explain it in one sentence that links the price level to C, I, or Xn.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting AD because the price level changed. A price level change is a <b>movement along</b> AD.</li>
+        <li>Using the micro reason for a downward slope (people switch to substitute goods). AD covers all goods, so the reasons are the wealth, interest rate, and exchange rate effects.</li>
+        <li>Saying imports add to AD. Imports are subtracted in Xn, so more imports (with exports unchanged) shift AD left.</li>
+        <li>Getting the currency backwards. A stronger (appreciating) dollar makes U.S. exports more expensive, so Xn falls and AD shifts left.</li>
+        <li>Calling a rise in the quantity of real GDP demanded an "increase in AD". An increase in AD means the whole curve shifts right.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.1. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  // ---------- Model ----------
+  // Price level P (index, start 100). Graph space: y = 5 + (P - 100) / 10.
+  // AD in graph space (Lab.market, slope 0.8): x = 5 + sh - (y - 5) / 0.8.
+  // Real GDP demanded (billions) Y = 1000 + 100 * (x - 5) = 1000 + 100*sh - 12.5*(P - 100).
+  // Each 1-point rise in P lowers C by 5 (wealth), I by 4 (interest rate), Xn by 3.5 (exchange rate): 12.5 total.
+  var K = 0.8, PER = { C: 5, I: 4, Xn: 3.5 };
+  var BASE = { P: 100, sh: 0, comp: null, key: null };
+  var S = Object.assign({}, BASE);
+
+  function yOf(P) { return 5 + (P - 100) / 10; }
+  function realGDP(s) { return 1000 + 100 * s.sh - 12.5 * (s.P - 100); }
+  function along(s) { var d = s.P - 100; return { C: -PER.C * d, I: -PER.I * d, G: 0, Xn: -PER.Xn * d }; }
+  function shiftParts(s) { var o = { C: 0, I: 0, G: 0, Xn: 0 }; if (s.comp) o[s.comp] = 100 * s.sh; return o; }
+
+  // ---------- Scenarios ----------
+  var SHIFTS = {
+    conf:   { b: "Consumer confidence rises", comp: "C", sh: 1.0, why: "Households expect higher future income, so they spend more now. Consumption rises at every price level." },
+    wealth: { b: "Stock and home prices fall", comp: "C", sh: -1.0, why: "Household wealth falls, so households feel poorer and cut spending. Consumption falls at every price level." },
+    debt:   { b: "Household debt rises sharply", comp: "C", sh: -0.8, why: "More of each paycheck goes to debt payments, so households have less to spend. Consumption falls at every price level." },
+    tax:    { b: "Personal income taxes cut", comp: "C", sh: 0.8, why: "Lower taxes raise disposable income, so households spend more. Consumption rises at every price level." },
+    expect: { b: "Business expectations improve", comp: "I", sh: 1.0, why: "Firms expect higher future sales and profits, so they buy more machines and buildings. Investment rises at every price level." },
+    rate:   { b: "Central bank raises interest rates", comp: "I", sh: -1.0, why: "Borrowing costs more for reasons that have nothing to do with the price level, so firms cut back on new capital. Investment falls at every price level." },
+    gov:    { b: "Government spends more on roads", comp: "G", sh: 1.0, why: "Government purchases are a component of AD. G rises at every price level." },
+    govcut: { b: "Government cuts defense spending", comp: "G", sh: -0.8, why: "Government purchases are a component of AD. G falls at every price level." },
+    forinc: { b: "Incomes rise in trading partners", comp: "Xn", sh: 0.8, why: "Richer foreign households buy more of our exports. Exports rise, so net exports rise at every price level." },
+    appr:   { b: "Dollar appreciates", comp: "Xn", sh: -0.8, why: "A stronger dollar makes U.S. exports more expensive for foreigners and imports cheaper for Americans. Exports fall and imports rise, so net exports fall at every price level." },
+    depr:   { b: "Dollar depreciates", comp: "Xn", sh: 0.8, why: "A weaker dollar makes U.S. exports cheaper for foreigners and imports more expensive for Americans. Exports rise and imports fall, so net exports rise at every price level." }
+  };
+  var COMPNAME = { C: "consumption (C)", I: "investment (I)", G: "government spending (G)", Xn: "net exports (Xn)" };
+
+  // ---------- Graphs ----------
+  var svgAD = document.getElementById("ad"), svgB = document.getElementById("bars");
+  function drawAD(s) {
+    var y = yOf(s.P), moved = Math.abs(s.P - 100) > 1e-6, shifted = Math.abs(s.sh) > 1e-6;
+    Lab.market(svgAD, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: s.sh, label: shifted ? "AD₁" : "AD₀" },
+      start: { demand: 0 }, slope: K,
+      extra: function (F, eq, fns) {
+        if (shifted) Lab.tag(F, 9.6, fns.D(0)(9.6) + 0.3, "AD₀", "var(--muted)", "end");
+        var x0 = 5, x1 = 5 + s.sh - (y - 5) / K;
+        var curLblY = moved ? "PL₁" : "PL₀";
+        if (moved || shifted) {
+          Lab.dot(F, x0, 5, "var(--ghost)", true, "Y₀", moved ? "PL₀" : null);
+          Lab.tag(F, x0 + 0.2, 4.35, "A", "var(--muted)");
+        }
+        if (moved && !shifted) {
+          // arrow along AD₀ from A toward B
+          var xa = x0 + (x1 - x0) * 0.2, xb = x0 + (x1 - x0) * 0.8;
+          Lab.arrow(F, xa + 0.35, fns.D(0)(xa) + 0.45, xb + 0.35, fns.D(0)(xb) + 0.45, "var(--c3)");
+        }
+        Lab.dot(F, x1, y, "var(--ink)", true, (moved || shifted) ? "Y₁" : "Y₀", curLblY);
+        Lab.tag(F, x1 + 0.25, y + 0.35, (moved || shifted) ? "B" : "A", "var(--ink)");
+      }
+    });
+  }
+
+  function drawBars(s) {
+    var a = along(s), b = shiftParts(s), keys = ["C", "I", "G", "Xn"];
+    var F = Lab.frame(svgB, { x: [0, 4], y: [-130, 130], xLabel: "Component of AD", yLabel: "Change in spending (billions)",
+      xTicks: [0.5, 1.5, 2.5, 3.5], yTicks: [-100, -50, 0, 50, 100],
+      fmtX: function (v) { return keys[Math.floor(v)]; }, fmtY: function (v) { return v > 0 ? "+" + v : String(v); } });
+    Lab.hline(F, 0, "var(--ink)", 1.5);
+    keys.forEach(function (k, i) {
+      var cx = i + 0.5;
+      [[a[k], "var(--c3)", cx - 0.32], [b[k], "var(--accent)", cx + 0.02]].forEach(function (bar) {
+        var v = bar[0];
+        if (Math.abs(v) < 0.05) return;
+        Lab.rect(F, bar[2], 0, bar[2] + 0.3, v, bar[1], 0.85);
+        Lab.tag(F, bar[2] + 0.15, v + (v > 0 ? 9 : -18), (v > 0 ? "+" : "−") + Lab.fmt(Math.abs(v), 0), bar[1], "middle");
+      });
+    });
+    if (Math.abs(s.P - 100) < 1e-6 && !s.comp) Lab.tag(F, 2, 60, "No change yet: move the price level or pick a scenario", "var(--muted)", "middle");
+  }
+
+  // ---------- Three effects panel ----------
+  function effects(s) {
+    var d = s.P - 100, up = d > 0, none = Math.abs(d) < 1e-6, a = along(s), f = function (v) { return Lab.fmt(Math.abs(v), 0); };
+    var pre = none ? "If the price level rises" : "The price level " + (up ? "rose" : "fell") + " to " + Math.round(s.P);
+    var items = [
+      { h: "Wealth effect", c: "C", t: none
+          ? "If the price level rises, the money and savings households hold buy fewer goods. Feeling poorer, they cut consumption."
+          : pre + ", so household wealth buys " + (up ? "less" : "more") + ". Households " + (up ? "cut" : "raise") + " consumption by " + f(a.C) + " billion." },
+      { h: "Interest rate effect", c: "I", t: none
+          ? "If the price level rises, people need more money for purchases, so money demand rises. The interest rate rises and investment falls."
+          : pre + ", so people need " + (up ? "more" : "less") + " money for purchases. Money demand " + (up ? "rises" : "falls") + ", the interest rate " + (up ? "rises" : "falls") + ", and investment " + (up ? "falls" : "rises") + " by " + f(a.I) + " billion." },
+      { h: "Exchange rate effect", c: "Xn", t: none
+          ? "Also called the foreign purchases effect. If the price level rises, our goods get more expensive than foreign goods. Exports fall, imports rise, and net exports fall."
+          : pre + ", so our goods are " + (up ? "more" : "less") + " expensive than foreign goods. Exports " + (up ? "fall" : "rise") + ", imports " + (up ? "rise" : "fall") + ", and net exports " + (up ? "fall" : "rise") + " by " + f(a.Xn) + " billion." }
+    ];
+    return items.map(function (x) {
+      return '<div class="effect' + (none ? "" : " on") + '"><h4>' + x.h + '<span>' + x.c + (none ? "" : (up ? " ↓" : " ↑")) + '</span></h4><p>' + x.t + '</p></div>';
+    }).join("");
+  }
+
+  // ---------- Story ----------
+  var f0 = function (v) { return Math.round(v).toLocaleString("en-US"); };
+  function story(s) {
+    var moved = Math.abs(s.P - 100) > 1e-6, shifted = Math.abs(s.sh) > 1e-6, Y = realGDP(s), Ystart = 1000 + 100 * s.sh, html = "";
+    if (!moved && !shifted) {
+      return "<p><b>Start.</b> At a price level of 100, buyers want 1,000 billion of real GDP: point A on AD₀. Move the price level slider to slide along AD, or pick a determinant to shift it.</p>" +
+        "<p><b>The rule to remember:</b> a change in the price level moves along AD. A change in anything else that affects C, I, G, or Xn shifts AD.</p>";
+    }
+    if (shifted) {
+      var sc = SHIFTS[s.key], dir = s.sh > 0 ? "right" : "left";
+      html += "<p><b>Shift of AD: " + sc.b.toLowerCase() + ".</b> " + sc.why + " AD shifts <b>" + dir + "</b> from AD₀ to AD₁ by " + f0(Math.abs(100 * s.sh)) + " billion at every price level.</p>";
+      html += "<p>The price level did not cause this. At a price level of 100, real GDP demanded is now " + f0(Ystart) + " billion instead of 1,000. On an FRQ: \"" + COMPNAME[sc.comp].replace(/^./, function (c) { return c.toUpperCase(); }) + (s.sh > 0 ? " increases" : " decreases") + ", so AD shifts " + dir + ".\"</p>";
+    }
+    if (moved) {
+      var up = s.P > 100;
+      html += "<p><b>Movement along AD" + (shifted ? "₁" : "") + ":</b> the price level " + (up ? "rose" : "fell") + " from 100 to " + Math.round(s.P) + ". The quantity of real GDP demanded " + (up ? "falls" : "rises") + " from " + f0(Ystart) + " to <b>" + f0(Y) + " billion</b>. The curve itself does not move, because the price level is the variable on the axis.</p>";
+      html += "<p>The three effects above explain why: consumption, investment, and net exports all " + (up ? "fall" : "rise") + ". Government spending does not respond to the price level in this model. On an FRQ: \"A " + (up ? "higher" : "lower") + " price level " + (up ? "decreases" : "increases") + " the quantity of real GDP demanded. AD does not shift.\"</p>";
+    }
+    if (moved && shifted) html += "<p><b>Both happened.</b> The determinant shifted the curve from AD₀ to AD₁; the price level change then moved the economy along AD₁. Point A to point B combines the two.</p>";
+    return html;
+  }
+
+  // ---------- Render and controls ----------
+  var elPL = document.getElementById("s-pl");
+  function render() {
+    elPL.value = Math.round(S.P);
+    document.getElementById("o-pl").textContent = Math.round(S.P) === 100 ? "100 (start)" : String(Math.round(S.P));
+    drawAD(S); drawBars(S);
+    document.getElementById("effects").innerHTML = effects(S);
+    document.getElementById("r-pl").textContent = String(Math.round(S.P));
+    document.getElementById("r-y").textContent = f0(realGDP(S));
+    var shifted = Math.abs(S.sh) > 1e-6, moved = Math.abs(S.P - 100) > 1e-6;
+    document.getElementById("r-ad").innerHTML = !shifted ? "AD₀" : '<span class="pill ' + (S.sh > 0 ? "lr" : "infl") + '">' + (S.sh > 0 ? "Right " : "Left ") + f0(Math.abs(100 * S.sh)) + "</span>";
+    document.getElementById("r-what").innerHTML = !moved && !shifted ? "Start" : moved && shifted ? '<span class="pill rec">Shift + along</span>' : shifted ? '<span class="pill rec">Shift</span>' : '<span class="pill rec">Along AD</span>';
+    document.getElementById("story").innerHTML = story(S);
+  }
+
+  var stop = null;
+  function go(target) {
+    if (stop) stop();
+    var from = { P: S.P, sh: S.sh };
+    S.comp = target.comp; S.key = target.key;
+    if (target.comp && Math.abs(from.sh) > 1e-6 && Math.sign(from.sh) !== Math.sign(target.sh)) from.sh = 0;
+    stop = Lab.animate(450, function (t) {
+      S.P = from.P + (target.P - from.P) * t; S.sh = from.sh + (target.sh - from.sh) * t; render();
+    }, function () { S.P = target.P; S.sh = target.sh; render(); });
+  }
+
+  elPL.addEventListener("input", function () { if (stop) stop(); S.P = parseFloat(elPL.value); render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { go({ P: 100, sh: 0, comp: null, key: null }); });
+
+  var moves = [["Price level rises to 110", 110], ["Price level falls to 90", 90], ["Inflation: price level rises to 120", 120]];
+  var mEl = document.getElementById("scen-move");
+  moves.forEach(function (m) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = m[0];
+    b.addEventListener("click", function () { go({ P: m[1], sh: 0, comp: null, key: null }); });
+    mEl.appendChild(b);
+  });
+  var sEl = document.getElementById("scen-shift");
+  Object.keys(SHIFTS).forEach(function (k) {
+    var x = SHIFTS[k], b = document.createElement("button"); b.type = "button"; b.textContent = x.b + " (" + x.comp + ")";
+    b.addEventListener("click", function () { go({ P: 100, sh: x.sh, comp: x.comp, key: k }); });
+    sEl.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following explains why the aggregate demand curve slopes downward?", o: ["A higher price level raises nominal wages, so firms produce more output", "A lower price level raises the real value of household wealth, so consumption rises", "When the price of one good rises, consumers switch to substitute goods", "Government spending rises automatically when the price level falls"], c: 1, w: "This is the wealth (real balances) effect. A lower price level makes household wealth buy more, so consumption and the quantity of real GDP demanded rise. Option C is the micro substitution reason, which does not apply to all goods at once." },
+    { s: "According to the interest rate effect, an increase in the price level will:", o: ["decrease money demand, lower interest rates, and increase investment", "increase the money supply, lower interest rates, and increase investment", "increase money demand, raise interest rates, and decrease investment", "cause the central bank to lower interest rates, increasing consumption"], c: 2, w: "A higher price level means people need more money for the same purchases. Money demand rises, the interest rate rises, and interest-sensitive spending such as investment falls. That lowers the quantity of real GDP demanded along AD." },
+    { s: "Which of the following would shift the aggregate demand curve to the left?", o: ["A decrease in the price level", "An increase in incomes in major trading partners", "A cut in personal income taxes", "A sharp fall in stock prices that reduces household wealth"], c: 3, w: "Lower household wealth reduces consumption at every price level, so AD shifts left. A lower price level (A) is a movement along AD. Options B and C both shift AD right." },
+    { s: "If the U.S. dollar appreciates relative to other currencies, what happens to U.S. aggregate demand?", o: ["AD shifts right because imports become cheaper", "AD shifts left because net exports fall", "There is a movement up along AD", "AD does not change because exchange rates are not part of AD"], c: 1, w: "A stronger dollar makes U.S. exports more expensive abroad and imports cheaper at home. Exports fall and imports rise, so net exports fall and AD shifts left. Cheaper imports reduce Xn; they do not add to AD." },
+    { s: "On a correctly labeled AD graph, the price level falls from PL₁ to PL₂ and nothing else changes. Which is correct?", o: ["There is a movement down along AD to a larger quantity of real GDP demanded", "AD shifts right", "AD shifts left", "There is a movement up along AD to a smaller quantity of real GDP demanded"], c: 0, w: "The price level is the variable on the vertical axis, so changing it moves the economy along the existing curve. A lower price level means a point lower and to the right on AD, with more real GDP demanded. AD shifts only when a determinant changes." },
+    { s: "Suppose each 1-point rise in the price level reduces consumption by $5 billion, investment by $4 billion, and net exports by $3.5 billion. If the price level rises from 100 to 108, the quantity of real GDP demanded:", o: ["decreases by $12.5 billion", "decreases by $40 billion", "increases by $100 billion", "decreases by $100 billion"], c: 3, w: "Each point lowers spending by 5 + 4 + 3.5 = $12.5 billion. The price level rises 8 points, so the drop is 8 × 12.5 = $100 billion. This is a movement along AD. Option A is the effect of only one point." },
+    { s: "At the current price level, C = $700 billion, I = $150 billion, G = $200 billion, and Xn = −$50 billion. Government spending then rises by $30 billion and net exports fall by $10 billion. Ignoring multiplier effects, what is the new level of aggregate spending at that price level?", o: ["$1,000 billion", "$1,020 billion", "$1,040 billion", "$1,100 billion"], c: 1, w: "Start: 700 + 150 + 200 − 50 = $1,000 billion. G adds 30 and Xn subtracts 10, so spending is 1,000 + 30 − 10 = $1,020 billion. Choosing 1,040 means adding the fall in net exports instead of subtracting it." },
+    { s: "Interest rates rise in two different situations: (1) the central bank raises its policy rate, and (2) the price level rises, increasing money demand. How does each affect AD?", o: ["Both shift AD left", "Both cause a movement along AD", "Situation 1 shifts AD left; situation 2 causes a movement along AD", "Situation 1 causes a movement along AD; situation 2 shifts AD left"], c: 2, w: "A central bank action is a change in a determinant: investment falls at every price level, so AD shifts left. When the price level itself raises interest rates, that is the interest rate effect, which is a movement along AD." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.1");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.1", compact: true, storageKey: "topic-3.1" });</script>
+</body>
+</html>

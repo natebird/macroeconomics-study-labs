@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Unemployment Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub-h { font-size: 1.2rem; }
+.side-card { display: grid; gap: 14px; align-content: start; }
+.nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nums input { font: inherit; font-family: var(--mono); width: 100%; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.nums input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.nums .ctl label { display: block; }
+.calc .row span:last-child { font-family: var(--mono); font-size: .88rem; text-align: right; }
+.calc .row span:first-child { min-width: 0; }
+.calc .row.warn { color: var(--bad); }
+.legend .l-bad { color: var(--bad); }
+.legend .l-nilf { color: var(--ghost); }
+.legend span.thick::before { height: 8px; }
+.scenarios button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.game { display: grid; gap: 14px; align-content: start; }
+.g-count2 { font-family: var(--mono); font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.item { font-family: var(--display); font-size: 1.18rem; font-weight: 600; line-height: 1.35; min-height: 4.1em; margin: 0; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.choices button { text-align: left; border-radius: 8px; }
+.choices button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choices button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choices button:disabled { cursor: default; }
+.fb { border-left: 4px solid var(--rule); padding: 8px 12px; font-size: .93rem; background: var(--paper); border-radius: 0 8px 8px 0; }
+.fb.ok { border-left-color: var(--good); }
+.fb.no { border-left-color: var(--bad); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.rules { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .92rem; }
+.tally { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tally div { border: 1px solid var(--rule); border-radius: 8px; padding: 6px 10px; font-size: .84rem; display: flex; justify-content: space-between; gap: 8px; }
+.tally b { font-family: var(--mono); font-weight: 500; }
+@media (max-width: 520px) {
+  .nums, .choices, .tally { grid-template-columns: 1fr; }
+  .calc .row { flex-direction: column; gap: 2px; }
+  .calc .row span:last-child { text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 2 · Topic 2.3</span>
+  <h1>The Unemployment Study Lab</h1>
+  <p class="lede">The unemployment rate counts people who have no job and are actively looking, as a share of the labor force. Who counts as employed, unemployed, or not in the labor force decides what the rate shows and what it misses. Run the labor force calculator, sort cases into the three types of unemployment, then build the natural rate and see what full employment means.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Count it, sort it, build the natural rate</h2>
+    <p>All numbers are in millions of people and are made up for teaching. The starting economy has 250 million adults, 152 million employed, and 8 million unemployed.</p>
+  </div>
+
+  <h3 class="sub-h">A. Labor force calculator</h3>
+  <div class="card" style="display:grid; gap:10px;">
+    <div class="tag">Try a scenario</div>
+    <div class="scenarios" id="lf-scen"></div>
+  </div>
+
+  <div class="lab">
+    <div class="card side-card">
+      <h3>Inputs <small style="font-family:var(--body); font-weight:400; font-size:.82rem; color:var(--muted);">millions of people</small></h3>
+      <div class="nums">
+        <div class="ctl"><label for="n-pop">Adult population (16+, civilian, noninstitutional)</label><input type="number" id="n-pop" min="0" step="1"></div>
+        <div class="ctl"><label for="n-emp">Employed (any paid work, full- or part-time)</label><input type="number" id="n-emp" min="0" step="1"></div>
+        <div class="ctl"><label for="n-unemp">Unemployed (no job, actively looking)</label><input type="number" id="n-unemp" min="0" step="1"></div>
+        <div class="ctl"><label for="n-nilf">Not in the labor force (students, retirees, discouraged workers)</label><input type="number" id="n-nilf" min="0" step="1"></div>
+        <div class="ctl"><label for="n-disc">Of those not in the labor force: discouraged workers</label><input type="number" id="n-disc" min="0" step="1"></div>
+        <div class="ctl"><label for="n-under">Of the employed: part-time, want full-time (underemployed)</label><input type="number" id="n-under" min="0" step="1"></div>
+      </div>
+      <p class="hint" style="font-size:.8rem; color:var(--muted); margin:0;">Change the population, employed, or unemployed and "not in the labor force" updates so the groups always add up. Change "not in the labor force" and the population updates.</p>
+    </div>
+    <div class="card graph-card">
+      <h3>Where the adults are <small>start vs. now</small></h3>
+      <svg class="chart" id="pop-chart" role="img" aria-label="Stacked bars splitting the adult population into employed, unemployed, and not in the labor force, at the start and now"></svg>
+      <div class="legend"><span class="l-lrpc thick">Employed</span><span class="l-c4 thick">Underemployed (still employed)</span><span class="l-bad thick">Unemployed</span><span class="l-nilf thick">Not in labor force</span><span class="l-c3 thick">Discouraged (not in labor force)</span></div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Labor force</div><div class="v" id="r-lf">160</div></div>
+    <div class="stat"><div class="k">Unemployment rate</div><div class="v" id="r-ur">5.0%</div></div>
+    <div class="stat"><div class="k">Labor force participation rate</div><div class="v" id="r-lfpr">64.0%</div></div>
+    <div class="stat"><div class="k">Rate if discouraged workers counted</div><div class="v" id="r-alt">5.6%</div></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:10px;">
+    <h3>Show your work</h3>
+    <div class="calc" id="lf-calc" aria-live="polite"></div>
+  </div>
+
+  <div class="story" id="lf-story" aria-live="polite"></div>
+
+  <h3 class="sub-h" style="margin-top:8px;">B. Classification drill</h3>
+  <div class="lab">
+    <div class="card game">
+      <div class="g-count2"><span id="d-pos">Case 1 of 15</span><span id="d-score">0 / 0 correct</span></div>
+      <p class="item" id="d-item"></p>
+      <div class="choices" id="d-choices" role="group" aria-label="Choose a category"></div>
+      <div class="btnrow">
+        <button type="button" class="primary" id="d-next">Next case</button>
+        <button type="button" id="d-shuffle">Reshuffle and restart</button>
+      </div>
+      <div class="fb" id="d-fb" aria-live="polite">Pick a category for this person. You get the reason right away.</div>
+    </div>
+    <div class="card game">
+      <h3>How to decide</h3>
+      <ol class="rules">
+        <li>Not working and <b>not looking</b> (student, retiree, stay-at-home parent, discouraged worker): <b>not in the labor force</b>. This person is not unemployed at all.</li>
+        <li>Looking, and the skills fit jobs that exist; it just takes time to find one (new graduate, quit to find a better job, moved): <b>frictional</b>.</li>
+        <li>Looking, but the skills or location no longer match the jobs available (technology, a declining industry, a plant that moved): <b>structural</b>.</li>
+        <li>Lost the job because total spending fell in a recession, and the job will come back when the economy recovers: <b>cyclical</b>.</li>
+      </ol>
+      <h3>Your answers so far</h3>
+      <div class="tally" id="d-tally"></div>
+    </div>
+  </div>
+
+  <h3 class="sub-h" style="margin-top:8px;">C. The natural rate and full employment</h3>
+  <div class="card" style="display:grid; gap:14px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="nr-scen"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(3, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-fr">Frictional <output id="o-fr"></output></label>
+        <input type="range" id="s-fr" min="0.5" max="4" step="0.5">
+        <span class="hint">Job search time between matches</span>
+      </div>
+      <div class="ctl">
+        <label for="s-st">Structural <output id="o-st"></output></label>
+        <input type="range" id="s-st" min="0.5" max="5" step="0.5">
+        <span class="hint">Skills or location mismatch</span>
+      </div>
+      <div class="ctl">
+        <label for="s-cy">Cyclical <output id="o-cy"></output></label>
+        <input type="range" id="s-cy" min="-2" max="6" step="0.5">
+        <span class="hint">Right = recession, left of 0 = boom</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Unemployment rate <small>natural vs. actual</small></h3>
+      <svg class="chart" id="nr-chart" role="img" aria-label="Bar chart comparing the natural rate of unemployment with the actual unemployment rate"></svg>
+      <div class="legend"><span class="l-c3 thick">Frictional</span><span class="l-srpc thick">Structural</span><span class="l-bad thick">Cyclical</span><span class="l-ghost">Natural rate</span></div>
+    </div>
+    <div class="card graph-card">
+      <h3>AD–AS <small>where output sits relative to Y<sub>f</sub></small></h3>
+      <svg class="chart" id="nr-adas" role="img" aria-label="AD-AS graph with LRAS at full-employment output"></svg>
+      <div class="legend"><span class="l-ad">AD</span><span class="l-srpc">SRAS</span><span class="l-lrpc">LRAS</span><span class="l-ghost">AD at full employment</span></div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Natural rate (frictional + structural)</div><div class="v" id="r-nat">5.0%</div></div>
+    <div class="stat"><div class="k">Actual unemployment rate</div><div class="v" id="r-act">5.0%</div></div>
+    <div class="stat"><div class="k">Cyclical unemployment</div><div class="v" id="r-cy">0.0%</div></div>
+    <div class="stat"><div class="k">Economy</div><div class="v" id="r-gap"></div></div>
+  </div>
+
+  <div class="story" id="nr-story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Three groups</span><h3>Employed, unemployed, not in the labor force</h3><p>Every adult lands in one group. Employed means any paid work, even a few hours. Unemployed means no job and actively looking. Everyone else, such as students, retirees, and stay-at-home parents, is not in the labor force.</p></div>
+    <div class="card"><span class="tag">LF = E + U</span><h3>Two rates, two denominators</h3><p>The unemployment rate divides the unemployed by the <b>labor force</b>. The labor force participation rate divides the labor force by the <b>adult population</b>. Mixing up the denominators is the most common calculation error.</p></div>
+    <div class="card"><span class="tag">Limitation</span><h3>Discouraged workers</h3><p>People who want a job but have stopped looking are not in the labor force. When the unemployed give up, the unemployment rate falls even though nobody found work, so the rate <b>understates</b> joblessness.</p></div>
+    <div class="card"><span class="tag">Limitation</span><h3>Underemployment</h3><p>A worker stuck in a part-time job who wants full-time work, or a worker in a job below their skill level, counts as fully employed. The unemployment rate does not show this lost work.</p></div>
+    <div class="card"><span class="tag">Three types</span><h3>Frictional, structural, cyclical</h3><p>Frictional comes from the time it takes to search for a job. Structural comes from a mismatch between workers' skills or location and the jobs available. Cyclical comes from a fall in aggregate demand during a recession.</p></div>
+    <div class="card"><span class="tag">NRU = F + S</span><h3>Natural rate and full employment</h3><p>The natural rate of unemployment is frictional plus structural. At full employment cyclical unemployment is zero, the actual rate equals the natural rate, and real GDP equals potential output. Full employment never means zero unemployment.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. What happens to the numbers</h2>
+    <p>Memorize these moves. AP questions love the ones where the unemployment rate changes for a reason that has nothing to do with jobs. Unemployment rate = U ÷ (E + U) × 100. Participation rate = (E + U) ÷ adult population × 100.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Employed</th><th>Unemployed</th><th>Labor force</th><th>Unemployment rate</th><th>Participation rate</th></tr></thead>
+    <tbody>
+      <tr><td>An unemployed worker finds a job</td><td>↑</td><td>↓</td><td>No change</td><td>↓</td><td>No change</td></tr>
+      <tr><td>A worker is laid off and starts looking for work</td><td>↓</td><td>↑</td><td>No change</td><td>↑</td><td>No change</td></tr>
+      <tr><td>An unemployed worker gets discouraged and stops looking</td><td>No change</td><td>↓</td><td>↓</td><td><b>↓</b> (nothing improved)</td><td>↓</td></tr>
+      <tr><td>A discouraged worker starts looking again</td><td>No change</td><td>↑</td><td>↑</td><td>↑</td><td>↑</td></tr>
+      <tr><td>A student graduates and starts job hunting</td><td>No change</td><td>↑</td><td>↑</td><td>↑ (frictional)</td><td>↑</td></tr>
+      <tr><td>An employed worker retires</td><td>↓</td><td>No change</td><td>↓</td><td>↑ (smaller denominator)</td><td>↓</td></tr>
+      <tr><td>A full-time worker is cut to part-time and wants more hours</td><td>No change</td><td>No change</td><td>No change</td><td>No change (underemployed)</td><td>No change</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. On the exam</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>FRQ tips</h3>
+      <ul>
+        <li>Write the formula first, then plug in: "Unemployment rate = 8 ÷ (152 + 8) × 100 = 5%." Calculation points need the work shown.</li>
+        <li>Compute the labor force before anything else: labor force = employed + unemployed.</li>
+        <li>When asked how an event changes the unemployment rate, say what happens to both the numerator (unemployed) and the denominator (labor force).</li>
+        <li>Name the type and give the reason: "cyclical, because the worker lost the job when aggregate demand fell."</li>
+        <li>On an AD–AS graph, a recessionary gap (output left of LRAS) means the unemployment rate is above the natural rate. An inflationary gap means it is below.</li>
+        <li>When asked for a limitation of the unemployment rate, name discouraged workers or underemployment and explain the direction: the rate understates joblessness.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Dividing the unemployed by the adult population. The denominator is the labor force.</li>
+        <li>Counting discouraged workers as unemployed. They are not looking, so they are not in the labor force.</li>
+        <li>Saying a part-time worker who wants full-time work is unemployed. Anyone with paid work is employed.</li>
+        <li>Saying full employment means 0% unemployment. It means cyclical unemployment is zero; frictional and structural remain.</li>
+        <li>Calling a job loss from new technology cyclical. Lost jobs that will not come back when the economy recovers are structural.</li>
+        <li>Saying a falling unemployment rate always means the job market improved. It also falls when people stop looking.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 2.3. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-2.html">Unit 2 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+
+  // =================== A. Labor force calculator ===================
+  var BASE = { pop: 250, emp: 152, unemp: 8, nilf: 90, disc: 1, under: 4 };
+  var S = Object.assign({}, BASE), scenKey = "start";
+
+  function calc(s) {
+    var lf = s.emp + s.unemp;
+    var ok = [s.pop, s.emp, s.unemp, s.nilf, s.disc, s.under].every(function (v) { return isFinite(v) && v >= 0; }) && s.nilf >= 0 && lf > 0 && s.pop > 0;
+    return {
+      lf: lf, ok: ok,
+      ur: lf > 0 ? s.unemp / lf * 100 : NaN,
+      lfpr: s.pop > 0 ? lf / s.pop * 100 : NaN,
+      alt: (lf + s.disc) > 0 ? (s.unemp + s.disc) / (lf + s.disc) * 100 : NaN,
+      discBad: s.disc > s.nilf, underBad: s.under > s.emp
+    };
+  }
+  var M0 = calc(BASE);
+
+  var SCEN = [
+    { k: "start", n: "Starting economy", v: {},
+      t: "This is the starting economy. Use the scenarios to see which changes move the unemployment rate and which ones it misses." },
+    { k: "disc", n: "Discouraged workers stop looking", v: { unemp: 5, nilf: 93, disc: 4 },
+      t: "<b>3 million unemployed people give up and stop looking.</b> They move from unemployed to not in the labor force and become discouraged workers. Nobody found a job, yet the unemployment rate fell. The labor force and the participation rate shrank too. This is why the unemployment rate <b>understates</b> joblessness. Count the discouraged workers and the broader rate does not move at all." },
+    { k: "under", n: "Full-time workers cut to part-time", v: { under: 12 },
+      t: "<b>8 million full-time workers have their hours cut to part-time, and they want full-time work.</b> They still have paid work, so they are still employed. Nothing in either formula changes, so the unemployment rate stays the same. The rate misses this <b>underemployment</b> completely." },
+    { k: "rec", n: "Recession layoffs", v: { emp: 146, unemp: 14 },
+      t: "<b>6 million workers are laid off when aggregate demand falls, and they look for new jobs.</b> They move from employed to unemployed. The labor force does not change, so the participation rate stays the same while the unemployment rate rises. This added unemployment is <b>cyclical</b>." },
+    { k: "grad", n: "Students graduate and job hunt", v: { unemp: 12, nilf: 86 },
+      t: "<b>4 million students finish school and start looking for work.</b> They move from not in the labor force to unemployed. Both the unemployment rate and the participation rate rise. This is <b>frictional</b> unemployment: new entrants searching for a first job." },
+    { k: "hire", n: "Unemployed workers find jobs", v: { emp: 154, unemp: 6 },
+      t: "<b>2 million unemployed workers find jobs.</b> They move from unemployed to employed. The labor force stays the same, so the participation rate does not change, and the unemployment rate falls for a good reason." },
+    { k: "retire", n: "Workers retire", v: { emp: 147, nilf: 95 },
+      t: "<b>5 million employed workers retire.</b> They leave the labor force. The number of unemployed people did not change, but the labor force (the denominator) got smaller, so the unemployment rate <b>rises slightly</b>. The participation rate falls." }
+  ];
+
+  var ids = ["pop", "emp", "unemp", "nilf", "disc", "under"];
+  var inp = {};
+  ids.forEach(function (k) { inp[k] = document.getElementById("n-" + k); });
+
+  var svgPop = document.getElementById("pop-chart");
+  function niceStep(max) { var raw = max / 5, p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
+  function bar(F, s, y0, y1) {
+    var x = 0;
+    var e1 = Math.max(0, s.emp), u1 = Math.max(0, s.unemp), n1 = Math.max(0, s.nilf);
+    var under = Math.min(Math.max(0, s.under), e1), disc = Math.min(Math.max(0, s.disc), n1);
+    Lab.rect(F, x, y0, x + e1 - under, y1, "var(--lrpc)", .75);
+    Lab.rect(F, x + e1 - under, y0, x + e1, y1, "var(--c4)", .75);
+    x += e1;
+    Lab.rect(F, x, y0, x + u1, y1, "var(--bad)", .85);
+    x += u1;
+    Lab.rect(F, x, y0, x + disc, y1, "var(--c3)", .75);
+    Lab.rect(F, x + disc, y0, x + n1, y1, "var(--ghost)", .6);
+    var tot = e1 + u1 + n1, ym = (y0 + y1) / 2 - 0.25;
+    if (e1 - under > tot * 0.22) Lab.tag(F, (e1 - under) / 2, ym, "E " + f(s.emp, 0), "var(--ink)", "middle");
+    if (n1 - disc > tot * 0.16) Lab.tag(F, e1 + u1 + disc + (n1 - disc) / 2, ym, "Not in LF " + f(s.nilf, 0), "var(--ink)", "middle");
+  }
+  function drawPop(m) {
+    var total = Math.max(BASE.emp + BASE.unemp + BASE.nilf, Math.max(0, S.emp) + Math.max(0, S.unemp) + Math.max(0, S.nilf), 1);
+    var step = niceStep(total), xmax = Math.ceil(total * 1.04 / step) * step, ticks = [];
+    for (var t = 0; t <= xmax + 1e-9; t += step) ticks.push(t);
+    var F = Lab.frame(svgPop, { x: [0, xmax], y: [0, 10], xLabel: "Adults age 16+ (millions)", yLabel: "",
+      xTicks: ticks, yTicks: [], fmtX: function (v) { return f(v, 0); }, height: 300 });
+    Lab.tag(F, 0.01 * xmax, 9.2, "Start: unemployment rate " + f(M0.ur) + "%", "var(--muted)");
+    bar(F, BASE, 6.4, 8.4);
+    Lab.tag(F, 0.01 * xmax, 4.6, m.ok ? "Now: unemployment rate " + f(m.ur) + "%" : "Now: numbers do not add up", "var(--ink)");
+    bar(F, S, 0.6, 2.6);
+    if (m.ok) {
+      Lab.line(F, [[0, 3.2], [m.lf, 3.2]], "var(--accent)", 2);
+      Lab.line(F, [[m.lf, 2.7], [m.lf, 3.6]], "var(--accent)", 2);
+      Lab.tag(F, m.lf - 0.01 * xmax, 3.45, "Labor force " + f(m.lf, 0), "var(--accent)", "end");
+    }
+  }
+
+  function row(a, b, cls) { return '<div class="row' + (cls ? " " + cls : "") + '"><span>' + a + "</span><span>" + b + "</span></div>"; }
+  function n0(v) { return f(v, 0); }
+  function drawCalc(m) {
+    var h = "";
+    if (S.nilf < 0) h += row("Employed + unemployed is larger than the adult population. Raise the population or lower a group.", "check inputs", "warn");
+    h += row("Adult population = employed + unemployed + not in labor force", n0(S.emp) + " + " + n0(S.unemp) + " + " + n0(S.nilf) + " = " + n0(S.emp + S.unemp + S.nilf));
+    h += row("Labor force = employed + unemployed", n0(S.emp) + " + " + n0(S.unemp) + " = " + n0(m.lf));
+    h += row("Unemployment rate = unemployed ÷ labor force × 100", m.ok ? n0(S.unemp) + " ÷ " + n0(m.lf) + " × 100 = " + f(m.ur) + "%" : "—");
+    h += row("Participation rate = labor force ÷ adult population × 100", m.ok ? n0(m.lf) + " ÷ " + n0(S.pop) + " × 100 = " + f(m.lfpr) + "%" : "—");
+    h += row("Broader rate = (unemployed + discouraged) ÷ (labor force + discouraged) × 100", m.ok ? "(" + n0(S.unemp) + " + " + n0(S.disc) + ") ÷ (" + n0(m.lf) + " + " + n0(S.disc) + ") × 100 = " + f(m.alt) + "%" : "—");
+    if (m.discBad) h += row("Discouraged workers are part of \"not in the labor force,\" so they cannot exceed it.", "check inputs", "warn");
+    if (m.underBad) h += row("Underemployed workers are part of the employed, so they cannot exceed it.", "check inputs", "warn");
+    document.getElementById("lf-calc").innerHTML = h;
+  }
+  function chg(a, b, unit) {
+    if (Math.abs(a - b) < 0.05) return "stays at " + f(b) + unit;
+    return (b > a ? "rises" : "falls") + " from " + f(a) + unit + " to " + f(b) + unit;
+  }
+  function drawStory(m) {
+    var el = document.getElementById("lf-story");
+    if (!m.ok) { el.innerHTML = "<p><b>These numbers do not work.</b> Every group must be zero or more, and employed plus unemployed cannot be larger than the adult population. Fix an input or pick a scenario.</p>"; return; }
+    var sc = SCEN.filter(function (x) { return x.k === scenKey; })[0];
+    var html = "";
+    if (sc) html += "<p>" + sc.t + "</p>";
+    else html += "<p><b>Your own numbers.</b> " + n0(S.emp) + " million employed plus " + n0(S.unemp) + " million unemployed gives a labor force of " + n0(m.lf) + " million. The " + n0(S.nilf) + " million not in the labor force are left out of the unemployment rate entirely.</p>";
+    var li = [];
+    li.push("Unemployment rate " + chg(M0.ur, m.ur, "%") + ".");
+    li.push("Labor force participation rate " + chg(M0.lfpr, m.lfpr, "%") + ".");
+    li.push("Rate counting discouraged workers " + chg(M0.alt, m.alt, "%") + ".");
+    if (S.under > 0) li.push(n0(S.under) + " million underemployed workers are counted as employed. The unemployment rate treats them the same as full-time workers.");
+    html += "<ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    html += "<p><b>AP answer:</b> unemployment rate = unemployed ÷ labor force × 100 = " + n0(S.unemp) + " ÷ " + n0(m.lf) + " × 100 = " + f(m.ur) + "%. A change in the rate can come from the numerator (people finding or losing jobs) or from the denominator (people entering or leaving the labor force).</p>";
+    el.innerHTML = html;
+  }
+  function renderLF(skip) {
+    ids.forEach(function (k) { if (k !== skip) inp[k].value = S[k]; });
+    var m = calc(S);
+    drawPop(m); drawCalc(m); drawStory(m);
+    document.getElementById("r-lf").textContent = m.ok ? n0(m.lf) : "—";
+    document.getElementById("r-ur").textContent = m.ok ? f(m.ur) + "%" : "—";
+    document.getElementById("r-lfpr").textContent = m.ok ? f(m.lfpr) + "%" : "—";
+    document.getElementById("r-alt").textContent = m.ok ? f(m.alt) + "%" : "—";
+    Array.prototype.forEach.call(document.querySelectorAll("#lf-scen button"), function (b) { b.setAttribute("aria-pressed", b.dataset.k === scenKey); });
+  }
+  ids.forEach(function (k) {
+    inp[k].addEventListener("input", function () {
+      var v = parseFloat(inp[k].value);
+      S[k] = isFinite(v) ? v : NaN;
+      if (k === "pop" || k === "emp" || k === "unemp") S.nilf = S.pop - S.emp - S.unemp;
+      if (k === "nilf") S.pop = S.emp + S.unemp + S.nilf;
+      scenKey = "custom";
+      renderLF(k);
+    });
+  });
+  var lfs = document.getElementById("lf-scen");
+  SCEN.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x.n; b.dataset.k = x.k;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, x.v); scenKey = x.k; renderLF(); });
+    lfs.appendChild(b);
+  });
+  renderLF();
+
+  // =================== B. Classification drill ===================
+  var CATS = [["fr", "Frictional"], ["st", "Structural"], ["cy", "Cyclical"], ["nilf", "Not in the labor force"]];
+  var CASES = [
+    { t: "A college graduate spends two months interviewing for her first engineering job.", a: "fr", w: "She has skills employers want and is searching for the right match. Time spent searching is frictional." },
+    { t: "An auto plant lays off 500 workers because car sales drop during a recession. The workers are looking for new jobs.", a: "cy", w: "The jobs disappeared because total spending fell in a downturn. They should return when the economy recovers, so this is cyclical." },
+    { t: "A typesetter loses his job when newspapers switch to layout software. No local employer needs his skills, and he keeps applying.", a: "st", w: "Technology changed the jobs available, and his skills no longer match them. That mismatch is structural." },
+    { t: "A retired teacher spends her days gardening and does not want a job.", a: "nilf", w: "She is not working and not looking, so she is not in the labor force. She is not unemployed." },
+    { t: "A nurse quits when her family moves to a new city and is applying to hospitals there.", a: "fr", w: "Her skills are in demand; she just needs time to find a job in the new place. That search is frictional." },
+    { t: "A coal miner's mine closes as power plants switch to natural gas. He is looking for work, but the jobs nearby need training he does not have.", a: "st", w: "The industry shrank for good and his skills do not match the openings. That is structural unemployment." },
+    { t: "A full-time high school student has no job and is not looking for one.", a: "nilf", w: "Not working and not looking means not in the labor force. Students are the classic example." },
+    { t: "A man wants a job but stopped looking months ago because he believes no one is hiring.", a: "nilf", w: "He is a discouraged worker. Because he is not actively looking, he is not in the labor force, even though he wants a job." },
+    { t: "A software developer quits a job she dislikes and interviews for a better one.", a: "fr", w: "Voluntarily searching for a better match is frictional unemployment." },
+    { t: "Households cut back on eating out as aggregate demand falls. A restaurant lays off a server, who looks for a new restaurant job.", a: "cy", w: "Falling aggregate demand cost the job. When spending recovers, restaurants hire again. This is cyclical." },
+    { t: "A bank teller is replaced by ATMs and mobile banking. She is searching, but the openings near her need coding or nursing skills.", a: "st", w: "Technology eliminated the job, and her skills do not match the jobs that exist. That is structural." },
+    { t: "A stay-at-home parent cares for young children full-time and is not seeking paid work.", a: "nilf", w: "Not looking for paid work, so not in the labor force." },
+    { t: "During a recession, a construction company has no new projects and lays off a carpenter. He is looking for work.", a: "cy", w: "The downturn in total spending cut the demand for construction. The job loss is cyclical." },
+    { t: "A clothing factory moves overseas. Its sewing machine operators look for work, but local employers need warehouse robot technicians.", a: "st", w: "The jobs left for good and the workers' skills do not match local openings. That is structural." },
+    { t: "A recent veteran leaves the military and spends a few weeks applying for civilian jobs that fit her training.", a: "fr", w: "She is entering the civilian job market and searching for a match. That short search is frictional." }
+  ];
+  var D = { order: [], pos: 0, right: 0, done: 0, answered: false, tally: {} };
+  var dItem = document.getElementById("d-item"), dCh = document.getElementById("d-choices"), dFb = document.getElementById("d-fb");
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function catName(k) { return CATS.filter(function (c) { return c[0] === k; })[0][1]; }
+  function drawTally() {
+    document.getElementById("d-tally").innerHTML = CATS.map(function (c) {
+      var t = D.tally[c[0]] || { r: 0, n: 0 };
+      return "<div><span>" + c[1] + "</span><b>" + t.r + " / " + t.n + "</b></div>";
+    }).join("");
+  }
+  function drawDrill() {
+    var fin = D.pos >= D.order.length;
+    document.getElementById("d-pos").textContent = fin ? "All " + CASES.length + " cases done" : "Case " + (D.pos + 1) + " of " + CASES.length;
+    document.getElementById("d-score").textContent = D.right + " / " + D.done + " correct";
+    dItem.textContent = fin ? "You classified every case. Reshuffle to play again." : CASES[D.order[D.pos]].t;
+    dCh.innerHTML = "";
+    CATS.forEach(function (c) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = c[1]; b.dataset.k = c[0];
+      b.disabled = fin;
+      b.addEventListener("click", function () { answer(c[0]); });
+      dCh.appendChild(b);
+    });
+    document.getElementById("d-next").disabled = fin;
+    drawTally();
+  }
+  function answer(k) {
+    if (D.answered || D.pos >= D.order.length) return;
+    var it = CASES[D.order[D.pos]], ok = k === it.a;
+    D.answered = true; D.done++; if (ok) D.right++;
+    var t = D.tally[it.a] || (D.tally[it.a] = { r: 0, n: 0 }); t.n++; if (ok) t.r++;
+    Array.prototype.forEach.call(dCh.querySelectorAll("button"), function (b) {
+      b.disabled = true;
+      if (b.dataset.k === it.a) b.classList.add("right");
+      else if (b.dataset.k === k) b.classList.add("wrong");
+    });
+    dFb.className = "fb " + (ok ? "ok" : "no");
+    dFb.innerHTML = (ok ? "<b style='color:var(--good)'>Correct.</b> " : "<b style='color:var(--bad)'>Not quite. It is " + catName(it.a).toLowerCase() + ".</b> ") + it.w;
+    document.getElementById("d-score").textContent = D.right + " / " + D.done + " correct";
+    drawTally();
+  }
+  function next() {
+    if (D.pos >= D.order.length) return;
+    D.pos++; D.answered = false;
+    dFb.className = "fb";
+    dFb.innerHTML = D.pos >= D.order.length
+      ? "<b>Final score: " + D.right + " / " + D.done + ".</b> The rule of thumb: not looking means not in the labor force; jobs that come back after a recession are cyclical; jobs that are gone for good are structural; a normal job search is frictional."
+      : "Pick a category for this person.";
+    drawDrill();
+  }
+  function restart() {
+    D = { order: shuffle(CASES.map(function (_, i) { return i; })), pos: 0, right: 0, done: 0, answered: false, tally: {} };
+    dFb.className = "fb"; dFb.innerHTML = "Pick a category for this person. You get the reason right away.";
+    drawDrill();
+  }
+  document.getElementById("d-next").addEventListener("click", next);
+  document.getElementById("d-shuffle").addEventListener("click", restart);
+  restart();
+
+  // =================== C. Natural rate panel ===================
+  var NB = { fr: 2, st: 3, cy: 0 };
+  var N = Object.assign({}, NB);
+  var elFr = document.getElementById("s-fr"), elSt = document.getElementById("s-st"), elCy = document.getElementById("s-cy");
+  var svgNr = document.getElementById("nr-chart"), svgAd = document.getElementById("nr-adas");
+
+  function drawNr() {
+    var nat = N.fr + N.st, act = nat + N.cy;
+    var F = Lab.frame(svgNr, { x: [0, 10], y: [0, 16], xLabel: "", yLabel: "Unemployment rate (%)",
+      xTicks: [2.75, 7.25], yTicks: [0, 4, 8, 12, 16], fmtX: function (v) { return v < 5 ? "Natural rate" : "Actual rate"; }, fmtY: function (v) { return v + "%"; } });
+    function stack(x0, x1, fr, st, cy) {
+      Lab.rect(F, x0, 0, x1, fr, "var(--c3)", .7);
+      Lab.rect(F, x0, fr, x1, fr + st, "var(--srpc)", .7);
+      if (fr >= 1.2) Lab.tag(F, (x0 + x1) / 2, fr / 2 - 0.3, "F " + f(fr) + "%", "var(--ink)", "middle");
+      if (st >= 1.2) Lab.tag(F, (x0 + x1) / 2, fr + st / 2 - 0.3, "S " + f(st) + "%", "var(--ink)", "middle");
+      if (cy > 0) {
+        Lab.rect(F, x0, fr + st, x1, fr + st + cy, "var(--bad)", .75);
+        if (cy >= 1.2) Lab.tag(F, (x0 + x1) / 2, fr + st + cy / 2 - 0.3, "C " + f(cy) + "%", "var(--ink)", "middle");
+      }
+    }
+    stack(1.5, 4, N.fr, N.st, 0);
+    if (N.cy >= 0) stack(6, 8.5, N.fr, N.st, N.cy);
+    else {
+      // actual below natural: trim the top of the stack and outline the missing part
+      var a = Math.max(0, act), frA = Math.min(N.fr, a), stA = Math.max(0, a - N.fr);
+      Lab.rect(F, 6, 0, 8.5, frA, "var(--c3)", .7);
+      Lab.rect(F, 6, frA, 8.5, frA + stA, "var(--srpc)", .7);
+      Lab.line(F, [[6, a], [6, nat], [8.5, nat], [8.5, a]], "var(--bad)", 2, "4 4");
+      Lab.tag(F, 7.25, a + (nat - a) / 2 - 0.3, "C \u2212" + f(-N.cy) + "%", "var(--bad)", "middle");
+    }
+    Lab.hline(F, nat, "var(--ghost)", 2, "6 5");
+    Lab.tag(F, 0.2, nat + 0.5, "natural rate " + f(nat) + "%", "var(--muted)");
+    Lab.tag(F, 7.25, Math.max(act, nat) + 1.3, "actual " + f(act) + "%", "var(--ink)", "middle");
+  }
+  function drawAd() {
+    var dsh = -N.cy * (N.cy > 0 ? 0.8 : 1.2);
+    Lab.market(svgAd, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: dsh, label: "AD" }, supply: { shift: 0, label: "SRAS" },
+      longRun: { shift: 0, label: "LRAS" }, start: { demand: 0 },
+      eqLabels: Math.abs(N.cy) < 1e-9 ? ["Y\u2081 = Yf", "PL\u2081"] : ["Y\u2081", "PL\u2081"], startLabels: ["Yf", "PL\u2080"],
+      extra: function (F, eq) {
+        if (Math.abs(N.cy) > 1e-9) {
+          var x = eq.x;
+          Lab.arrow(F, x, 1.4, 5, 1.4, "var(--bad)");
+          Lab.tag(F, (x + 5) / 2, 1.8, N.cy > 0 ? "recessionary gap" : "inflationary gap", "var(--bad)", "middle");
+        }
+      }
+    });
+  }
+  function drawNrStory() {
+    var nat = N.fr + N.st, act = nat + N.cy, html, gap;
+    if (Math.abs(N.cy) < 1e-9) {
+      html = "<p><b>Full employment.</b> Cyclical unemployment is zero, so the actual unemployment rate equals the natural rate of " + f(nat) + "%. Real GDP equals potential output (Y<sub>f</sub>), on LRAS. Unemployment is still " + f(act) + "%, because frictional and structural unemployment never disappear.</p>";
+      gap = '<span class="pill lr">Full employment</span>';
+    } else if (N.cy > 0) {
+      html = "<p><b>Recession.</b> Aggregate demand has fallen, so firms cut jobs. Cyclical unemployment is " + f(N.cy) + "%, so the actual rate of " + f(act) + "% is above the natural rate of " + f(nat) + "%. Real GDP is below Y<sub>f</sub>: a <b>recessionary gap</b>.</p>";
+      gap = '<span class="pill rec">Recessionary gap</span>';
+    } else {
+      html = "<p><b>Boom.</b> Aggregate demand is high and firms hire beyond the normal level, so the actual rate of " + f(act) + "% is below the natural rate of " + f(nat) + "%. Cyclical unemployment is negative (" + f(N.cy) + "%). Real GDP is above Y<sub>f</sub>: an <b>inflationary gap</b>. This cannot last in the long run.</p>";
+      gap = '<span class="pill infl">Inflationary gap</span>';
+    }
+    var natB = NB.fr + NB.st;
+    if (Math.abs(nat - natB) > 1e-9) {
+      html += "<p>The natural rate " + (nat < natB ? "fell" : "rose") + " from " + f(natB) + "% to " + f(nat) + "% because " +
+        (N.fr !== NB.fr ? "frictional unemployment " + (N.fr < NB.fr ? "fell" : "rose") : "") +
+        (N.fr !== NB.fr && N.st !== NB.st ? " and " : "") +
+        (N.st !== NB.st ? "structural unemployment " + (N.st < NB.st ? "fell" : "rose") : "") +
+        ". Full employment now means " + f(nat) + "% unemployment. Changes in aggregate demand do not move the natural rate; only frictional and structural unemployment do.</p>";
+    }
+    html += "<p><b>AP answer:</b> natural rate = frictional + structural = " + f(N.fr) + "% + " + f(N.st) + "% = " + f(nat) + "%. Cyclical = actual − natural = " + f(act) + "% − " + f(nat) + "% = " + f(N.cy) + "%.</p>";
+    document.getElementById("nr-story").innerHTML = html;
+    document.getElementById("r-gap").innerHTML = gap;
+    document.getElementById("r-nat").textContent = f(nat) + "%";
+    document.getElementById("r-act").textContent = f(act) + "%";
+    document.getElementById("r-cy").textContent = f(N.cy).replace("-", "\u2212") + "%";
+  }
+  function renderNr() {
+    elFr.value = N.fr; elSt.value = N.st; elCy.value = N.cy;
+    document.getElementById("o-fr").textContent = f(N.fr) + "%";
+    document.getElementById("o-st").textContent = f(N.st) + "%";
+    document.getElementById("o-cy").textContent = (N.cy > 0 ? "+" : "") + f(N.cy) + "%";
+    drawNr(); drawAd(); drawNrStory();
+  }
+  elFr.addEventListener("input", function () { N.fr = parseFloat(elFr.value); renderNr(); });
+  elSt.addEventListener("input", function () { N.st = parseFloat(elSt.value); renderNr(); });
+  elCy.addEventListener("input", function () { N.cy = parseFloat(elCy.value); renderNr(); });
+  var NSC = [
+    ["Full employment", {}],
+    ["Recession", { cy: 4 }],
+    ["Boom (economy overheats)", { cy: -1.5 }],
+    ["Better job-matching websites", { fr: 1 }],
+    ["New technology makes skills obsolete", { st: 4.5 }]
+  ];
+  var nrs = document.getElementById("nr-scen");
+  NSC.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { N = Object.assign({}, NB, x[1]); renderNr(); });
+    nrs.appendChild(b);
+  });
+  renderNr();
+
+  // =================== Quiz ===================
+  var Q = [
+    { s: "An economy has an adult population of 200 million. 114 million people are employed and 6 million are unemployed. What is the unemployment rate?", o: ["3.0%", "5.0%", "5.3%", "60.0%"], c: 1, w: "Labor force = 114 + 6 = 120 million. Unemployment rate = 6 ÷ 120 × 100 = 5.0%. Dividing by the adult population (3.0%) or by the employed (5.3%) uses the wrong denominator. 60% is the participation rate." },
+    { s: "An economy has 250 million adults, 180 million employed, and 20 million unemployed. Which of the following is correct?", o: ["Unemployment rate 10%, labor force participation rate 80%", "Unemployment rate 8%, labor force participation rate 80%", "Unemployment rate 10%, labor force participation rate 72%", "Unemployment rate 11.1%, labor force participation rate 80%"], c: 0, w: "Labor force = 180 + 20 = 200. Unemployment rate = 20 ÷ 200 = 10%. Participation rate = 200 ÷ 250 = 80%. 8% divides by the population, 72% leaves out the unemployed, and 11.1% divides by the employed." },
+    { s: "Some unemployed workers become discouraged and stop looking for work. What happens to the unemployment rate and the labor force participation rate?", o: ["Unemployment rate increases; participation rate decreases", "Unemployment rate decreases; participation rate decreases", "Unemployment rate decreases; participation rate does not change", "Neither rate changes"], c: 1, w: "Discouraged workers leave the labor force. The number unemployed falls, so the unemployment rate falls, and the labor force shrinks, so the participation rate falls. The unemployment rate dropped even though no one found a job." },
+    { s: "Which of the following is an example of structural unemployment?", o: ["A teacher who quits to move to another state and is searching for a teaching job there", "A factory worker laid off because consumer spending falls during a recession", "A college student who is not looking for work", "A travel agent who loses her job as people book trips online and whose skills do not match available jobs"], c: 3, w: "Structural unemployment comes from a mismatch between workers' skills and the jobs available, often caused by technology. The teacher is frictional, the factory worker is cyclical, and the student is not in the labor force." },
+    { s: "The natural rate of unemployment equals:", o: ["Cyclical unemployment plus frictional unemployment", "Structural unemployment plus cyclical unemployment", "Frictional unemployment plus structural unemployment", "Zero, when the economy is at full employment"], c: 2, w: "The natural rate is frictional plus structural unemployment. It is the rate when cyclical unemployment is zero, and it is never zero." },
+    { s: "When an economy is at full employment, which of the following is true?", o: ["Cyclical unemployment is zero", "The unemployment rate is zero", "Frictional and structural unemployment are zero", "Real GDP is greater than potential output"], c: 0, w: "Full employment means no cyclical unemployment. Frictional and structural unemployment remain, so the unemployment rate equals the natural rate, and real GDP equals potential output." },
+    { s: "A worker wants a full-time job but can only find 15 hours of work a week. In the official statistics this worker is counted as:", o: ["Unemployed", "Not in the labor force", "A discouraged worker", "Employed"], c: 3, w: "Anyone who did paid work during the survey week is employed, even part-time. This worker is underemployed, which the unemployment rate does not capture." },
+    { s: "The actual unemployment rate is 7%. Frictional unemployment is 2% and structural unemployment is 3%. Which of the following describes the economy?", o: ["Cyclical unemployment is 7% and the economy is at full employment", "Cyclical unemployment is 5% and real GDP is above potential output", "Cyclical unemployment is 2% and real GDP is below potential output", "Cyclical unemployment is 2% and real GDP is above potential output"], c: 2, w: "Natural rate = 2% + 3% = 5%. Cyclical = 7% − 5% = 2%. Unemployment above the natural rate means real GDP is below potential: a recessionary gap. 5% is the natural rate, not cyclical unemployment." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("2.3");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [2], topic: "2.3", compact: true, storageKey: "topic-2.3" });</script>
+</body>
+</html>

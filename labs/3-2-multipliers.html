@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Multipliers Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub { display: grid; gap: 6px; margin-top: 8px; }
+.sub h3 { font-size: 1.2rem; }
+.sub p { color: var(--muted); max-width: 70ch; }
+.controls.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 12px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.ctl input[type="number"] { font: inherit; font-size: .95rem; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); width: 100%; }
+.prob { background: var(--paper); border-left: 4px solid var(--c3); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: .95rem; }
+.calc-card { display: grid; gap: 12px; align-content: start; }
+.calc .row span:last-child { font-family: var(--mono); white-space: nowrap; }
+.ans { font-size: .95rem; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+@media (max-width: 860px) { .controls.three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .controls.three { grid-template-columns: 1fr; } .calc .row { flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.2</span>
+  <h1>The Multipliers Study Lab</h1>
+  <p class="lede">One person's spending is another person's income, so a change in spending ripples through the economy and changes real GDP by more than the first dollar spent. Watch the rounds of spending shrink and add up, then use the calculator to work AP-style spending, tax, and balanced-budget multiplier problems step by step.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. The multiplier at work</h2>
+    <p>Pick an MPC and an initial change in spending. Each round, the people who receive the new income spend the MPC share of it and save the rest. Press Play to watch the chain build.</p>
+  </div>
+
+  <div class="sub">
+    <h3>A. The spending chain</h3>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Spending in each round <small>round 1 = initial change</small></h3>
+      <svg class="chart" id="chain" role="img" aria-label="Bar chart of new spending in each round of the multiplier process"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Running total <small>total change in real GDP</small></h3>
+      <svg class="chart" id="total" role="img" aria-label="Line chart of the running total change in real GDP approaching its maximum"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">New spending this round</span><span class="l-c3">Running total</span><span class="l-lrpc">Maximum change in real GDP</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls three">
+      <div class="ctl">
+        <label for="s-mpc">Marginal propensity to consume (MPC) <output id="o-mpc"></output></label>
+        <input type="range" id="s-mpc" min="0.5" max="0.95" step="0.05">
+        <span class="hint">MPS = 1 − MPC</span>
+      </div>
+      <div class="ctl">
+        <label for="s-amt">Initial change in spending <output id="o-amt"></output></label>
+        <input type="range" id="s-amt" min="-40" max="40" step="5">
+        <span class="hint">Change in C, I, G, or net exports ($ billions)</span>
+      </div>
+      <div class="ctl">
+        <label for="s-speed">Animation speed <output id="o-speed"></output></label>
+        <input type="range" id="s-speed" min="1" max="3" step="1">
+        <span class="hint">How fast Play runs the rounds</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button id="btn-play" type="button" class="primary">Play the rounds</button>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">MPS = 1 − MPC</div><div class="v" id="r-mps"></div></div>
+    <div class="stat"><div class="k">Spending multiplier = 1 / MPS</div><div class="v" id="r-mult"></div></div>
+    <div class="stat"><div class="k">Running total so far</div><div class="v" id="r-tot"></div></div>
+    <div class="stat"><div class="k">Maximum change in real GDP</div><div class="v" id="r-max"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="sub">
+    <h3>B. Multiplier calculator</h3>
+    <p>Choose a preset AP problem or set your own numbers. The calculator shows every line of work an FRQ grader wants to see.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card calc-card">
+      <div>
+        <div class="tag" style="margin-bottom:8px;">AP-style presets</div>
+        <div class="scenarios" id="presets"></div>
+      </div>
+      <div style="display:grid; gap:6px;">
+        <span style="font-size:.86rem; font-weight:500;">What does the question give you?</span>
+        <div class="seg" role="group" aria-label="Type of policy or spending change">
+          <button type="button" id="k-g" aria-pressed="true">Spending (G, I, C, Xn)</button>
+          <button type="button" id="k-t" aria-pressed="false">Taxes</button>
+          <button type="button" id="k-tr" aria-pressed="false">Transfers</button>
+          <button type="button" id="k-bb" aria-pressed="false">Balanced budget</button>
+        </div>
+      </div>
+      <div style="display:grid; gap:6px;">
+        <span style="font-size:.86rem; font-weight:500;">What does the question ask for?</span>
+        <div class="seg" role="group" aria-label="What to solve for">
+          <button type="button" id="g-y" aria-pressed="true">Change in real GDP</button>
+          <button type="button" id="g-p" aria-pressed="false">Policy needed to close a gap</button>
+        </div>
+      </div>
+      <div class="controls" style="grid-template-columns: 1fr 1fr;">
+        <div class="ctl">
+          <label for="c-mpc">MPC <output id="oc-mpc"></output></label>
+          <input type="range" id="c-mpc" min="0.5" max="0.95" step="0.05">
+          <span class="hint" id="h-mps"></span>
+        </div>
+        <div class="ctl">
+          <label for="c-amt" id="l-amt">Change in spending ($ billions)</label>
+          <input type="number" id="c-amt" step="5">
+          <span class="hint" id="h-amt"></span>
+        </div>
+      </div>
+    </div>
+    <div class="card calc-card">
+      <div class="prob" id="prob"></div>
+      <div><span class="formula" id="formula"></span></div>
+      <div class="calc" id="calc" aria-live="polite"></div>
+      <p class="ans" id="ans"></p>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">MPC + MPS = 1</span><h3>Spend it or save it</h3><p>Each extra dollar of disposable income is either spent or saved. If the MPC is 0.8, the MPS is 0.2. When a question gives you one, subtract from 1 to get the other.</p></div>
+    <div class="card"><span class="tag">The chain</span><h3>The multiplier effect</h3><p>A change in autonomous spending becomes someone's income. They spend the MPC share of it, which becomes income for someone else. Each round is smaller, and the rounds add up to a total change in real GDP larger than the first change.</p></div>
+    <div class="card"><span class="tag">1 / MPS</span><h3>Spending multiplier</h3><p>Spending multiplier = 1 / MPS = 1 / (1 − MPC). It applies to any change in C, I, G, or net exports. A bigger MPC means less leaks into saving each round, so the multiplier is bigger.</p></div>
+    <div class="card"><span class="tag">−MPC / MPS</span><h3>Tax multiplier</h3><p>A tax cut raises disposable income, but households save the MPS share before spending anything. First-round spending is only MPC × ΔT, so the tax multiplier is smaller in absolute value than the spending multiplier. It is negative: higher taxes lower real GDP. A change in transfer payments works the same way with a positive sign.</p></div>
+    <div class="card"><span class="tag">Equals 1</span><h3>Balanced-budget multiplier</h3><p>If government spending and taxes rise by the same amount, real GDP rises by that same amount. The spending effect (1/MPS) minus the tax effect (MPC/MPS) equals MPS/MPS = 1.</p></div>
+    <div class="card"><span class="tag">Upper limit</span><h3>Why it is the maximum</h3><p>The simple multiplier assumes only saving leaks out and the price level stays fixed. In practice, taxes, imports, a rising price level, and higher interest rates make the actual change smaller. That is why AP asks for the <b>maximum</b> change in real GDP.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Worked examples by MPC</h2>
+    <p>Each row uses a $10 billion change. Notice that the tax multiplier is always the spending multiplier minus 1 (ignoring the sign), and the balanced-budget result is always $10 billion.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>MPC</th><th>MPS</th><th>Spending multiplier (1/MPS)</th><th>Tax multiplier (−MPC/MPS)</th><th>G rises $10B</th><th>Taxes cut $10B</th><th>G and taxes both rise $10B</th></tr></thead>
+    <tbody>
+      <tr><td>0.5</td><td>0.5</td><td>2</td><td>−1</td><td>+$20B</td><td>+$10B</td><td>+$10B</td></tr>
+      <tr><td>0.6</td><td>0.4</td><td>2.5</td><td>−1.5</td><td>+$25B</td><td>+$15B</td><td>+$10B</td></tr>
+      <tr><td>0.75</td><td>0.25</td><td>4</td><td>−3</td><td>+$40B</td><td>+$30B</td><td>+$10B</td></tr>
+      <tr><td><b>0.8</b></td><td><b>0.2</b></td><td><b>5</b></td><td><b>−4</b></td><td><b>+$50B</b></td><td><b>+$40B</b></td><td><b>+$10B</b></td></tr>
+      <tr><td>0.9</td><td>0.1</td><td>10</td><td>−9</td><td>+$100B</td><td>+$90B</td><td>+$10B</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Showing your work on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Tips that earn points</h3>
+      <ul>
+        <li>Write the formula, then plug in: "Spending multiplier = 1 / (1 − 0.8) = 5." Graders look for the multiplier value and the final answer.</li>
+        <li>Finish with units and direction: "Real GDP increases by a maximum of $50 billion (5 × $10 billion)."</li>
+        <li>For "minimum change in government spending needed to close a gap," divide: ΔG = gap ÷ spending multiplier. A $100 billion gap with MPC 0.8 needs $20 billion.</li>
+        <li>For a tax question, use −MPC/MPS and say whether taxes are cut or raised. A tax change needed to close a gap is always larger than the spending change.</li>
+        <li>Treat a change in transfer payments like a tax change with the opposite sign: multiplier MPC/MPS.</li>
+        <li>If a question gives the MPS, use it directly. If it gives a change in consumption and income, compute MPC = ΔC / ΔDisposable income first.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Using the spending multiplier for a tax change. A $10 billion tax cut with MPC 0.8 raises real GDP by $40 billion, not $50 billion.</li>
+        <li>Dropping the sign. A tax increase lowers real GDP; a tax cut raises it.</li>
+        <li>Multiplying when you should divide. If the question gives the gap and asks for the policy, divide the gap by the multiplier.</li>
+        <li>Saying a balanced-budget increase has no effect. Real GDP rises by the amount of the spending increase.</li>
+        <li>Mixing up the spending multiplier with the money multiplier (1 / required reserve ratio), which belongs to banking in Unit 4.</li>
+        <li>Calling the result the exact change. Say "maximum," because leakages and price level changes shrink the real effect.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.2. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+  // Clean decimal display: 6.666 -> "6.67", 5 -> "5", 0.20 -> "0.2"
+  function num(v, d) { var k = Math.pow(10, d == null ? 2 : d); var r = Math.round(v * k) / k; if (Object.is(r, -0)) r = 0; return String(r); }
+  function money(v) { var r = num(Math.abs(v)); return (v < -1e-9 ? "−" : "") + "$" + r + "B"; }
+  function smoney(v) { return (v > 1e-9 ? "+" : "") + money(v); }
+  function neg(v) { return v < 0 ? "−" + num(-v) : num(v); }
+
+  // =================== A. Spending chain ===================
+  var BASE = { mpc: 0.8, amt: 10, speed: 2 };
+  var S = Object.assign({}, BASE);
+  var BARS = 12, ROUNDS = 25;
+  var shown = ROUNDS;          // rounds currently revealed (fractional during animation)
+  var stopAnim = null;
+  var svgC = document.getElementById("chain"), svgT = document.getElementById("total");
+
+  function model(s) {
+    var mps = Math.round((1 - s.mpc) * 100) / 100;
+    var mult = 1 / mps;
+    var rounds = [];
+    for (var n = 1; n <= ROUNDS; n++) rounds.push(s.amt * Math.pow(s.mpc, n - 1));
+    return { mps: mps, mult: mult, rounds: rounds, max: s.amt * mult };
+  }
+  function cumAt(m, k) {           // running total after k rounds (k may be fractional)
+    var t = 0, whole = Math.floor(k);
+    for (var i = 0; i < whole && i < m.rounds.length; i++) t += m.rounds[i];
+    if (whole < m.rounds.length) t += m.rounds[whole] * (k - whole);
+    return t;
+  }
+  function yRange(v) { var a = Math.abs(v) || 10; return v < 0 ? [-a * 1.18, 0] : [0, a * 1.18]; }
+  function ticks(v) { var a = Math.abs(v) || 10, sg = v < 0 ? -1 : 1; return [0, 0.25, 0.5, 0.75, 1].map(function (q) { return sg * a * q; }); }
+
+  function drawChain(m, s, k) {
+    var F = Lab.frame(svgC, { x: [0.3, BARS + 0.7], y: yRange(s.amt), xLabel: "Round of spending", yLabel: "New spending ($ billions)",
+      xTicks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], yTicks: ticks(s.amt),
+      fmtX: String, fmtY: function (v) { return num(v, 1); } });
+    var col = s.amt < 0 ? "var(--bad)" : "var(--accent)";
+    for (var i = 0; i < BARS; i++) {
+      var frac = Math.max(0, Math.min(1, k - i));
+      if (frac <= 0) break;
+      var v = m.rounds[i] * frac;
+      Lab.rect(F, i + 1 - 0.34, 0, i + 1 + 0.34, v, col, 0.85);
+      if (i < 4 && frac >= 1) {
+        var yl = v + (s.amt < 0 ? -1 : 1) * Math.abs(s.amt) * 0.05;
+        Lab.tag(F, i + 1, yl, num(v, 2), "var(--ink)", "middle");
+      }
+    }
+    if (k >= 2 && s.amt !== 0) {
+      Lab.tag(F, 2.9, s.amt < 0 ? m.rounds[0] * 0.85 : m.rounds[0] * 0.92, "each round × " + num(s.mpc), "var(--muted)", "start");
+    }
+  }
+
+  function drawTotal(m, s, k) {
+    var yr = yRange(m.max);
+    var F = Lab.frame(svgT, { x: [0, ROUNDS], y: yr, xLabel: "Rounds completed", yLabel: "Total change in real GDP ($ billions)",
+      xTicks: [0, 5, 10, 15, 20, 25], yTicks: ticks(m.max),
+      fmtX: String, fmtY: function (v) { return num(v, 1); } });
+    Lab.hline(F, m.max, "var(--lrpc)", 2, "6 5");
+    Lab.tag(F, ROUNDS - 0.3, m.max + (m.max < 0 ? -1 : 1) * Math.abs(m.max) * 0.06, "Maximum = " + money(m.max), "var(--lrpc)", "end");
+    var pts = [[0, 0]], kk = Math.min(k, ROUNDS);
+    for (var r = 1; r <= Math.floor(kk); r++) pts.push([r, cumAt(m, r)]);
+    if (kk > Math.floor(kk)) pts.push([kk, cumAt(m, kk)]);
+    Lab.line(F, pts, "var(--c3)", 3);
+    if (kk > 0) {
+      var cur = cumAt(m, kk);
+      Lab.dot(F, kk, cur, "var(--c3)", false);
+      var lx = kk > 16 ? kk - 0.6 : kk + 0.6, anchor = kk > 16 ? "end" : "start";
+      var ly = cur - (m.max < 0 ? -1 : 1) * Math.abs(m.max) * 0.1;
+      Lab.tag(F, lx, ly, money(cur), "var(--c3)", anchor);
+    }
+  }
+
+  function story(m, s) {
+    if (s.amt === 0) return "<p><b>No initial change in spending.</b> With nothing to start the chain, real GDP does not change. Move the spending slider to start a round of new spending.</p>";
+    var up = s.amt > 0, A = Math.abs(s.amt);
+    var r2 = s.amt * s.mpc, saved = s.amt * m.mps;
+    var after10 = cumAt(m, 10), pct10 = after10 / m.max * 100;
+    var lead = up
+      ? "<b>Round 1: spending rises by " + money(A) + ".</b> That " + money(A) + " becomes new income for workers and firms."
+      : "<b>Round 1: spending falls by " + money(A) + ".</b> Workers and firms lose " + money(A) + " of income.";
+    var lines = [];
+    lines.push("With an MPC of " + num(s.mpc) + ", they " + (up ? "spend " : "cut spending by ") + num(s.mpc) + " × " + money(A) + " = <b>" + money(Math.abs(r2)) + "</b> in round 2 and " + (up ? "save" : "cut saving by") + " the other " + money(Math.abs(saved)) + " (MPS = " + num(m.mps) + ").");
+    lines.push("Each round is " + num(s.mpc) + " times the round before it, so the bars shrink. The higher the MPC, the slower they shrink and the bigger the total.");
+    lines.push("After 10 rounds the running total is " + money(after10) + ", about " + f(pct10, 0) + "% of the way to the limit.");
+    var end = "<p><b>Total:</b> the rounds add up to at most " + money(s.amt) + " × 1/" + num(m.mps) + " = " + money(s.amt) + " × " + num(m.mult) + " = <b>" + smoney(m.max) + "</b> in real GDP. ";
+    end += "An AP answer: \"The spending multiplier is 1/MPS = " + num(m.mult) + ", so real GDP " + (up ? "increases" : "decreases") + " by a maximum of " + money(Math.abs(m.max)) + ".\" It is a maximum because taxes, imports, and a rising price level can make the real effect smaller.</p>";
+    return "<p>" + lead + "</p><ul>" + lines.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" + end;
+  }
+
+  var elM = document.getElementById("s-mpc"), elA = document.getElementById("s-amt"), elSp = document.getElementById("s-speed");
+  function drawAt(k) {
+    var m = model(S);
+    drawChain(m, S, k); drawTotal(m, S, k);
+    document.getElementById("r-tot").textContent = smoney(cumAt(m, Math.min(k, ROUNDS)));
+  }
+  function render() {
+    if (stopAnim) { stopAnim(); stopAnim = null; }
+    shown = ROUNDS;
+    var m = model(S);
+    elM.value = S.mpc; elA.value = S.amt; elSp.value = S.speed;
+    document.getElementById("o-mpc").textContent = num(S.mpc);
+    document.getElementById("o-amt").textContent = smoney(S.amt);
+    document.getElementById("o-speed").textContent = ["", "slow", "medium", "fast"][S.speed];
+    document.getElementById("r-mps").textContent = num(m.mps);
+    document.getElementById("r-mult").textContent = num(m.mult);
+    document.getElementById("r-max").textContent = smoney(m.max);
+    drawAt(shown);
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  elM.addEventListener("input", function () { S.mpc = parseFloat(elM.value); render(); });
+  elA.addEventListener("input", function () { S.amt = parseFloat(elA.value); render(); });
+  elSp.addEventListener("input", function () { S.speed = parseInt(elSp.value, 10); render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+  document.getElementById("btn-play").addEventListener("click", function () {
+    if (stopAnim) stopAnim();
+    var dur = [0, 9000, 6000, 3500][S.speed];
+    stopAnim = Lab.animate(dur, function (t) { drawAt(t * ROUNDS); }, function () { stopAnim = null; });
+  });
+
+  var scen = [
+    ["Government buys $10B more, MPC 0.8", { mpc: 0.8, amt: 10 }],
+    ["Investment falls $20B, MPC 0.75", { mpc: 0.75, amt: -20 }],
+    ["Exports rise $10B, MPC 0.9", { mpc: 0.9, amt: 10 }],
+    ["Consumers spend $40B more, MPC 0.5", { mpc: 0.5, amt: 40 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, { speed: S.speed }, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // =================== B. Calculator ===================
+  // kind: g (spending), t (taxes), tr (transfers), bb (balanced budget). goal: y (find ΔGDP) or p (find policy for a gap).
+  // amt: in goal y, the policy change (ΔG, ΔT, ΔTR, or the matched change in G and T); in goal p, the gap (+ recessionary, − inflationary).
+  var C = { kind: "g", goal: "y", mpc: 0.8, amt: 10, text: null };
+  var cM = document.getElementById("c-mpc"), cA = document.getElementById("c-amt");
+  var kindBtns = { g: document.getElementById("k-g"), t: document.getElementById("k-t"), tr: document.getElementById("k-tr"), bb: document.getElementById("k-bb") };
+  var goalBtns = { y: document.getElementById("g-y"), p: document.getElementById("g-p") };
+
+  function row(a, b) { return '<div class="row"><span>' + a + '</span><span>' + b + '</span></div>'; }
+
+  function solve(c) {
+    var mpc = c.mpc, mps = Math.round((1 - mpc) * 100) / 100, sm = 1 / mps, tm = -mpc / mps;
+    var out = { mps: mps, sm: sm, tm: tm, rows: [], formula: "", ans: "", prob: "", label: "", hint: "" };
+    var R = out.rows;
+    R.push(row("MPS = 1 − MPC = 1 − " + num(mpc), num(mps)));
+    var a = c.amt;
+    if (c.goal === "y") {
+      if (c.kind === "g") {
+        out.label = "Change in spending ($ billions)"; out.hint = "Positive = increase, negative = decrease";
+        out.formula = "ΔReal GDP = (1 / MPS) × ΔSpending";
+        R.push(row("Spending multiplier = 1 / " + num(mps), num(sm)));
+        var y = sm * a;
+        R.push(row("ΔReal GDP = " + num(sm) + " × " + neg(a), smoney(y)));
+        out.prob = "MPC is " + num(mpc) + ". Spending " + (a >= 0 ? "rises" : "falls") + " by " + money(Math.abs(a)) + ". What is the maximum change in real GDP?";
+        out.ans = "Real GDP " + (y >= 0 ? "increases" : "decreases") + " by a maximum of <b>" + money(Math.abs(y)) + "</b>.";
+      } else if (c.kind === "t") {
+        out.label = "Change in taxes ($ billions)"; out.hint = "Negative = tax cut, positive = tax increase";
+        out.formula = "ΔReal GDP = (−MPC / MPS) × ΔTaxes";
+        R.push(row("Tax multiplier = −" + num(mpc) + " / " + num(mps), neg(tm)));
+        R.push(row("First-round spending change = −MPC × ΔT = −" + num(mpc) + " × " + neg(a), smoney(-mpc * a)));
+        var yt = tm * a;
+        R.push(row("ΔReal GDP = " + neg(tm) + " × " + neg(a), smoney(yt)));
+        out.prob = "MPC is " + num(mpc) + ". Taxes are " + (a < 0 ? "cut" : "raised") + " by " + money(Math.abs(a)) + ". What is the maximum change in real GDP?";
+        out.ans = "Real GDP " + (yt >= 0 ? "increases" : "decreases") + " by a maximum of <b>" + money(Math.abs(yt)) + "</b>. The same-size change in G would move real GDP by " + money(Math.abs(sm * a)) + ", because households " + (a < 0 ? "save " + money(Math.abs(mps * a)) + " of the tax cut" : "pay " + money(Math.abs(mps * a)) + " of the tax out of saving") + " before the chain starts.";
+      } else if (c.kind === "tr") {
+        out.label = "Change in transfer payments ($ billions)"; out.hint = "Positive = more transfers, negative = fewer";
+        out.formula = "ΔReal GDP = (MPC / MPS) × ΔTransfers";
+        R.push(row("Transfer multiplier = " + num(mpc) + " / " + num(mps), num(-tm)));
+        var ytr = -tm * a;
+        R.push(row("ΔReal GDP = " + num(-tm) + " × " + neg(a), smoney(ytr)));
+        out.prob = "MPC is " + num(mpc) + ". Transfer payments " + (a >= 0 ? "rise" : "fall") + " by " + money(Math.abs(a)) + ". What is the maximum change in real GDP?";
+        out.ans = "Real GDP " + (ytr >= 0 ? "increases" : "decreases") + " by a maximum of <b>" + money(Math.abs(ytr)) + "</b>. Transfers work like a tax cut: households save part before spending.";
+      } else {
+        out.label = "Change in both G and taxes ($ billions)"; out.hint = "G and taxes change by this same amount";
+        out.formula = "ΔReal GDP = (1 / MPS) × ΔG + (−MPC / MPS) × ΔT";
+        R.push(row("Spending effect = " + num(sm) + " × " + neg(a), smoney(sm * a)));
+        R.push(row("Tax effect = " + neg(tm) + " × " + neg(a), smoney(tm * a)));
+        var yb = sm * a + tm * a;
+        R.push(row("ΔReal GDP = " + smoney(sm * a) + " + (" + smoney(tm * a) + ")", smoney(yb)));
+        out.prob = "MPC is " + num(mpc) + ". Government spending and taxes both " + (a >= 0 ? "rise" : "fall") + " by " + money(Math.abs(a)) + ". What is the maximum change in real GDP?";
+        out.ans = "Real GDP " + (yb >= 0 ? "increases" : "decreases") + " by a maximum of <b>" + money(Math.abs(yb)) + "</b>, the same as the change in G. The balanced-budget multiplier is 1 for any MPC.";
+      }
+    } else {
+      var gapTxt = a > 0 ? "recessionary gap of " + money(a) : a < 0 ? "inflationary gap of " + money(-a) : "no output gap";
+      out.label = "Output gap ($ billions)"; out.hint = "Positive = recessionary gap, negative = inflationary gap";
+      if (c.kind === "g") {
+        out.formula = "ΔG needed = Required ΔReal GDP ÷ (1 / MPS)";
+        R.push(row("Spending multiplier = 1 / " + num(mps), num(sm)));
+        var g = a / sm;
+        R.push(row("ΔG = " + neg(a) + " ÷ " + num(sm), smoney(g)));
+        out.prob = "MPC is " + num(mpc) + ". The economy has a " + gapTxt + ". What change in government spending would close it?";
+        out.ans = a === 0 ? "No change is needed." : "The government should " + (g > 0 ? "increase" : "decrease") + " spending by <b>" + money(Math.abs(g)) + "</b>. That is the minimum change if the full multiplier works.";
+      } else if (c.kind === "t" || c.kind === "tr") {
+        var tr = c.kind === "tr", mult = tr ? -tm : tm;
+        out.formula = tr ? "ΔTransfers needed = Required ΔReal GDP ÷ (MPC / MPS)" : "ΔT needed = Required ΔReal GDP ÷ (−MPC / MPS)";
+        R.push(row((tr ? "Transfer multiplier = " : "Tax multiplier = −") + num(mpc) + " / " + num(mps), neg(mult)));
+        var t = a / mult;
+        R.push(row((tr ? "ΔTransfers = " : "ΔT = ") + neg(a) + " ÷ " + neg(mult), smoney(t)));
+        out.prob = "MPC is " + num(mpc) + ". The economy has a " + gapTxt + ". What change in " + (tr ? "transfer payments" : "taxes") + " would close it?";
+        if (a === 0) out.ans = "No change is needed.";
+        else if (tr) out.ans = "The government should " + (t > 0 ? "increase" : "decrease") + " transfer payments by <b>" + money(Math.abs(t)) + "</b>.";
+        else out.ans = "The government should " + (t < 0 ? "cut" : "raise") + " taxes by <b>" + money(Math.abs(t)) + "</b>. Compare: a change in G of only " + money(Math.abs(a / sm)) + " would do the same job, because the tax multiplier is smaller.";
+      } else {
+        out.formula = "Balanced-budget multiplier = 1, so ΔG = ΔT = Required ΔReal GDP";
+        R.push(row("Balanced-budget multiplier", "1"));
+        R.push(row("ΔG = ΔT = " + neg(a) + " ÷ 1", smoney(a)));
+        out.prob = "MPC is " + num(mpc) + ". The economy has a " + gapTxt + ". If G and taxes must change by the same amount, how large a change closes it?";
+        out.ans = a === 0 ? "No change is needed." : "Government spending and taxes should both " + (a > 0 ? "increase" : "decrease") + " by <b>" + money(Math.abs(a)) + "</b>.";
+      }
+    }
+    return out;
+  }
+
+  function renderCalc() {
+    var o = solve(C);
+    cM.value = C.mpc; cA.value = C.amt;
+    Object.keys(kindBtns).forEach(function (k) { kindBtns[k].setAttribute("aria-pressed", C.kind === k); });
+    Object.keys(goalBtns).forEach(function (k) { goalBtns[k].setAttribute("aria-pressed", C.goal === k); });
+    document.getElementById("oc-mpc").textContent = num(C.mpc);
+    document.getElementById("h-mps").textContent = "MPS = 1 − " + num(C.mpc) + " = " + num(o.mps);
+    document.getElementById("l-amt").textContent = o.label;
+    document.getElementById("h-amt").textContent = o.hint;
+    document.getElementById("prob").innerHTML = "<b>Problem.</b> " + (C.text || o.prob);
+    document.getElementById("formula").textContent = o.formula;
+    document.getElementById("calc").innerHTML = o.rows.join("");
+    document.getElementById("ans").innerHTML = o.ans;
+  }
+  function setC(p) { C = Object.assign({}, C, { text: null }, p); renderCalc(); }
+  Object.keys(kindBtns).forEach(function (k) { kindBtns[k].addEventListener("click", function () { setC({ kind: k }); }); });
+  Object.keys(goalBtns).forEach(function (k) { goalBtns[k].addEventListener("click", function () { setC({ goal: k }); }); });
+  cM.addEventListener("input", function () { setC({ mpc: parseFloat(cM.value) }); });
+  cA.addEventListener("input", function () { var v = parseFloat(cA.value); if (!isNaN(v)) setC({ amt: v }); });
+
+  var presets = [
+    ["MPC 0.8, G up $10B", { kind: "g", goal: "y", mpc: 0.8, amt: 10, text: "The MPC is 0.8. Government spending rises by $10 billion. What is the maximum change in real GDP?" }],
+    ["MPC 0.75, tax cut $20B", { kind: "t", goal: "y", mpc: 0.75, amt: -20, text: "The MPC is 0.75. The government cuts taxes by $20 billion. What is the maximum change in real GDP?" }],
+    ["MPC 0.9, G and T up $30B", { kind: "bb", goal: "y", mpc: 0.9, amt: 30, text: "The MPC is 0.9. Government spending and taxes both increase by $30 billion. What is the maximum change in real GDP?" }],
+    ["MPS 0.2, investment falls $15B", { kind: "g", goal: "y", mpc: 0.8, amt: -15, text: "The MPS is 0.2. Investment spending falls by $15 billion. What is the maximum change in real GDP?" }],
+    ["Recessionary gap $100B: ΔG?", { kind: "g", goal: "p", mpc: 0.8, amt: 100, text: "The MPC is 0.8 and real GDP is $100 billion below full-employment output. What is the minimum increase in government spending that could close the gap?" }],
+    ["Inflationary gap $60B: ΔT?", { kind: "t", goal: "p", mpc: 0.75, amt: -60, text: "The MPC is 0.75 and real GDP is $60 billion above full-employment output. What change in taxes could close the gap?" }],
+    ["MPC 0.75, transfers up $10B", { kind: "tr", goal: "y", mpc: 0.75, amt: 10, text: "The MPC is 0.75. Transfer payments rise by $10 billion. What is the maximum change in real GDP?" }]
+  ];
+  var pr = document.getElementById("presets");
+  presets.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { C = Object.assign({}, C, x[1]); renderCalc(); });
+    pr.appendChild(b);
+  });
+  C = Object.assign({}, C, presets[0][1]);
+  renderCalc();
+
+  // =================== Quiz ===================
+  var Q = [
+    { s: "The marginal propensity to consume is 0.8. If government spending increases by $10 billion, what is the maximum change in real GDP?", o: ["An increase of $8 billion", "An increase of $10 billion", "An increase of $40 billion", "An increase of $50 billion"], c: 3, w: "MPS = 1 − 0.8 = 0.2, so the spending multiplier is 1/0.2 = 5. Real GDP rises by up to 5 × $10 billion = $50 billion. $40 billion is the result for a $10 billion tax cut, which uses the smaller tax multiplier." },
+    { s: "If the marginal propensity to save is 0.25, the spending multiplier is:", o: ["0.25", "1.33", "4", "5"], c: 2, w: "The spending multiplier is 1/MPS = 1/0.25 = 4. The value 1.33 comes from dividing 1 by the MPC (0.75), which is the wrong formula." },
+    { s: "The MPC is 0.75. The government cuts taxes by $20 billion. What is the maximum change in real GDP?", o: ["An increase of $15 billion", "An increase of $60 billion", "An increase of $80 billion", "A decrease of $60 billion"], c: 1, w: "The tax multiplier is −MPC/MPS = −0.75/0.25 = −3. A tax cut is ΔT = −$20 billion, so ΔReal GDP = −3 × (−$20 billion) = +$60 billion. $80 billion would use the spending multiplier of 4, which is wrong for a tax change." },
+    { s: "Why is the tax multiplier smaller in absolute value than the spending multiplier?", o: ["Households save part of a tax cut before spending any of it, so first-round spending is only MPC times the tax change", "Taxes affect only the price level, not real GDP", "Government spending is always larger than tax revenue", "The tax multiplier uses the MPS in the numerator instead of the MPC"], c: 0, w: "A change in government spending enters the spending stream in full in round 1. A tax cut first raises disposable income, and households save the MPS share. Only MPC × ΔT is spent in round 1, so the tax multiplier is −MPC/MPS, smaller in size than 1/MPS." },
+    { s: "The MPC is 0.9. Government spending and taxes both increase by $40 billion. What is the maximum change in real GDP?", o: ["No change", "An increase of $40 billion", "An increase of $360 billion", "An increase of $400 billion"], c: 1, w: "The spending effect is 10 × $40 billion = +$400 billion. The tax effect is −9 × $40 billion = −$360 billion. The net change is +$40 billion. The balanced-budget multiplier is 1." },
+    { s: "The economy has a recessionary gap of $100 billion and the MPC is 0.8. What is the minimum increase in government spending that could close the gap?", o: ["$20 billion", "$80 billion", "$100 billion", "$500 billion"], c: 0, w: "The spending multiplier is 1/0.2 = 5. Divide the gap by the multiplier: $100 billion ÷ 5 = $20 billion. Answering $500 billion multiplies when you should divide." },
+    { s: "Which of the following would increase the size of the spending multiplier?", o: ["An increase in the marginal propensity to save", "An increase in income tax rates", "An increase in the marginal propensity to consume", "A decrease in the marginal propensity to consume"], c: 2, w: "A higher MPC means a lower MPS, and the multiplier is 1/MPS. Less leaks out as saving in each round, so each round is larger and the total is larger. A higher MPS shrinks the multiplier." },
+    { s: "AP questions ask for the \"maximum\" change in real GDP from a multiplier. Why?", o: ["The multiplier only works when the economy is at full employment", "Each round of spending is larger than the round before it", "The MPC always rises during the multiplier process", "Leakages such as taxes and imports, and a rising price level, can make the actual change in real GDP smaller"], c: 3, w: "The simple multiplier assumes saving is the only leakage and the price level does not change. In practice, taxes, imports, price level increases, and higher interest rates reduce the effect, so 1/MPS gives an upper limit. Each round is smaller, not larger, than the one before." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.2");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.2", compact: true, storageKey: "topic-3.2" });</script>
+</body>
+</html>

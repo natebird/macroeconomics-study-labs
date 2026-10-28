@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real vs. Nominal GDP Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.lab > .card, .graph-card > .tbl-wrap { min-width: 0; }
+.side-card { display: grid; gap: 12px; align-content: start; }
+.calc .row > span:last-child { font-family: var(--mono); text-align: right; white-space: nowrap; }
+.calc .row span:first-child { min-width: 0; }
+.calc .work { display: block; font-family: var(--mono); font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
+.seg { justify-self: start; display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: end; }
+.toggles .grp { display: grid; gap: 6px; }
+.toggles .grp > span { font-size: .86rem; font-weight: 500; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+table.inputs { min-width: 640px; }
+table.inputs th, table.inputs td { padding: 6px 8px; vertical-align: middle; position: relative; }
+table.inputs td:first-child { font-weight: 600; white-space: nowrap; }
+table.inputs input { font: inherit; font-family: var(--mono); font-size: .88rem; width: 100%; min-width: 58px; padding: 5px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+table.inputs th.yr { text-align: center; border-left: 1px solid var(--rule); }
+table.inputs td.p { border-left: 1px solid var(--rule); }
+table.inputs tr.off { opacity: .4; }
+table.inputs tr.base-note td { font-size: .8rem; color: var(--muted); }
+table.inputs th.isbase { color: var(--accent); }
+table.results { min-width: 440px; }
+table.results td, table.results th { padding: 7px 8px; font-variant-numeric: tabular-nums; }
+table.results tr.sel td { background: var(--accent-soft); }
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.legend .l-gap::before { height: 10px; background: var(--accent); opacity: .18; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 2 · Topic 2.6</span>
+  <h1>Real vs. Nominal GDP Study Lab</h1>
+  <p class="lede">Nominal GDP values output at the prices of the year it was produced, so it rises when prices rise even if the economy makes nothing extra. Real GDP values every year's output at the same base-year prices, so it changes only when output changes. Edit the prices and quantities for a small economy, then follow each calculation step by step.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. GDP calculator</h2>
+    <p>A small economy produces a few final goods over three years. Every number in the table is editable. The chart and the work update as you type.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Nominal and real GDP <small>base year: <span id="base-lbl">Year 1</span></small></h3>
+      <svg class="chart" id="gdp" role="img" aria-label="Line chart of nominal GDP and real GDP over three years"></svg>
+      <div class="tbl-wrap">
+        <table class="results" id="results"></table>
+      </div>
+    </div>
+    <div class="card side-card">
+      <h3>Show your work</h3>
+      <div class="seg" role="group" aria-label="Year to show work for">
+        <button type="button" id="y-0" aria-pressed="false">Year 1</button>
+        <button type="button" id="y-1" aria-pressed="false">Year 2</button>
+        <button type="button" id="y-2" aria-pressed="true">Year 3</button>
+      </div>
+      <div class="calc" id="steps" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Nominal GDP (current prices)</span><span class="l-lrpc">Real GDP (base-year prices)</span><span class="l-gap">Gap from price changes</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="toggles">
+      <div class="grp">
+        <span>Base year (its prices value every year's output)</span>
+        <div class="seg" role="group" aria-label="Base year">
+          <button type="button" id="b-0" aria-pressed="true">Year 1</button>
+          <button type="button" id="b-1" aria-pressed="false">Year 2</button>
+          <button type="button" id="b-2" aria-pressed="false">Year 3</button>
+        </div>
+      </div>
+      <label class="check" for="c-third"><input type="checkbox" id="c-third" checked> Include a third good</label>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="inputs" id="inputs"></table>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k" id="k-n">Nominal GDP</div><div class="v" id="r-n"></div></div>
+    <div class="stat"><div class="k" id="k-r">Real GDP</div><div class="v" id="r-r"></div></div>
+    <div class="stat"><div class="k" id="k-d">GDP deflator</div><div class="v" id="r-d"></div></div>
+    <div class="stat"><div class="k" id="k-g">Real GDP growth</div><div class="v" id="r-g"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Current P × current Q</span><h3>Nominal GDP</h3><p>The value of final goods and services at the prices of the year they were produced. It can rise because output rose, because prices rose, or both. Taken alone, a rise in nominal GDP does not tell you the economy made more.</p></div>
+    <div class="card"><span class="tag">Base-year P × current Q</span><h3>Real GDP</h3><p>The value of the same output at constant base-year prices. Prices are held fixed, so real GDP changes only when quantities change. That is why economists use real GDP to measure output and economic growth.</p></div>
+    <div class="card"><span class="tag">Nominal ÷ real × 100</span><h3>GDP deflator</h3><p>A price index for everything counted in GDP. It equals 100 in the base year, where nominal and real GDP are the same. A deflator of 125 means prices are 25% higher than in the base year. The percentage change in the deflator is a measure of inflation.</p></div>
+    <div class="card"><span class="tag">Real = nominal ÷ deflator × 100</span><h3>Deflating nominal GDP</h3><p>If you know nominal GDP and the deflator, divide to remove the price effect. Nominal GDP of $1,500 with a deflator of 120 is real GDP of $1,250 in base-year dollars.</p></div>
+    <div class="card"><span class="tag">Deflator vs. CPI</span><h3>Two price indexes</h3><p>The GDP deflator covers all final goods and services <b>produced domestically</b>, including investment goods and government purchases, and leaves out imports. The CPI tracks a fixed <b>basket of goods bought by consumers</b>, and that basket includes imports. A rise in the price of imported cars raises the CPI but not the deflator.</p></div>
+    <div class="card"><span class="tag">Real GDP ÷ population</span><h3>Real GDP per capita</h3><p>Real GDP per person is the usual measure of the average standard of living. If population grows faster than real GDP, real GDP per capita falls even though total output rose.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Worked example</h2>
+    <p>An economy produces pens and notebooks. The base year is Year 1. Cover the right-hand columns and work each row yourself, then check. This is the same problem as the "Two-good AP problem" scenario above.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Year</th><th>Pens (P × Q)</th><th>Notebooks (P × Q)</th><th>Nominal GDP</th><th>Real GDP (Year 1 prices)</th><th>GDP deflator</th><th>Real GDP growth</th></tr></thead>
+    <tbody>
+      <tr><td>1 (base)</td><td>$1 × 200</td><td>$4 × 50</td><td>200 + 200 = <b>$400</b></td><td>1×200 + 4×50 = <b>$400</b></td><td>400 ÷ 400 × 100 = <b>100</b></td><td>none (first year)</td></tr>
+      <tr><td>2</td><td>$2 × 220</td><td>$5 × 55</td><td>440 + 275 = <b>$715</b></td><td>1×220 + 4×55 = <b>$440</b></td><td>715 ÷ 440 × 100 = <b>162.5</b></td><td>(440 − 400) ÷ 400 = <b>+10.0%</b></td></tr>
+      <tr><td>3</td><td>$3 × 210</td><td>$6 × 50</td><td>630 + 300 = <b>$930</b></td><td>1×210 + 4×50 = <b>$410</b></td><td>930 ÷ 410 × 100 = <b>226.8</b></td><td>(410 − 440) ÷ 440 = <span class="shift">−6.8%</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="color:var(--muted); max-width:70ch;">In Year 3, nominal GDP rose 30.1% while real GDP fell 6.8%. Output fell; higher prices hid the drop. Inflation from Year 2 to Year 3, measured by the deflator, was (226.8 − 162.5) ÷ 162.5 × 100 ≈ 39.6%.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Question</th><th>GDP deflator</th><th>Consumer price index (CPI)</th></tr></thead>
+    <tbody>
+      <tr><td>Which goods are covered?</td><td>All final goods and services produced domestically (C, I, G, and exports)</td><td>A fixed market basket bought by a typical urban household</td></tr>
+      <tr><td>Imports?</td><td>Not included (they are not produced domestically)</td><td>Included if consumers buy them</td></tr>
+      <tr><td>Capital goods and government purchases?</td><td>Included</td><td>Not included</td></tr>
+      <tr><td>How it is found</td><td>Nominal GDP ÷ real GDP × 100</td><td>Cost of basket this year ÷ cost in base year × 100</td></tr>
+      <tr><td>Base year value</td><td>100</td><td>100</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. On the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>How to earn the points</h3>
+      <ul>
+        <li>Write the formula, then the numbers, then the answer: "Real GDP = (nominal GDP ÷ GDP deflator) × 100 = (1,500 ÷ 120) × 100 = $1,250."</li>
+        <li>For real GDP from a table, multiply <b>this year's quantities</b> by <b>base-year prices</b>, then add across goods.</li>
+        <li>Growth rate = (new − old) ÷ old × 100. Divide by the <b>earlier</b> year's value.</li>
+        <li>When asked whether the economy produced more, answer with real GDP and say why: "Real GDP holds prices constant, so it changes only when output changes."</li>
+        <li>Quick check: real GDP growth ≈ nominal GDP growth − inflation rate. Use it to catch arithmetic slips; show the exact calculation when the question gives full data.</li>
+        <li>In the base year, state that the deflator is 100 and nominal GDP equals real GDP.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Using current-year prices for real GDP. Real GDP always uses base-year prices.</li>
+        <li>Flipping the deflator: it is nominal ÷ real × 100. If prices have risen since the base year, the deflator is above 100 and nominal GDP is above real GDP.</li>
+        <li>Saying output grew because nominal GDP rose. Nominal GDP can rise while real GDP falls.</li>
+        <li>Dividing by the new year in a growth rate. The denominator is the starting year.</li>
+        <li>Putting imports into the GDP deflator. The deflator covers domestic production only; the CPI includes imported consumer goods.</li>
+        <li>Treating total real GDP as the standard of living. Divide by population: real GDP per capita.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 2.6. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-2.html">Unit 2 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+  function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
+  function money2(v) { var r = Math.round(v * 100) / 100; return "$" + r.toFixed(2); }
+  function num(v) { return (Math.round(v * 100) / 100).toString(); }
+  function ab(v) { return f(Math.abs(Math.round(v * 10) / 10)) + "%"; }
+  function sg(v) { var r = Math.round(v * 10) / 10; return (r < 0 ? "−" : "") + f(Math.abs(r)) + "%"; }
+  function pct(v) { var r = Math.round(v * 10) / 10; return (r > 0 ? "+" : r < 0 ? "−" : "") + f(Math.abs(r)) + "%"; }
+
+  // ---------- Presets ----------
+  // g: goods names; d[good][year] = [price, quantity]; pop: population by year; base: base-year index; third: include good 3
+  var PRESETS = [
+    { name: "Prices and output both rise", g: ["Pizza", "Books", "Haircuts"],
+      d: [[[10, 100], [11, 104], [12, 108]], [[20, 50], [21, 52], [23, 53]], [[15, 40], [16, 41], [17, 43]]],
+      pop: [100, 101, 102], base: 0, third: true, year: 2 },
+    { name: "Prices rise, output falls", g: ["Pizza", "Books", "Haircuts"],
+      d: [[[10, 100], [11, 104], [13, 98]], [[20, 50], [21, 52], [24, 48]], [[15, 40], [16, 41], [18, 38]]],
+      pop: [100, 101, 102], base: 0, third: true, year: 2 },
+    { name: "Higher prices, same output", g: ["Pizza", "Books", "Haircuts"],
+      d: [[[10, 100], [11, 100], [12, 100]], [[20, 50], [22, 50], [24, 50]], [[15, 40], [17, 40], [18, 40]]],
+      pop: [100, 100, 100], base: 0, third: true, year: 2 },
+    { name: "Growth with stable prices", g: ["Pizza", "Books", "Haircuts"],
+      d: [[[10, 100], [10, 105], [10, 110]], [[20, 50], [20, 53], [20, 55]], [[15, 40], [15, 42], [15, 44]]],
+      pop: [100, 101, 102], base: 0, third: true, year: 2 },
+    { name: "Falling prices (deflation)", g: ["Pizza", "Books", "Haircuts"],
+      d: [[[10, 100], [9, 106], [8, 112]], [[20, 50], [19, 53], [18, 56]], [[15, 40], [14, 42], [14, 45]]],
+      pop: [100, 101, 102], base: 0, third: true, year: 2 },
+    { name: "Population outgrows output", g: ["Pizza", "Books", "Haircuts"],
+      d: [[[10, 100], [11, 101], [12, 102]], [[20, 50], [21, 51], [23, 51]], [[15, 40], [16, 40], [17, 41]]],
+      pop: [100, 104, 108], base: 0, third: true, year: 2 },
+    { name: "Two-good AP problem", g: ["Pens", "Notebooks", "Haircuts"],
+      d: [[[1, 200], [2, 220], [3, 210]], [[4, 50], [5, 55], [6, 50]], [[15, 40], [16, 41], [17, 43]]],
+      pop: [20, 21, 21], base: 0, third: false, year: 2 }
+  ];
+  function clone(p) { return JSON.parse(JSON.stringify(p)); }
+  var S = clone(PRESETS[0]);
+
+  // ---------- Model ----------
+  function goods(s) { return s.third ? [0, 1, 2] : [0, 1]; }
+  function model(s) {
+    var Y = [0, 1, 2].map(function (t) {
+      var N = 0, R = 0;
+      goods(s).forEach(function (g) { N += s.d[g][t][0] * s.d[g][t][1]; R += s.d[g][s.base][0] * s.d[g][t][1]; });
+      var D = R > 0 ? N / R * 100 : NaN;
+      var pc = s.pop[t] > 0 ? R / s.pop[t] : NaN;
+      return { N: N, R: R, D: D, pc: pc };
+    });
+    function gr(a, b) { return a > 0 ? (b - a) / a * 100 : NaN; }
+    Y.forEach(function (y, t) {
+      if (t === 0) { y.gN = y.gR = y.inf = y.gPC = NaN; return; }
+      var p = Y[t - 1];
+      y.gN = gr(p.N, y.N); y.gR = gr(p.R, y.R); y.inf = gr(p.D, y.D); y.gPC = gr(p.pc, y.pc);
+    });
+    return Y;
+  }
+
+  // ---------- Inputs table ----------
+  var inTbl = document.getElementById("inputs");
+  function buildInputs() {
+    var h = '<thead><tr><th rowspan="2">Good</th>';
+    for (var t = 0; t < 3; t++) h += '<th class="yr" colspan="2" id="yh-' + t + '">Year ' + (t + 1) + '</th>';
+    h += '</tr><tr>';
+    for (t = 0; t < 3; t++) h += '<th class="yr">Price ($)</th><th>Quantity</th>';
+    h += '</tr></thead><tbody>';
+    for (var g = 0; g < 3; g++) {
+      h += '<tr id="row-' + g + '"><td id="gn-' + g + '"></td>';
+      for (t = 0; t < 3; t++) {
+        h += '<td class="p"><label class="sr" for="p-' + g + '-' + t + '" id="pl-' + g + '-' + t + '"></label><input type="number" min="0" step="any" inputmode="decimal" id="p-' + g + '-' + t + '"></td>';
+        h += '<td><label class="sr" for="q-' + g + '-' + t + '" id="ql-' + g + '-' + t + '"></label><input type="number" min="0" step="any" inputmode="decimal" id="q-' + g + '-' + t + '"></td>';
+      }
+      h += '</tr>';
+    }
+    h += '<tr><td>Population</td>';
+    for (t = 0; t < 3; t++) h += '<td class="p" colspan="2"><label class="sr" for="pop-' + t + '">Population, Year ' + (t + 1) + '</label><input type="number" min="0" step="any" inputmode="decimal" id="pop-' + t + '"></td>';
+    h += '</tr></tbody>';
+    inTbl.innerHTML = h;
+    for (g = 0; g < 3; g++) for (t = 0; t < 3; t++) (function (g, t) {
+      ["p", "q"].forEach(function (k, i) {
+        document.getElementById(k + "-" + g + "-" + t).addEventListener("input", function (e) {
+          var v = parseFloat(e.target.value); S.d[g][t][i] = isFinite(v) && v >= 0 ? v : 0; render(false);
+        });
+      });
+    })(g, t);
+    for (t = 0; t < 3; t++) (function (t) {
+      document.getElementById("pop-" + t).addEventListener("input", function (e) {
+        var v = parseFloat(e.target.value); S.pop[t] = isFinite(v) && v > 0 ? v : 0; render(false);
+      });
+    })(t);
+  }
+  function fillInputs() {
+    for (var g = 0; g < 3; g++) {
+      document.getElementById("gn-" + g).textContent = S.g[g];
+      document.getElementById("row-" + g).className = g === 2 && !S.third ? "off" : "";
+      for (var t = 0; t < 3; t++) {
+        var p = document.getElementById("p-" + g + "-" + t), q = document.getElementById("q-" + g + "-" + t);
+        p.value = S.d[g][t][0]; q.value = S.d[g][t][1];
+        p.disabled = q.disabled = g === 2 && !S.third;
+        document.getElementById("pl-" + g + "-" + t).textContent = "Price of " + S.g[g] + ", Year " + (t + 1);
+        document.getElementById("ql-" + g + "-" + t).textContent = "Quantity of " + S.g[g] + ", Year " + (t + 1);
+      }
+    }
+    for (var t2 = 0; t2 < 3; t2++) document.getElementById("pop-" + t2).value = S.pop[t2];
+  }
+
+  // ---------- Chart ----------
+  var svg = document.getElementById("gdp");
+  function niceStep(span) { var raw = span / 5, p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
+  function drawChart(Y, s) {
+    var vals = [];
+    Y.forEach(function (y) { vals.push(y.N, y.R); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if (!(hi > 0)) { lo = 0; hi = 100; }
+    var span = Math.max(hi - lo, hi * 0.2);
+    var step = niceStep(span * 1.3);
+    var y0 = Math.max(0, Math.floor((lo - span * 0.25) / step) * step), y1 = Math.ceil((hi + span * 0.3) / step) * step;
+    var ticks = []; for (var v = y0; v <= y1 + 1e-9; v += step) ticks.push(v);
+    var F = Lab.frame(svg, { x: [0.6, 3.4], y: [y0, y1], xLabel: "Year", yLabel: "GDP (dollars)", xTicks: [1, 2, 3], yTicks: ticks,
+      fmtX: function (x) { return "Year " + x + (x - 1 === s.base ? " (base)" : ""); }, fmtY: function () { return ""; } });
+    // shaded gap between the two lines
+    var top = Y.map(function (y, t) { return F.sx(t + 1).toFixed(1) + " " + F.sy(y.N).toFixed(1); });
+    var bot = Y.map(function (y, t) { return F.sx(t + 1).toFixed(1) + " " + F.sy(y.R).toFixed(1); }).reverse();
+    Lab.el("path", { d: "M" + top.join(" L") + " L" + bot.join(" L") + " Z", fill: "var(--accent)", opacity: 0.12 }, F.g);
+    Lab.line(F, Y.map(function (y, t) { return [t + 1, y.R]; }), "var(--lrpc)", 3);
+    Lab.line(F, Y.map(function (y, t) { return [t + 1, y.N]; }), "var(--accent)", 3);
+    var off = (y1 - y0) * 0.055;
+    Y.forEach(function (y, t) {
+      var nAbove = y.N >= y.R;
+      Lab.dot(F, t + 1, y.R, "var(--lrpc)", false);
+      Lab.dot(F, t + 1, y.N, "var(--accent)", false);
+      var anchor = t === 0 ? "start" : t === 2 ? "end" : "middle";
+      var dx = t === 0 ? -0.08 : t === 2 ? 0.08 : 0;
+      if (Math.abs(y.N - y.R) < 1e-9) {
+        Lab.tag(F, t + 1 + dx, y.N - off * 1.8, money(y.N) + " (equal)", "var(--ink)", anchor);
+      } else {
+        Lab.tag(F, t + 1 + dx, y.N + (nAbove ? off : -off * 1.6), money(y.N), "var(--accent)", anchor);
+        Lab.tag(F, t + 1 + dx, y.R + (nAbove ? -off * 1.6 : off), money(y.R), "var(--lrpc)", anchor);
+      }
+    });
+    // series labels near the right edge
+    var last = Y[2];
+    if (Math.abs(last.N - last.R) > (y1 - y0) * 0.12) {
+      Lab.tag(F, 2.55, (Y[1].N + last.N) / 2 + (last.N >= last.R ? off * 2 : -off * 2.4), "Nominal", "var(--accent)", "middle");
+      Lab.tag(F, 2.55, (Y[1].R + last.R) / 2 + (last.N >= last.R ? -off * 2.4 : off * 2), "Real", "var(--lrpc)", "middle");
+    }
+  }
+
+  // ---------- Results table ----------
+  function cell(v, kind) {
+    if (!isFinite(v)) return "—";
+    if (kind === "$") return money(v);
+    if (kind === "$2") return money2(v);
+    if (kind === "%") return pct(v);
+    return f(v);
+  }
+  function drawResults(Y, s) {
+    var h = '<thead><tr><th>Year</th><th>Nominal GDP</th><th>Real GDP</th><th>Deflator</th><th>Real growth</th><th>Real per capita</th></tr></thead><tbody>';
+    Y.forEach(function (y, t) {
+      h += '<tr' + (t === s.year ? ' class="sel"' : '') + '><td>' + (t + 1) + (t === s.base ? " (base)" : "") + '</td><td>' + cell(y.N, "$") + '</td><td>' + cell(y.R, "$") + '</td><td>' + cell(y.D) + '</td><td>' + (t === 0 ? "—" : cell(y.gR, "%")) + '</td><td>' + cell(y.pc, "$2") + '</td></tr>';
+    });
+    document.getElementById("results").innerHTML = h + '</tbody>';
+  }
+
+  // ---------- Show your work ----------
+  function row(label, work, val) {
+    return '<div class="row"><span>' + label + (work ? '<span class="work">' + work + '</span>' : '') + '</span><span>' + val + '</span></div>';
+  }
+  function drawSteps(Y, s) {
+    var t = s.year, b = s.base, y = Y[t], G = goods(s);
+    var nW = G.map(function (g) { return "$" + num(s.d[g][t][0]) + "×" + num(s.d[g][t][1]); }).join(" + ");
+    var rW = G.map(function (g) { return "$" + num(s.d[g][b][0]) + "×" + num(s.d[g][t][1]); }).join(" + ");
+    var html = "";
+    html += row("1. Nominal GDP: Year " + (t + 1) + " prices × Year " + (t + 1) + " quantities", nW, money(y.N));
+    html += row("2. Real GDP: Year " + (b + 1) + " (base) prices × Year " + (t + 1) + " quantities", rW, money(y.R));
+    html += row("3. GDP deflator = nominal ÷ real × 100", num(Math.round(y.N)) + " ÷ " + num(Math.round(y.R)) + " × 100", cell(y.D));
+    html += row("4. Real GDP per capita = real GDP ÷ population", money(y.R) + " ÷ " + num(s.pop[t]), cell(y.pc, "$2"));
+    if (t === 0) {
+      html += row("5. Growth rates", "Year 1 has no earlier year to compare with. Pick Year 2 or 3.", "—");
+    } else {
+      var p = Y[t - 1];
+      html += row("5. Inflation (deflator) = (new − old) ÷ old × 100", "(" + f(y.D) + " − " + f(p.D) + ") ÷ " + f(p.D) + " × 100", cell(y.inf, "%"));
+      html += row("6. Nominal GDP growth", "(" + num(Math.round(y.N)) + " − " + num(Math.round(p.N)) + ") ÷ " + num(Math.round(p.N)) + " × 100", cell(y.gN, "%"));
+      html += row("7. Real GDP growth (economic growth rate)", "(" + num(Math.round(y.R)) + " − " + num(Math.round(p.R)) + ") ÷ " + num(Math.round(p.R)) + " × 100", cell(y.gR, "%"));
+    }
+    document.getElementById("steps").innerHTML = html;
+  }
+
+  // ---------- Story ----------
+  function story(Y, s) {
+    var t = s.year, y = Y[t], out = [];
+    var baseNote = "Year " + (s.base + 1) + " is the base year, so in Year " + (s.base + 1) + " nominal GDP equals real GDP (" + money(Y[s.base].N) + ") and the deflator is 100.";
+    if (!(y.R > 0)) return "<p><b>Real GDP is zero for this year.</b> Enter positive quantities and base-year prices to compute the deflator.</p>";
+    if (t === 0 && s.base === 0) {
+      out.push("<p><b>Year 1 is the base year.</b> Nominal and real GDP use the same prices here, so both are " + money(y.N) + " and the GDP deflator is 100. Choose Year 2 or Year 3 to see the two measures split apart.</p>");
+      return out.join("");
+    }
+    if (t === 0) {
+      out.push("<p><b>Year 1 valued at Year " + (s.base + 1) + " prices.</b> Real GDP is " + money(y.R) + " and nominal GDP is " + money(y.N) + ", so the deflator is " + f(y.D) + ". " + (y.D < 100 ? "A deflator below 100 means prices in Year 1 were lower than in the base year." : y.D > 100 ? "A deflator above 100 means prices in Year 1 were higher than in the base year." : "") + "</p>");
+      out.push("<p>" + baseNote + "</p>");
+      return out.join("");
+    }
+    var p = Y[t - 1], from = "Year " + t, to = "Year " + (t + 1);
+    var lead;
+    if (y.gN > 0.05 && y.gR < -0.05) lead = "<b>Prices rose but output fell.</b> From " + from + " to " + to + ", nominal GDP rose " + ab(y.gN) + " while real GDP fell " + ab(y.gR) + ". The economy produced less. Higher prices made the dollar value of output look bigger.";
+    else if (y.gN < -0.05 && y.gR > 0.05) lead = "<b>Output grew while prices fell.</b> Nominal GDP fell " + ab(y.gN) + ", yet real GDP grew " + ab(y.gR) + ". Falling prices (deflation) hide real growth in the nominal figure.";
+    else if (Math.abs(y.gR) <= 0.05 && Math.abs(y.inf) > 0.05) lead = "<b>Output did not change.</b> Real GDP is flat, so all of the " + sg(y.gN) + " change in nominal GDP comes from prices.";
+    else if (Math.abs(y.inf) <= 0.05) lead = "<b>Prices did not change.</b> The deflator is steady, so nominal and real GDP change at the same rate (" + sg(y.gR) + "). All of the change is output.";
+    else lead = "<b>From " + from + " to " + to + ", nominal GDP changed " + sg(y.gN) + " and real GDP changed " + sg(y.gR) + ".</b> The difference is the change in prices: the GDP deflator changed " + sg(y.inf) + ".";
+    out.push("<p>" + lead + "</p>");
+    var li = [];
+    li.push("Check: nominal growth ≈ real growth + inflation, so " + sg(y.gN) + " ≈ " + sg(y.gR) + " + " + sg(y.inf) + ". The match is close, not exact, because growth rates multiply.");
+    if (isFinite(y.gPC) && isFinite(y.gR) && ((y.gR > 0.05 && y.gPC < -0.05) || (y.gR < -0.05 && y.gPC > 0.05)))
+      li.push("<b>Per capita tells a different story.</b> Population changed from " + num(s.pop[t - 1]) + " to " + num(s.pop[t]) + ", so real GDP per capita changed " + sg(y.gPC) + " even though total real GDP changed " + sg(y.gR) + ". Real GDP per capita is the better measure of the average standard of living.");
+    else if (isFinite(y.gPC)) li.push("Real GDP per capita changed " + sg(y.gPC) + " (from " + cell(p.pc, "$2") + " to " + cell(y.pc, "$2") + " per person).");
+    li.push(baseNote);
+    out.push("<ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>");
+    out.push("<p><b>AP answer:</b> to judge whether the economy produced more, use real GDP, because it holds prices constant at base-year levels and changes only when output changes.</p>");
+    return out.join("");
+  }
+
+  // ---------- Render ----------
+  function render(refill) {
+    if (refill) fillInputs();
+    var Y = model(S), y = Y[S.year];
+    for (var i = 0; i < 3; i++) {
+      document.getElementById("y-" + i).setAttribute("aria-pressed", S.year === i);
+      document.getElementById("b-" + i).setAttribute("aria-pressed", S.base === i);
+      document.getElementById("yh-" + i).className = "yr" + (S.base === i ? " isbase" : "");
+      document.getElementById("yh-" + i).textContent = "Year " + (i + 1) + (S.base === i ? " (base)" : "");
+    }
+    document.getElementById("c-third").checked = S.third;
+    document.getElementById("base-lbl").textContent = "Year " + (S.base + 1);
+    drawChart(Y, S); drawResults(Y, S); drawSteps(Y, S);
+    var yl = "Year " + (S.year + 1);
+    document.getElementById("k-n").textContent = "Nominal GDP, " + yl;
+    document.getElementById("k-r").textContent = "Real GDP, " + yl;
+    document.getElementById("k-d").textContent = "GDP deflator, " + yl;
+    document.getElementById("k-g").textContent = "Real GDP growth, " + yl;
+    document.getElementById("r-n").textContent = money(y.N);
+    document.getElementById("r-r").textContent = money(y.R);
+    document.getElementById("r-d").textContent = cell(y.D);
+    var g = document.getElementById("r-g");
+    if (S.year === 0 || !isFinite(y.gR)) g.textContent = "—";
+    else g.innerHTML = Math.abs(y.gR) < 0.05 ? "0.0%" : '<span class="pill ' + (y.gR > 0 ? "lr" : "infl") + '">' + pct(y.gR) + '</span>';
+    document.getElementById("story").innerHTML = story(Y, S);
+  }
+
+  buildInputs();
+  [0, 1, 2].forEach(function (i) {
+    document.getElementById("y-" + i).addEventListener("click", function () { S.year = i; render(false); });
+    document.getElementById("b-" + i).addEventListener("click", function () { S.base = i; render(false); });
+  });
+  document.getElementById("c-third").addEventListener("change", function (e) { S.third = e.target.checked; render(true); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = clone(PRESETS[0]); render(true); });
+  var sc = document.getElementById("scenarios");
+  PRESETS.forEach(function (p) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p.name;
+    b.addEventListener("click", function () { S = clone(p); render(true); });
+    sc.appendChild(b);
+  });
+  render(true);
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following best explains why economists use real GDP rather than nominal GDP to measure economic growth?", o: ["Real GDP includes intermediate goods, so it is more complete", "Real GDP holds prices constant, so it changes only when the quantity of output changes", "Real GDP is adjusted for population, so it measures the standard of living", "Real GDP excludes government purchases, which do not add to output"], c: 1, w: "Real GDP values each year's output at base-year prices. With prices held fixed, a change in real GDP reflects a change in output. Adjusting for population gives real GDP per capita, a different measure." },
+    { s: "An economy produces only apples and bananas. In the base year, apples cost $2 and bananas cost $1. In the current year, it produces 100 apples at $3 each and 200 bananas at $2 each. What is real GDP in the current year?", o: ["$300", "$700", "$500", "$400"], c: 3, w: "Real GDP uses base-year prices with current-year quantities: ($2 × 100) + ($1 × 200) = $400. Nominal GDP would use current prices: ($3 × 100) + ($2 × 200) = $700, the tempting wrong answer." },
+    { s: "Nominal GDP is $1,500 billion and the GDP deflator is 125. What is real GDP?", o: ["$1,200 billion", "$1,875 billion", "$1,375 billion", "$1,250 billion"], c: 0, w: "Real GDP = (nominal GDP ÷ GDP deflator) × 100 = (1,500 ÷ 125) × 100 = $1,200 billion. Multiplying instead of dividing gives $1,875 billion." },
+    { s: "From one year to the next, nominal GDP rises 7% and the GDP deflator rises 4%. Real GDP grew by approximately:", o: ["11%", "4%", "3%", "−3%"], c: 2, w: "Real GDP growth ≈ nominal GDP growth − inflation = 7% − 4% = 3%. Adding the two (11%) is the common error." },
+    { s: "In the base year, which of the following must be true?", o: ["Nominal GDP is greater than real GDP", "The GDP deflator is 0", "Real GDP growth is 0%", "Nominal GDP equals real GDP and the GDP deflator equals 100"], c: 3, w: "In the base year, current prices and base-year prices are the same, so nominal GDP equals real GDP and the deflator is 100. Real GDP can still grow or shrink compared with the year before." },
+    { s: "The price of cars imported from Japan rises sharply, while prices of domestically produced goods do not change. Which is most likely?", o: ["The CPI rises; the GDP deflator does not change", "The GDP deflator rises; the CPI does not change", "Both the CPI and the GDP deflator rise by the same amount", "Neither index changes because imports are not counted in either"], c: 0, w: "The CPI basket includes goods consumers buy, including imports. The GDP deflator covers only goods and services produced domestically, so an imported good's price does not enter it." },
+    { s: "Between two years, nominal GDP increases and real GDP decreases. Which of the following must have happened?", o: ["Output rose and the price level fell", "Population fell", "Output fell and the price level rose", "Output and the price level both fell"], c: 2, w: "A fall in real GDP means output fell. For nominal GDP to rise anyway, the price level must have risen enough to more than offset the drop in output." },
+    { s: "A country's real GDP grows 2% in a year while its population grows 3%. What happens to real GDP per capita?", o: ["It rises by about 5%", "It falls by about 1%", "It rises by about 1%", "It does not change because real GDP grew"], c: 1, w: "Real GDP per capita growth ≈ real GDP growth − population growth = 2% − 3% = −1%. Output grew, but not as fast as the number of people sharing it." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("2.6");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [2], topic: "2.6", compact: true, storageKey: "topic-2.6" });</script>
+</body>
+</html>

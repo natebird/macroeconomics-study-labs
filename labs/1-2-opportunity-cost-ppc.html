@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Opportunity Cost and PPC Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub { display: grid; gap: 6px; margin-top: 8px; }
+.sub h3 { font-size: 1.2rem; }
+.sub p { color: var(--muted); max-width: 70ch; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 12px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: end; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.mini table { min-width: 0; }
+.mini th, .mini td { padding: 7px 10px; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.mini tr.cur td { background: var(--accent-soft); }
+.mini td.oc { color: var(--muted); font-family: var(--mono); font-size: .82rem; }
+.mini tr.cur td.oc { color: var(--ink); font-weight: 600; }
+.mini .pt { padding: 2px 12px; font-weight: 600; font-family: var(--mono); }
+.mini .pt[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.note { font-size: .84rem; color: var(--muted); }
+.prob { background: var(--paper); border-left: 4px solid var(--c3); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: .95rem; }
+.calc-card { display: grid; gap: 12px; align-content: start; }
+.calc .row span:last-child { font-family: var(--mono); white-space: nowrap; }
+.ctl select, .ctl input[type="number"] { font: inherit; font-size: .95rem; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); width: 100%; }
+.ctl select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.controls.two-col { grid-template-columns: 1fr 1fr; }
+.ans { font-size: .95rem; }
+@media (max-width: 520px) { .calc .row { flex-wrap: wrap; } .controls.two-col { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 1 · Topic 1.2</span>
+  <h1>The Opportunity Cost and PPC Study Lab</h1>
+  <p class="lede">Every choice has an opportunity cost: the next best thing you give up. The production possibilities curve (PPC) shows that trade-off for a whole economy making two goods. Move the point along the curve, push it inside or outside, shift the curve, and then work AP-style table problems with the calculator.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. The production possibilities curve</h2>
+    <p>This economy makes two goods, pizzas and robots. The table lists six points on its PPC. Pick a point, drag the sliders, or try a scenario. The dashed grey curve shows where the PPC started once something shifts it.</p>
+  </div>
+
+  <div class="sub"><h3>A. Move along, inside, and outside the curve</h3></div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Production possibilities <small>robots vs. pizzas per week</small></h3>
+      <svg class="chart" id="ppc" role="img" aria-label="Production possibilities curve for pizzas and robots"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>PPC table <small>pick a point</small></h3>
+      <div class="tbl-wrap mini">
+        <table>
+          <thead><tr><th>Point</th><th>Pizzas</th><th>Robots</th><th>Cost of each extra pizza</th></tr></thead>
+          <tbody id="ptable"></tbody>
+        </table>
+      </div>
+      <p class="note" id="tnote"></p>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-lrpc">PPC now</span><span class="l-ghost">Starting PPC</span><span class="l-ad">Highlighted move in the table</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="toggles">
+      <div style="display:grid; gap:6px;">
+        <span style="font-size:.86rem; font-weight:500;">Shape of the PPC</span>
+        <div class="seg" role="group" aria-label="Shape of the PPC">
+          <button type="button" id="m-bow" aria-pressed="true">Increasing cost (bowed out)</button>
+          <button type="button" id="m-line" aria-pressed="false">Constant cost (straight line)</button>
+        </div>
+      </div>
+      <label class="check" for="c-lock"><input type="checkbox" id="c-lock" checked> Keep the point on the curve</label>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <label for="s-p">Pizzas <output id="o-p"></output></label>
+        <input type="range" id="s-p" min="0" max="120" step="1">
+        <span class="hint">Slide right to make more pizzas</span>
+      </div>
+      <div class="ctl">
+        <label for="s-r">Robots <output id="o-r"></output></label>
+        <input type="range" id="s-r" min="0" max="120" step="1">
+        <span class="hint" id="h-r">Uncheck the box above to move freely</span>
+      </div>
+      <div class="ctl">
+        <label for="s-x">Most pizzas possible <output id="o-x"></output></label>
+        <input type="range" id="s-x" min="60" max="120" step="10">
+        <span class="hint">Pizza intercept: resources and pizza technology</span>
+      </div>
+      <div class="ctl">
+        <label for="s-y">Most robots possible <output id="o-y"></output></label>
+        <input type="range" id="s-y" min="60" max="120" step="10">
+        <span class="hint">Robot intercept: resources and robot technology</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Point (pizzas, robots)</div><div class="v" id="r-pt"></div></div>
+    <div class="stat"><div class="k">Where is the point?</div><div class="v" id="r-st"></div></div>
+    <div class="stat"><div class="k">Cost of 1 more pizza</div><div class="v" id="r-ocx"></div></div>
+    <div class="stat"><div class="k">Cost of 1 more robot</div><div class="v" id="r-ocy"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="sub">
+    <h3>B. PPC table calculator</h3>
+    <p>AP questions often give you a table instead of a graph. Choose a preset, pick the move, and the calculator shows each line of work. You can also check whether a combination is on, inside, or outside the curve.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card calc-card">
+      <div>
+        <div class="tag" style="margin-bottom:8px;">AP-style presets</div>
+        <div class="scenarios" id="presets"></div>
+      </div>
+      <div class="tbl-wrap mini">
+        <table>
+          <thead id="cthead"></thead>
+          <tbody id="ctable"></tbody>
+        </table>
+      </div>
+      <div class="controls two-col">
+        <div class="ctl">
+          <label for="c-from">Move from point</label>
+          <select id="c-from"></select>
+        </div>
+        <div class="ctl">
+          <label for="c-to">To point</label>
+          <select id="c-to"></select>
+        </div>
+        <div class="ctl">
+          <label for="c-cx" id="l-cx">Check a point: x good</label>
+          <input type="number" id="c-cx" min="0" step="1">
+        </div>
+        <div class="ctl">
+          <label for="c-cy" id="l-cy">Check a point: y good</label>
+          <input type="number" id="c-cy" min="0" step="1">
+        </div>
+      </div>
+    </div>
+    <div class="card calc-card">
+      <div class="prob" id="prob"></div>
+      <div><span class="formula">Opportunity cost per unit = amount given up ÷ amount gained</span></div>
+      <div class="calc" id="calc" aria-live="polite"></div>
+      <p class="ans" id="ans"></p>
+      <div class="calc" id="check" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Opportunity cost</h3><p>The value of the next best alternative you give up when you make a choice. On a PPC, the opportunity cost of more of one good is the amount of the other good the economy must stop making.</p></div>
+    <div class="card"><span class="tag">On, inside, outside</span><h3>Reading the PPC</h3><p>A point on the curve uses all resources fully and efficiently. A point inside means unemployed or underused resources. A point outside cannot be produced with current resources and technology.</p></div>
+    <div class="card"><span class="tag">Shape</span><h3>Constant vs. increasing cost</h3><p>A straight-line PPC means each extra unit costs the same amount of the other good. A PPC bowed out from the origin means each extra unit costs more than the one before. That is the law of increasing opportunity cost.</p></div>
+    <div class="card"><span class="tag">Why bowed out</span><h3>Resources are specialized</h3><p>Resources are not equally suited to making both goods. The first workers and machines moved into pizza making are the ones best at it and worst at robots. As you keep going, you pull in robot experts who make few pizzas, so each pizza costs more robots.</p></div>
+    <div class="card"><span class="tag">Two kinds</span><h3>Productive vs. allocative efficiency</h3><p>Every point on the PPC is productively efficient: no resources are wasted. Only one point is allocatively efficient: the combination of goods that society values most. A point inside the curve is neither.</p></div>
+    <div class="card"><span class="tag">Outward shift</span><h3>Economic growth</h3><p>More or better resources (labor, capital, natural resources) or better technology shift the PPC outward. Technology that helps only one good moves only that good's intercept. Making more capital goods today shifts the PPC out farther in the future.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. PPC cheat sheet</h2>
+    <p>Memorize which events move a point and which events shift the curve. A shift needs a change in resources or technology.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>What happens on the graph</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Recession, rising unemployment</td><td><b>Point moves inside</b> the PPC; the curve does not shift</td><td>Resources still exist but sit idle</td></tr>
+      <tr><td>Economy returns to full employment</td><td><b>Point moves out to</b> the PPC</td><td>Idle resources go back to work; no opportunity cost to reach the curve</td></tr>
+      <tr><td>Society wants more of one good</td><td><b>Movement along</b> the PPC</td><td>Resources move between goods; the trade-off is the opportunity cost</td></tr>
+      <tr><td>More labor (immigration, population growth), more capital, new natural resources</td><td><span class="lshift">Whole PPC shifts outward</span></td><td>More resources can make more of both goods</td></tr>
+      <tr><td>Better education and training (human capital)</td><td><span class="lshift">Whole PPC shifts outward</span></td><td>Workers become more productive in both goods</td></tr>
+      <tr><td>New technology for one good only</td><td><span class="lshift">Only that good's intercept moves out</span>; the other intercept stays put</td><td>The technology does not help produce the other good</td></tr>
+      <tr><td>Natural disaster or war destroys factories and land</td><td><span class="shift">PPC shifts inward</span></td><td>Fewer resources exist</td></tr>
+      <tr><td>Producing more capital goods today</td><td>Point on today's PPC with more capital goods; <span class="lshift">larger outward shift later</span></td><td>More capital today raises future productive capacity</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Label each axis with the name of a good (for example, <b>Capital goods</b> on one axis and <b>Consumer goods</b> on the other). Never label a PPC axis "Price" or "Quantity".</li>
+        <li>Draw the PPC bowed out from the origin unless the question says opportunity cost is constant. Then draw a straight line.</li>
+        <li>Label points with the letters the question uses and place them clearly on, inside, or outside the curve.</li>
+        <li>For growth, draw the new curve outside the old one, label it PPC₂, and add an arrow. For one-good technology, keep the other intercept fixed.</li>
+        <li>Show your work on table questions: amount given up ÷ amount gained, with units. Write "2 units of robots per pizza," not just "2."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting the PPC inward for a recession. Unemployment is a point <b>inside</b> the curve. The curve shifts only when resources or technology change.</li>
+        <li>Giving the total cost when the question asks for the cost <b>per unit</b>. Divide the amount given up by the amount gained.</li>
+        <li>Stating the opportunity cost in the wrong good. The cost of pizzas is measured in robots, and the cost of robots in pizzas.</li>
+        <li>Shifting both intercepts for technology that helps only one good.</li>
+        <li>Saying a point inside the curve is unattainable. It is attainable; it is just inefficient.</li>
+        <li>Calling every point on the PPC allocatively efficient. They are all productively efficient; only one is allocatively efficient.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 1.2. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-1.html">Unit 1 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+  var LET = ["A", "B", "C", "D", "E", "F"];
+
+  // ---------- Model ----------
+  // Graph units: Lab.ppc draws 0..12. One graph unit = 10 pizzas or 10 robots.
+  // X, Y are the intercepts in graph units; start is 10 and 10 (100 pizzas, 100 robots).
+  var BASE = { bowed: true, X: 10, Y: 10, p: 40, r: null, lock: true };
+  var S;
+  function curveR(s, p) {           // robots on the PPC at p pizzas, NaN beyond the pizza intercept
+    var x = p / 10;
+    if (x > s.X + 1e-9) return NaN;
+    var k = x / s.X;
+    return 10 * (s.bowed ? s.Y * Math.sqrt(Math.max(0, 1 - k * k)) : s.Y * (1 - k));
+  }
+  function rows(s) {                // six table points A-F, evenly spaced in pizzas, rounded to whole units
+    var out = [];
+    for (var i = 0; i <= 5; i++) {
+      var k = i / 5;
+      out.push({ p: Math.round(10 * s.X * k), r: Math.round(10 * (s.bowed ? s.Y * Math.sqrt(1 - k * k) : s.Y * (1 - k))) });
+    }
+    return out;
+  }
+  function segCost(R, k) { return (R[k].r - R[k + 1].r) / (R[k + 1].p - R[k].p); }   // robots per pizza from row k to k+1
+  function rowAt(R, p) { for (var i = 0; i < R.length; i++) if (Math.abs(R[i].p - p) < 0.01) return i; return -1; }
+  function fix(s) {
+    var pmax = 10 * s.X;
+    if (s.lock) { if (s.p > pmax) s.p = pmax; s.r = curveR(s, s.p); }
+    return s;
+  }
+  function model(s) {
+    var R = rows(s), step = R[1].p, pmax = R[5].p;
+    var c = curveR(s, s.p);
+    var st = isNaN(c) ? "outside" : Math.abs(s.r - c) < 1.5 ? "on" : (s.r < c ? "inside" : "outside");
+    var kx = s.p >= pmax - 1e-9 ? -1 : Math.min(4, Math.floor(s.p / step + 1e-9));      // segment used for one more pizza
+    var ky = s.p <= 1e-9 ? -1 : Math.min(4, Math.ceil(s.p / step - 1e-9) - 1);          // segment used for one more robot
+    var row = rowAt(R, s.p);
+    if (row >= 0 && (st !== "on" || Math.abs(s.r - R[row].r) > 1.5)) row = -1;   // a table point only when the dot sits on it
+    return { R: R, st: st, c: c, kx: kx, ky: ky, row: row };
+  }
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("ppc");
+  function draw(s, m) {
+    var shifted = s.X !== 10 || s.Y !== 10;
+    var onRow = m.row >= 0;
+    Lab.ppc(svg, {
+      xLabel: "Pizzas", yLabel: "Robots", xMax: s.X, yMax: s.Y, start: { xMax: 10, yMax: 10 }, bowed: s.bowed,
+      curveLabel: shifted ? "PPC₂" : "PPC",
+      point: [s.p / 10, s.r / 10], pointLabel: onRow ? null : "P",
+      extra: function (F) {
+        // tick labels in real units (one graph unit = 10)
+        Array.prototype.forEach.call(F.svg.childNodes, function (n) {
+          if (n.tagName === "text" && /^\d+$/.test(n.textContent)) n.textContent = String(10 * +n.textContent);
+        });
+        // highlight the table move that sets the cost of one more pizza
+        if (m.st === "on" && m.kx >= 0) {
+          var a = m.R[m.kx], b = m.R[m.kx + 1];
+          Lab.line(F, [[a.p / 10, a.r / 10], [b.p / 10, a.r / 10], [b.p / 10, b.r / 10]], "var(--accent)", 2, "4 3");
+        }
+        // table points
+        m.R.forEach(function (q, i) {
+          if (!(onRow && i === m.row)) Lab.el("circle", { cx: F.sx(q.p / 10), cy: F.sy(q.r / 10), r: 3.5, fill: "var(--lrpc)" }, F.g);
+          Lab.tag(F, q.p / 10 + 0.18, q.r / 10 + 0.3, LET[i], "var(--ink)");
+        });
+        if (shifted) {
+          var X0 = 10, Y0 = 10, g0 = function (x) { var k = x / X0; return s.bowed ? Y0 * Math.sqrt(1 - k * k) : Y0 * (1 - k); };
+          var inner = s.X >= X0 && s.Y >= Y0;
+          var gx = 0.93 * X0;
+          if (inner) Lab.tag(F, gx - 0.25, g0(gx) - 0.6, "PPC₁", "var(--muted)", "end");
+          else Lab.tag(F, gx + 0.2, g0(gx) + 0.25, "PPC₁", "var(--muted)");
+          var a0, a1;
+          if (s.bowed) { var sn = Math.sin(Math.PI / 3); a0 = [X0 * sn, Y0 * 0.5]; a1 = [s.X * sn, s.Y * 0.5]; }
+          else { a0 = [X0 / 2, Y0 / 2]; a1 = [s.X / 2, s.Y / 2]; }
+          Lab.arrow(F, a0[0] + (a1[0] - a0[0]) * 0.15, a0[1] + (a1[1] - a0[1]) * 0.15, a1[0] - (a1[0] - a0[0]) * 0.15, a1[1] - (a1[1] - a0[1]) * 0.15, "var(--muted)");
+        }
+      }
+    });
+  }
+
+  // ---------- Table ----------
+  var tbody = document.getElementById("ptable");
+  function drawTable(s, m) {
+    var html = "";
+    m.R.forEach(function (q, i) {
+      var oc = i === 0 ? "" : LET[i - 1] + "→" + LET[i] + ": " + f(segCost(m.R, i - 1), 2) + " robots";
+      var cur = m.st === "on" && m.kx === i - 1 && i > 0;
+      var pressed = m.row === i;
+      html += '<tr' + (cur ? ' class="cur"' : '') + '><td><button type="button" class="pt" data-i="' + i + '" aria-pressed="' + pressed + '" aria-label="Go to point ' + LET[i] + '">' + LET[i] + '</button></td><td>' + q.p + '</td><td>' + q.r + '</td><td class="oc">' + oc + '</td></tr>';
+    });
+    tbody.innerHTML = html;
+    var costs = [0, 1, 2, 3, 4].map(function (k) { return f(segCost(m.R, k), 2); });
+    document.getElementById("tnote").textContent = s.bowed
+      ? "Cost per extra pizza = robots given up ÷ pizzas gained. Down the table it rises: " + costs.join(", ") + " robots. That rising cost is why the curve bows out."
+      : "Cost per extra pizza = robots given up ÷ pizzas gained. It stays at " + costs[0] + " robots in every row, so the PPC is a straight line.";
+  }
+  tbody.addEventListener("click", function (e) {
+    var b = e.target.closest("button.pt"); if (!b) return;
+    var R = rows(S), q = R[+b.dataset.i];
+    S.lock = true; S.p = q.p; render();
+  });
+
+  // ---------- Story ----------
+  function story(s, m) {
+    var R = m.R, P = Math.round(s.p), Rb = Math.round(s.r), parts = [];
+    var name = m.row >= 0 ? "Point " + LET[m.row] : "Point P";
+    var where = name + " (" + P + " pizzas, " + Rb + " robots)";
+    if (m.st === "on") {
+      var lead = "<b>" + where + " is on the PPC.</b> The economy uses all of its resources fully and efficiently, so it is productively efficient. The only way to get more pizzas is to give up robots.";
+      parts.push(lead);
+      if (m.kx >= 0) {
+        var a = R[m.kx], b = R[m.kx + 1], gu = a.r - b.r, ga = b.p - a.p;
+        parts.push("From " + LET[m.kx] + " to " + LET[m.kx + 1] + " in the table, the economy gains " + ga + " pizzas and gives up " + gu + " robots. Opportunity cost per pizza = " + gu + " ÷ " + ga + " = <b>" + f(gu / ga, 2) + " robots</b>.");
+      } else {
+        parts.push("All resources already make pizzas, so the economy cannot make any more.");
+      }
+      if (s.bowed) parts.push("Move right and the cost per pizza rises. This is the law of increasing opportunity cost. Resources are not equally suited to both goods: the first resources moved into pizzas are good cooks and poor robot builders, while the last ones are skilled robot engineers who make few pizzas. That is why the PPC bows out.");
+      else parts.push("Each pizza costs the same " + f(segCost(R, 0), 2) + " robots everywhere on the line. A straight-line PPC means constant opportunity cost, which happens when resources are equally suited to making both goods.");
+      parts.push("Every point on the curve is productively efficient. Which one is allocatively efficient depends on what society wants most; that is the single point that matches society's preferences.");
+    } else if (m.st === "inside") {
+      parts.push("<b>" + where + " is inside the PPC.</b> The economy is not using all its resources: some workers are unemployed or factories sit idle, as in a recession. This point is attainable but inefficient.");
+      parts.push("On the curve at " + P + " pizzas the economy could make about " + Math.round(m.c) + " robots. Putting idle resources to work gives more of one or both goods without giving anything up, so moving out to the curve has <b>no opportunity cost</b>.");
+      parts.push("AP answer: a recession or rising unemployment is a movement to a point inside the PPC. The curve itself does not shift, because the economy still has the same resources and technology.");
+    } else {
+      parts.push("<b>" + where + " is outside the PPC.</b> With its current resources and technology, the economy cannot produce this combination. It is unattainable.");
+      parts.push("Only economic growth, an outward shift of the PPC from more resources or better technology, can put this point within reach. (In topic 1.3 you will see that trade can let a country consume beyond its PPC, but it still cannot produce there.)");
+    }
+    // shift story
+    var dx = s.X - 10, dy = s.Y - 10, sh = "";
+    if (dx > 0 && dy > 0) sh = "The whole PPC shifted outward (pizza intercept 100 → " + 10 * s.X + ", robot intercept 100 → " + 10 * s.Y + "). More resources or better technology for both goods let the economy make more of both. This is <b>economic growth</b>.";
+    else if (dx < 0 && dy < 0) sh = "The whole PPC shifted inward (pizza intercept 100 → " + 10 * s.X + ", robot intercept 100 → " + 10 * s.Y + "). Resources were destroyed or lost, as in a natural disaster or war, so the economy can make less of both goods.";
+    else if (dx > 0 && dy === 0) sh = "Only the pizza intercept moved out (100 → " + 10 * s.X + "). Better pizza technology does not help build robots, so the robot intercept stays at 100. Each pizza now costs <b>fewer</b> robots, because the same resources make more pizzas.";
+    else if (dy > 0 && dx === 0) sh = "Only the robot intercept moved up (100 → " + 10 * s.Y + "). Better robot technology does not help make pizzas, so the pizza intercept stays at 100. Each pizza now costs <b>more</b> robots, because the resources moved into pizzas could have built more robots.";
+    else if (dx < 0 && dy === 0) sh = "Only the pizza intercept moved in (100 → " + 10 * s.X + "), as if a crop disease hurt pizza ingredients. The robot intercept stays at 100.";
+    else if (dy < 0 && dx === 0) sh = "Only the robot intercept moved in (100 → " + 10 * s.Y + "). The pizza intercept stays at 100.";
+    else if (dx !== 0 || dy !== 0) sh = "The pizza intercept moved " + (dx > 0 ? "out" : "in") + " and the robot intercept moved " + (dy > 0 ? "out" : "in") + ". The economy gained the ability to make more of one good and lost some ability to make the other.";
+    var html = "<p>" + parts[0] + "</p>";
+    if (sh) html += "<p>" + sh + "</p>";
+    if (parts.length > 1) html += "<ul>" + parts.slice(1).map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elP = document.getElementById("s-p"), elR = document.getElementById("s-r"), elX = document.getElementById("s-x"), elY = document.getElementById("s-y");
+  var elLock = document.getElementById("c-lock"), bBow = document.getElementById("m-bow"), bLine = document.getElementById("m-line");
+  function render() {
+    fix(S);
+    var m = model(S);
+    elP.value = Math.round(S.p); elR.value = Math.round(S.r); elX.value = 10 * S.X; elY.value = 10 * S.Y;
+    elR.disabled = S.lock; elLock.checked = S.lock;
+    document.getElementById("h-r").textContent = S.lock ? "Locked to the curve. Uncheck the box to move freely" : "Move the point inside or outside the curve";
+    bBow.setAttribute("aria-pressed", S.bowed); bLine.setAttribute("aria-pressed", !S.bowed);
+    document.getElementById("o-p").textContent = Math.round(S.p);
+    document.getElementById("o-r").textContent = Math.round(S.r);
+    document.getElementById("o-x").textContent = 10 * S.X;
+    document.getElementById("o-y").textContent = 10 * S.Y;
+    draw(S, m); drawTable(S, m);
+    document.getElementById("r-pt").textContent = Math.round(S.p) + ", " + Math.round(S.r);
+    document.getElementById("r-st").innerHTML = m.st === "on" ? '<span class="pill lr">On: efficient</span>' : m.st === "inside" ? '<span class="pill rec">Inside: inefficient</span>' : '<span class="pill infl">Outside: unattainable</span>';
+    var ox = document.getElementById("r-ocx"), oy = document.getElementById("r-ocy");
+    if (m.st === "inside") { ox.textContent = "0 (idle resources)"; oy.textContent = "0 (idle resources)"; }
+    else if (m.st === "outside") { ox.textContent = "Not possible"; oy.textContent = "Not possible"; }
+    else {
+      ox.textContent = m.kx >= 0 ? f(segCost(m.R, m.kx), 2) + " robots" : "None left";
+      oy.textContent = m.ky >= 0 ? f(1 / segCost(m.R, m.ky), 2) + " pizzas" : "None left";
+    }
+    document.getElementById("story").innerHTML = story(S, m);
+  }
+  elP.addEventListener("input", function () { S.p = parseFloat(elP.value); render(); });
+  elR.addEventListener("input", function () { if (!S.lock) { S.r = parseFloat(elR.value); render(); } });
+  elX.addEventListener("input", function () { S.X = parseFloat(elX.value) / 10; render(); });
+  elY.addEventListener("input", function () { S.Y = parseFloat(elY.value) / 10; render(); });
+  elLock.addEventListener("change", function () { S.lock = elLock.checked; render(); });
+  bBow.addEventListener("click", function () { S.bowed = true; render(); });
+  bLine.addEventListener("click", function () { S.bowed = false; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Start: point C", { bowed: true }],
+    ["Recession: idle workers", { lock: false, p: 40, r: 60 }],
+    ["Point beyond the curve", { lock: false, p: 80, r: 90 }],
+    ["More resources (labor, capital)", { X: 12, Y: 12, p: 48 }],
+    ["Better pizza technology", { X: 12, p: 48 }],
+    ["Better robot technology", { Y: 12 }],
+    ["Natural disaster", { X: 8, Y: 8, lock: false, p: 40, r: 92 }],
+    ["Constant cost", { bowed: false }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, { bowed: x[1].bowed != null ? x[1].bowed : S.bowed }, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  S = Object.assign({}, BASE);
+  render();
+
+  // ---------- Table calculator ----------
+  var GB = { x: ["unit of butter", "units of butter"], y: ["gun", "guns"], X: "Butter", Y: "Guns", rows: [[0, 40], [10, 38], [20, 34], [30, 26], [40, 0]] };
+  var PRE = [
+    ["Butter and guns: B to C", Object.assign({}, GB, { from: 1, to: 2, chk: [20, 30], text: "The table shows a country's production possibilities for butter and guns. Moving from point B to point C, what is the opportunity cost of each additional unit of butter?" })],
+    ["Constant cost: cars", { x: ["car", "cars"], y: ["computer", "computers"], X: "Cars", Y: "Computers", rows: [[0, 100], [5, 75], [10, 50], [15, 25], [20, 0]], from: 0, to: 1, chk: [10, 60], text: "The table shows the production possibilities for cars and computers. What is the opportunity cost of producing one more car? Is opportunity cost constant or increasing?" }],
+    ["Butter and guns: D to C", Object.assign({}, GB, { from: 3, to: 2, chk: [30, 30], text: "Using the butter and guns table, the country moves from point D to point C. What is the opportunity cost of each additional gun?" })],
+    ["Total cost: A to D", { x: ["unit of consumer goods", "units of consumer goods"], y: ["unit of capital goods", "units of capital goods"], X: "Consumer goods", Y: "Capital goods", rows: [[0, 50], [20, 48], [40, 42], [60, 30], [80, 0]], from: 0, to: 3, chk: [40, 30], text: "The table shows production possibilities for consumer goods and capital goods. What is the total opportunity cost of moving from point A to point D?" }],
+    ["Is (20, 30) attainable?", Object.assign({}, GB, { from: 1, to: 2, chk: [20, 30], text: "Using the butter and guns table, can the country produce 20 units of butter and 30 guns? If it does, is it efficient?" })]
+  ];
+  var C = null;
+  var elF = document.getElementById("c-from"), elT = document.getElementById("c-to"), elCX = document.getElementById("c-cx"), elCY = document.getElementById("c-cy");
+  function n(v, one, many) { return v + " " + (v === 1 ? one : many); }
+  function renderCalc() {
+    var R = C.rows, L = LET.slice(0, R.length);
+    document.getElementById("prob").textContent = C.text;
+    document.getElementById("cthead").innerHTML = "<tr><th>Point</th><th>" + C.X + "</th><th>" + C.Y + "</th><th>Cost per unit of " + C.X.toLowerCase() + "</th></tr>";
+    var costs = [];
+    document.getElementById("ctable").innerHTML = R.map(function (q, i) {
+      var oc = "";
+      if (i > 0) { var c = (R[i - 1][1] - q[1]) / (q[0] - R[i - 1][0]); costs.push(c); oc = L[i - 1] + "→" + L[i] + ": " + f(c, 2); }
+      var lo = Math.min(C.from, C.to), hi = Math.max(C.from, C.to);
+      return "<tr" + (i > lo && i <= hi ? ' class="cur"' : "") + "><td><b>" + L[i] + "</b></td><td>" + q[0] + "</td><td>" + q[1] + "</td><td class=\"oc\">" + oc + "</td></tr>";
+    }).join("");
+    [elF, elT].forEach(function (sel, k) {
+      sel.innerHTML = L.map(function (l, i) { return '<option value="' + i + '">' + l + " (" + R[i][0] + ", " + R[i][1] + ")</option>"; }).join("");
+      sel.value = k ? C.to : C.from;
+    });
+    document.getElementById("l-cx").textContent = "Check a point: " + C.X.toLowerCase();
+    document.getElementById("l-cy").textContent = "Check a point: " + C.Y.toLowerCase();
+    elCX.value = C.chk[0]; elCY.value = C.chk[1];
+
+    var a = R[C.from], b = R[C.to], rowsH = [], ans;
+    function row(k, v) { rowsH.push('<div class="row"><span>' + k + "</span><span>" + v + "</span></div>"); }
+    if (C.from === C.to) {
+      row("Pick two different points", "—"); ans = "Choose a different starting or ending point.";
+    } else {
+      row("Start at " + L[C.from], a[0] + " " + C.x[1] + ", " + a[1] + " " + C.y[1]);
+      row("End at " + L[C.to], b[0] + " " + C.x[1] + ", " + b[1] + " " + C.y[1]);
+      var gainX = b[0] > a[0];
+      var G = gainX ? C.x : C.y, Lo = gainX ? C.y : C.x;
+      var gain = gainX ? b[0] - a[0] : b[1] - a[1], lost = gainX ? a[1] - b[1] : a[0] - b[0];
+      row("Gained: " + G[1], (gainX ? b[0] + " − " + a[0] : b[1] + " − " + a[1]) + " = " + gain);
+      row("Given up: " + Lo[1], (gainX ? a[1] + " − " + b[1] : a[0] + " − " + b[0]) + " = " + lost);
+      row("Total opportunity cost", n(lost, Lo[0], Lo[1]));
+      row("Per unit: " + lost + " ÷ " + gain, f(lost / gain, 2) + " " + Lo[1] + " per " + G[0]);
+      ans = "Moving from " + L[C.from] + " to " + L[C.to] + ", the economy gains " + n(gain, G[0], G[1]) + " and gives up " + n(lost, Lo[0], Lo[1]) + ". The total opportunity cost is <b>" + n(lost, Lo[0], Lo[1]) + "</b>, or <b>" + f(lost / gain, 2) + " " + Lo[1] + " per " + G[0] + "</b>.";
+    }
+    var same = costs.every(function (c) { return Math.abs(c - costs[0]) < 1e-9; });
+    var rising = costs.every(function (c, i) { return i === 0 || c > costs[i - 1]; });
+    ans += " Down the table the cost per unit of " + C.X.toLowerCase() + " is " + costs.map(function (c) { return f(c, 2); }).join(", ") + ": " + (same ? "<b>constant opportunity cost</b>, so the PPC is a straight line." : rising ? "<b>increasing opportunity cost</b>, so the PPC is bowed out from the origin." : "the cost changes but does not rise steadily.");
+    document.getElementById("calc").innerHTML = rowsH.join("");
+    document.getElementById("ans").innerHTML = ans;
+    renderCheck();
+  }
+  function renderCheck() {
+    var R = C.rows, x = parseFloat(elCX.value), y = parseFloat(elCY.value), out = [];
+    function row(k, v) { out.push('<div class="row"><span>' + k + "</span><span>" + v + "</span></div>"); }
+    if (isNaN(x) || isNaN(y) || x < 0 || y < 0) { row("Enter two amounts to check a point", "—"); document.getElementById("check").innerHTML = out.join(""); return; }
+    var max = R[R.length - 1][0], yc = null, how = "";
+    if (x > max) { row("Most " + C.X.toLowerCase() + " possible", max); row("Verdict", "Outside: unattainable"); document.getElementById("check").innerHTML = out.join(""); return; }
+    for (var i = 0; i < R.length; i++) if (R[i][0] === x) { yc = R[i][1]; how = "row " + LET[i]; }
+    if (yc === null) {
+      for (var k = 0; k < R.length - 1; k++) if (x > R[k][0] && x < R[k + 1][0]) {
+        yc = R[k][1] + (R[k + 1][1] - R[k][1]) * (x - R[k][0]) / (R[k + 1][0] - R[k][0]);
+        how = "between " + LET[k] + " and " + LET[k + 1] + ", estimated with a straight line";
+      }
+    }
+    row("Most " + C.Y.toLowerCase() + " possible with " + x + " " + C.X.toLowerCase() + " (" + how + ")", f(yc, yc % 1 ? 1 : 0));
+    row(C.Y + " in your point", y);
+    var v = Math.abs(y - yc) < 1e-9 ? "On the PPC: efficient" : y < yc ? "Inside: attainable but inefficient" : "Outside: unattainable";
+    row("Verdict", v);
+    document.getElementById("check").innerHTML = out.join("");
+  }
+  var pc = document.getElementById("presets");
+  PRE.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { C = JSON.parse(JSON.stringify(x[1])); renderCalc(); });
+    pc.appendChild(b);
+  });
+  elF.addEventListener("change", function () { C.from = +elF.value; renderCalc(); });
+  elT.addEventListener("change", function () { C.to = +elT.value; renderCalc(); });
+  elCX.addEventListener("input", function () { C.chk[0] = parseFloat(elCX.value); renderCheck(); });
+  elCY.addEventListener("input", function () { C.chk[1] = parseFloat(elCY.value); renderCheck(); });
+  C = JSON.parse(JSON.stringify(PRE[0][1]));
+  renderCalc();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "A point inside a country's production possibilities curve shows that the country:", o: ["Cannot produce that combination with its current resources", "Is using all of its resources efficiently", "Has unemployed or underused resources", "Has experienced economic growth"], c: 2, w: "A point inside the PPC is attainable but inefficient: some resources are idle, as in a recession. A point outside is the one that is unattainable." },
+    { s: "A country can produce these combinations of wheat and cloth: A (0 wheat, 60 cloth), B (5, 56), C (10, 48), D (15, 34), E (20, 0). Moving from C to D, what is the opportunity cost of each additional unit of wheat?", o: ["14 units of cloth", "2.8 units of cloth", "0.36 units of cloth", "34 units of cloth"], c: 1, w: "From C to D the country gains 5 wheat and gives up 48 − 34 = 14 cloth. Per unit: 14 ÷ 5 = 2.8 cloth. 14 is the total cost for all 5 units, not the cost per unit." },
+    { s: "Why is a typical production possibilities curve bowed outward from the origin?", o: ["Resources are not equally suited to producing both goods", "Technology improves as the economy produces more", "Resources are equally suited to producing both goods", "The prices of both goods rise as output rises"], c: 0, w: "As production shifts toward one good, the economy has to use resources that are less and less suited to it, so each extra unit costs more of the other good. Equally suited resources would give a straight line." },
+    { s: "A country's PPC has computers on the horizontal axis and wheat on the vertical axis. A new technology makes computer production more efficient but has no effect on wheat. Which change to the PPC is correct?", o: ["The entire PPC shifts outward in a parallel way", "The economy moves along the PPC toward more computers", "The entire PPC shifts inward", "The horizontal (computer) intercept moves outward while the wheat intercept stays the same"], c: 3, w: "Technology for one good moves only that good's intercept. If all resources made wheat, the country would make the same amount of wheat as before, so the wheat intercept does not move." },
+    { s: "An economy falls into a recession and the unemployment rate rises. How is this shown on its PPC?", o: ["The PPC shifts outward", "The PPC shifts inward", "A movement from a point on the PPC to a point inside it", "A movement along the PPC toward more capital goods"], c: 2, w: "Unemployment means existing resources are idle, so production falls to a point inside the curve. The PPC shifts only when the quantity or quality of resources or technology changes." },
+    { s: "A country's PPC is a straight line from 50 tablets on the vertical axis to 25 bikes on the horizontal axis. What is the opportunity cost of producing one bike?", o: ["0.5 tablets", "25 tablets", "50 tablets", "2 tablets"], c: 3, w: "Making all 25 bikes means giving up all 50 tablets, so each bike costs 50 ÷ 25 = 2 tablets. Because the PPC is straight, that cost is the same for every bike. 0.5 is the cost of one tablet in bikes." },
+    { s: "Which statement about efficiency and the PPC is correct?", o: ["Every point on the PPC is productively efficient, but only the combination society values most is allocatively efficient", "Every point on the PPC is allocatively efficient, but only one point is productively efficient", "Points inside the PPC are productively efficient because they use fewer resources", "Allocative efficiency requires producing at a point outside the PPC"], c: 0, w: "Any point on the curve wastes no resources, so all are productively efficient. Allocative efficiency picks the one point that matches society's preferences. Points inside are inefficient, and points outside cannot be produced." },
+    { s: "Countries X and Y have identical PPCs for capital goods and consumer goods today. Country X chooses a point with more capital goods and fewer consumer goods than Country Y. Other things equal, what is most likely in the future?", o: ["Country Y's PPC will shift outward more than Country X's", "Country X's PPC will shift outward more than Country Y's", "Neither country's PPC will shift because they start with the same PPC", "Country X's PPC will shift inward because it consumes less today"], c: 1, w: "Capital goods such as machines and factories increase future productive capacity. By producing more capital today, Country X gives up some consumption now in exchange for a larger outward shift of its PPC later." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("1.2");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [1], topic: "1.2", compact: true, storageKey: "topic-1.2" });</script>
+</body>
+</html>

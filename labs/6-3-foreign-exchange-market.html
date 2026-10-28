@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Foreign Exchange Market Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.mirror { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.mirror .link { border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; font-size: .9rem; display: grid; gap: 4px; }
+.mirror .who { font-weight: 600; }
+.mirror .eq { color: var(--muted); }
+.mirror .eq b { color: var(--ink); }
+.mirror .link.on { border-color: var(--accent); background: var(--accent-soft); }
+@media (max-width: 700px) { .mirror { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 6 · Topic 6.3</span>
+  <h1>The Foreign Exchange Market Study Lab</h1>
+  <p class="lede">In the foreign exchange market, people trade one currency for another so they can buy goods, services, and assets from another country. Every trade shows up in two markets at once: when Europeans buy dollars, they sell euros. Change who is buying what below and watch the market for dollars and the market for euros move as mirror images.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Two linked currency markets</h2>
+    <p>The page starts at 0.80 euros per dollar, which is the same as 1.25 dollars per euro. Dashed grey lines show where each market started. Solid lines show where it is now.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Market for U.S. dollars <small>price of the dollar in euros</small></h3>
+      <svg class="chart" id="usd" role="img" aria-label="Foreign exchange market for U.S. dollars"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Market for euros <small>price of the euro in dollars</small></h3>
+      <svg class="chart" id="eur" role="img" aria-label="Foreign exchange market for euros"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Demand for the currency</span><span class="l-srpc">Supply of the currency</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-eu">Europeans buying U.S. goods and assets <output id="o-eu"></output></label>
+        <input type="range" id="s-eu" min="-2" max="2" step="1">
+        <span class="hint">Shifts demand for dollars and supply of euros</span>
+      </div>
+      <div class="ctl">
+        <label for="s-us">Americans buying European goods and assets <output id="o-us"></output></label>
+        <input type="range" id="s-us" min="-2" max="2" step="1">
+        <span class="hint">Shifts supply of dollars and demand for euros</span>
+      </div>
+    </div>
+    <div class="mirror" aria-label="How one purchase appears in both markets">
+      <div class="link" id="m-eu"><span class="who">Europeans buy U.S. goods and assets</span><span class="eq">They pay with euros to get dollars: <b>demand for dollars</b> = <b>supply of euros</b></span></div>
+      <div class="link" id="m-us"><span class="who">Americans buy European goods and assets</span><span class="eq">They pay with dollars to get euros: <b>supply of dollars</b> = <b>demand for euros</b></span></div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Euros per dollar</div><div class="v" id="r-e">0.80</div></div>
+    <div class="stat"><div class="k">Dollars per euro</div><div class="v" id="r-d">1.25</div></div>
+    <div class="stat"><div class="k">The dollar</div><div class="v" id="r-usd">No change</div></div>
+    <div class="stat"><div class="k">The euro</div><div class="v" id="r-eur">No change</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Demand</span><h3>Who demands dollars</h3><p>Foreigners who want to buy U.S. goods, services, and assets. A European tourist in New York, a French firm buying U.S. software, and a German investor buying U.S. bonds all need dollars first.</p></div>
+    <div class="card"><span class="tag">Supply</span><h3>Who supplies dollars</h3><p>Americans who want to buy foreign goods, services, and assets. To pay for a German car or a French stock, an American trades dollars away for euros.</p></div>
+    <div class="card"><span class="tag">One trade, two markets</span><h3>The mirror image</h3><p>Trading euros for dollars is buying dollars and selling euros at the same time. An increase in demand for dollars is an increase in supply of euros. An increase in supply of dollars is an increase in demand for euros.</p></div>
+    <div class="card"><span class="tag">Read the axis</span><h3>Appreciation and depreciation</h3><p>On the dollar graph, a higher number of euros per dollar means the dollar appreciates: one dollar buys more euros. The euro depreciates by the same move, so dollars per euro falls.</p></div>
+    <div class="card"><span class="tag">Reciprocal</span><h3>Two quotes, one rate</h3><p>Dollars per euro is 1 divided by euros per dollar. If 1 dollar buys 0.80 euros, then 1 euro buys 1 ÷ 0.80 = 1.25 dollars.</p></div>
+    <div class="card"><span class="tag">Shift or move</span><h3>What moves the curves</h3><p>A change in the exchange rate itself is a movement along the curves. A change in how much people want to buy from the other country shifts a curve in each market.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Who buys what: the cheat sheet</h2>
+    <p>Each event shifts one curve in the dollar market and the matching curve in the euro market. Memorize the pairs.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Market for dollars</th><th>Market for euros</th><th>Dollar</th><th>Euro</th></tr></thead>
+    <tbody>
+      <tr><td>Europeans buy more U.S. goods and services (U.S. exports rise)</td><td><b>Demand right</b></td><td><span class="shift">Supply right</span></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>European investors buy more U.S. stocks and bonds</td><td><b>Demand right</b></td><td><span class="shift">Supply right</span></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>Americans buy more European goods and services (U.S. imports rise)</td><td><span class="shift">Supply right</span></td><td><b>Demand right</b></td><td>Depreciates</td><td>Appreciates</td></tr>
+      <tr><td>Americans buy more European stocks and bonds</td><td><span class="shift">Supply right</span></td><td><b>Demand right</b></td><td>Depreciates</td><td>Appreciates</td></tr>
+      <tr><td>Europeans buy fewer U.S. goods or assets</td><td><b>Demand left</b></td><td><span class="shift">Supply left</span></td><td>Depreciates</td><td>Appreciates</td></tr>
+      <tr><td>Americans buy fewer European goods or assets</td><td><span class="shift">Supply left</span></td><td><b>Demand left</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Title the graph with the currency you are graphing, such as "Market for U.S. dollars."</li>
+        <li>Horizontal axis: <b>Quantity of dollars</b>. Vertical axis: the price of the dollar in the other currency, <b>Euros per dollar</b>. For the euro market, use <b>Quantity of euros</b> and <b>Dollars per euro</b>.</li>
+        <li>Label the curves D<sub>$</sub> and S<sub>$</sub>. Draw the new curve, label it D<sub>$2</sub> or S<sub>$2</sub>, and add an arrow for the direction of the shift.</li>
+        <li>Mark the starting and new exchange rates on the vertical axis (ER<sub>1</sub> and ER<sub>2</sub>) and the quantities on the horizontal axis.</li>
+        <li>Name the cause in words: "Demand for dollars increases because Europeans need dollars to buy U.S. goods."</li>
+        <li>Use the CED words: "the dollar <b>appreciates</b> relative to the euro" and "the euro <b>depreciates</b> relative to the dollar."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Putting the wrong currency on the vertical axis. The dollar graph needs the price of a dollar (euros per dollar), not dollars per euro.</li>
+        <li>Shifting demand for dollars when Americans buy imports. Americans buying foreign goods <b>supply</b> dollars and <b>demand</b> the foreign currency.</li>
+        <li>Saying both currencies appreciate. If the dollar appreciates against the euro, the euro must depreciate against the dollar.</li>
+        <li>Shifting both curves in one market when only one group's behavior changed. A single purchase decision, such as Europeans buying more U.S. goods, shifts one curve in the dollar market and the mirror curve in the euro market. Some events, like relative inflation, change both groups' behavior and shift both curves.</li>
+        <li>Calling a change in the exchange rate a shift. The rate moving is a movement along the curves.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 6.3. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-6.html">Unit 6 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { eu: 0, us: 0 };
+  var S = Object.assign({}, BASE);
+  var K = 1;                 // curve slope passed to Lab.market
+  var E0 = 0.80, C = 0.12;   // starting euros per dollar; how far the rate moves per unit of graph height
+
+  // ---------- Model ----------
+  // Dollar market: demand shift = eu (Europeans buying U.S. things), supply shift = us (Americans buying European things).
+  // Euro market is the mirror: demand shift = us, supply shift = eu.
+  // Graph height y maps to a rate: euros per dollar = 0.80 * exp(C*(y - 5)). The euro graph's y is 10 - y,
+  // so dollars per euro = 1.25 * exp(C*(yEur - 5)) is always exactly 1 / (euros per dollar).
+  function rateUSD(y) { return E0 * Math.exp(C * (y - 5)); }
+  function rateEUR(y) { return (1 / E0) * Math.exp(C * (y - 5)); }
+
+  // ---------- Graphs ----------
+  var svgU = document.getElementById("usd"), svgE = document.getElementById("eur");
+  function draw(eu, us) {
+    var movedAny = Math.abs(eu) > 1e-6 || Math.abs(us) > 1e-6;
+    function cfg(xl, yl, dsh, ssh, cur) {
+      var dS = Math.abs(dsh) > 1e-6, sS = Math.abs(ssh) > 1e-6;
+      return {
+        xLabel: xl, yLabel: yl, slope: K,
+        demand: { shift: dsh, label: "D" + cur + (dS ? "₂" : "₁") },
+        supply: { shift: ssh, label: "S" + cur + (sS ? "₂" : "₁") },
+        start: { demand: 0, supply: 0 },
+        eqLabels: movedAny ? ["Q₂", "ER₂"] : ["Q₁", "ER₁"],
+        startLabels: ["Q₁", "ER₁"],
+        arrows: false,
+        extra: function (F, eq, c) {
+          // shift arrows on the left side of the plot, clear of the curve labels and the equilibrium dot
+          if (dS) Lab.arrow(F, 5 - 3 / K, 8, 5 - 3 / K + dsh, 8, "var(--muted)");
+          if (sS) Lab.arrow(F, 5 - 2.5 / K, 2.5, 5 - 2.5 / K + ssh, 2.5, "var(--muted)");
+        }
+      };
+    }
+    // Pre-compute where equilibria land so starting labels are skipped when they would sit on top of the new ones.
+    var cu = cfg("Quantity of dollars", "Euros per dollar", eu, us, "$");
+    var ce = cfg("Quantity of euros", "Dollars per euro", us, eu, "€");
+    var dx = Math.abs(eu + us) > 1e-6, dyU = Math.abs(eu - us) > 1e-6;
+    [cu, ce].forEach(function (c) {
+      c.startLabels = [dx ? "Q₁" : "", dyU ? "ER₁" : ""];
+      if (movedAny) c.eqLabels = [dx ? "Q₂" : "Q₁", dyU ? "ER₂" : "ER₁"];
+    });
+    var eqU = Lab.market(svgU, cu);
+    var eqE = Lab.market(svgE, ce);
+    return { u: eqU, e: eqE };
+  }
+
+  // ---------- Story ----------
+  var f = Lab.fmt;
+  function amt(v) { return Math.abs(v) === 2 ? "a lot" : "somewhat"; }
+  function story(s, m) {
+    var e = rateUSD(m.u.y), d = rateEUR(m.e.y);
+    var html = "", items = [];
+    if (s.eu === 0 && s.us === 0) {
+      html += "<p><b>Starting point.</b> Europeans who want U.S. goods, services, and assets demand dollars and supply euros. Americans who want European goods, services, and assets supply dollars and demand euros. The two groups meet at <b>0.80 euros per dollar</b>, which is the same rate as <b>1.25 dollars per euro</b>.</p>";
+      html += "<p>Move a slider or pick a scenario. Watch one purchase shift a curve in <b>both</b> markets.</p>";
+      return html;
+    }
+    if (s.eu > 0) items.push("Europeans buy " + amt(s.eu) + " more U.S. goods and assets. They need dollars to pay, so <b>demand for dollars shifts right</b>. To get those dollars they offer euros, so <b>supply of euros shifts right</b>.");
+    if (s.eu < 0) items.push("Europeans buy " + amt(s.eu) + " fewer U.S. goods and assets. They need fewer dollars, so <b>demand for dollars shifts left</b>. They offer fewer euros, so <b>supply of euros shifts left</b>.");
+    if (s.us > 0) items.push("Americans buy " + amt(s.us) + " more European goods and assets. They need euros to pay, so <b>demand for euros shifts right</b>. To get those euros they offer dollars, so <b>supply of dollars shifts right</b>.");
+    if (s.us < 0) items.push("Americans buy " + amt(s.us) + " fewer European goods and assets. They need fewer euros, so <b>demand for euros shifts left</b>. They offer fewer dollars, so <b>supply of dollars shifts left</b>.");
+    html += "<ul>" + items.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+
+    var up = e > E0 + 1e-6, down = e < E0 - 1e-6;
+    if (up) html += "<p><b>Result:</b> the price of a dollar rises from 0.80 to <b>" + f(e, 2) + " euros</b>, so the <b>dollar appreciates</b>. In the euro market the price of a euro falls from 1.25 to <b>" + f(d, 2) + " dollars</b>, so the <b>euro depreciates</b>. A $100 U.S. jacket now costs a European €" + f(100 * e, 0) + " instead of €80.</p>";
+    else if (down) html += "<p><b>Result:</b> the price of a dollar falls from 0.80 to <b>" + f(e, 2) + " euros</b>, so the <b>dollar depreciates</b>. In the euro market the price of a euro rises from 1.25 to <b>" + f(d, 2) + " dollars</b>, so the <b>euro appreciates</b>. A $100 U.S. jacket now costs a European €" + f(100 * e, 0) + " instead of €80.</p>";
+    else html += "<p><b>Result:</b> in this example the two shifts are the same size, so the rate stays at 0.80 euros per dollar (1.25 dollars per euro). Neither currency appreciates.</p>";
+
+    if (s.eu !== 0 && s.us !== 0) {
+      if ((s.eu > 0) === (s.us > 0)) {
+        html += "<p><b>AP note:</b> both curves in each market shift the same direction, so the quantity of dollars traded " + (s.eu > 0 ? "rises" : "falls") + " for sure. The change in the exchange rate is <b>indeterminate</b> unless the question tells you which shift is larger. The lab picks sizes so you can see one possible outcome.</p>";
+      } else {
+        html += "<p><b>AP note:</b> the two shifts push the exchange rate the same way, so the direction of the rate change is certain. The change in the quantity of dollars traded is <b>indeterminate</b> unless you know which shift is larger.</p>";
+      }
+    }
+    var causes = [];
+    if (s.eu !== 0) causes.push("the demand for dollars " + (s.eu > 0 ? "increases" : "decreases"));
+    if (s.us !== 0) causes.push("the supply of dollars " + (s.us > 0 ? "increases" : "decreases"));
+    var ap, cause = "In the market for U.S. dollars, " + causes.join(" and ");
+    if (s.eu !== 0 && s.us !== 0 && (s.eu > 0) === (s.us > 0)) ap = cause + ", so the quantity of dollars " + (s.eu > 0 ? "increases" : "decreases") + " and the change in the exchange rate is indeterminate.";
+    else if (up) ap = cause + ", so the dollar appreciates relative to the euro, and the euro depreciates relative to the dollar.";
+    else if (down) ap = cause + ", so the dollar depreciates relative to the euro, and the euro appreciates relative to the dollar.";
+    if (ap) html += "<p><b>AP answer:</b> “" + ap + "”</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elEU = document.getElementById("s-eu"), elUS = document.getElementById("s-us");
+  var stop = function () {};
+  function word(v) { return v === 0 ? "start" : (v > 0 ? "more" : "less") + (Math.abs(v) === 2 ? " (large)" : " (small)"); }
+  function status(r, r0) { return r > r0 + 1e-6 ? '<span class="pill lr">Appreciated</span>' : r < r0 - 1e-6 ? '<span class="pill infl">Depreciated</span>' : "No change"; }
+  function paint(eu, us) { return draw(eu, us); }
+  function render() {
+    elEU.value = S.eu; elUS.value = S.us;
+    document.getElementById("o-eu").textContent = word(S.eu);
+    document.getElementById("o-us").textContent = word(S.us);
+    document.getElementById("m-eu").classList.toggle("on", S.eu !== 0);
+    document.getElementById("m-us").classList.toggle("on", S.us !== 0);
+    var m = paint(S.eu, S.us);
+    var e = rateUSD(m.u.y), d = rateEUR(m.e.y);
+    document.getElementById("r-e").textContent = "€" + f(e, 2);
+    document.getElementById("r-d").textContent = "$" + f(d, 2);
+    document.getElementById("r-usd").innerHTML = status(e, E0);
+    document.getElementById("r-eur").innerHTML = status(d, 1 / E0);
+    document.getElementById("story").innerHTML = story(S, m);
+  }
+  function go(target) {
+    stop();
+    var from = { eu: S.eu, us: S.us };
+    S = Object.assign({}, BASE, target);
+    render();
+    if (from.eu === S.eu && from.us === S.us) return;
+    stop = Lab.animate(500, function (t) {
+      paint(from.eu + (S.eu - from.eu) * t, from.us + (S.us - from.us) * t);
+    }, function () { paint(S.eu, S.us); });
+  }
+  elEU.addEventListener("input", function () { stop(); S.eu = parseFloat(elEU.value); render(); });
+  elUS.addEventListener("input", function () { stop(); S.us = parseFloat(elUS.value); render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { go(BASE); });
+
+  var scen = [
+    ["European tourists visit the U.S.", { eu: 1 }],
+    ["European investors buy U.S. bonds", { eu: 2 }],
+    ["Americans buy more European cars", { us: 1 }],
+    ["U.S. firms buy European stocks", { us: 2 }],
+    ["U.S. goods fall out of favor in Europe", { eu: -1 }],
+    ["Both sides buy more (indeterminate rate)", { eu: 2, us: 1 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { go(x[1]); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "European businesses increase their purchases of U.S. software. In the foreign exchange market for U.S. dollars, which of the following occurs?", o: ["The supply of dollars increases, and the dollar depreciates", "The demand for dollars increases, and the dollar appreciates", "The demand for dollars decreases, and the dollar depreciates", "The supply of dollars decreases, and the dollar appreciates"], c: 1, w: "European firms need dollars to pay for U.S. software, so demand for dollars shifts right and the dollar appreciates. Choice D also has the dollar appreciating, but Americans did not change what they buy, so the supply of dollars does not shift." },
+    { s: "Americans buy more French wine. In the foreign exchange market for euros, which of the following occurs?", o: ["The demand for euros increases, and the euro appreciates", "The supply of euros increases, and the euro depreciates", "The demand for euros decreases, and the euro depreciates", "The supply of euros decreases, and the euro appreciates"], c: 0, w: "Americans need euros to pay French sellers, so demand for euros shifts right and the euro appreciates. At the same time, Americans supply more dollars, so the dollar depreciates." },
+    { s: "Which group supplies U.S. dollars in the foreign exchange market?", o: ["Europeans who want to buy U.S. stocks", "Foreign tourists visiting the United States", "Americans who want to buy foreign goods, services, and assets", "Foreign firms that want to buy U.S. exports"], c: 2, w: "To buy foreign goods or assets, Americans trade dollars for foreign currency, which supplies dollars. The other three groups all want dollars, so they demand dollars." },
+    { s: "The exchange rate changes from 0.80 euros per dollar to 1.00 euro per dollar. Which of the following is true?", o: ["Dollars per euro falls from 1.25 to 1.00, and the dollar depreciates", "Dollars per euro rises from 1.00 to 1.25, and the euro appreciates", "Dollars per euro stays at 1.25 because only the price of the dollar changed", "Dollars per euro falls from 1.25 to 1.00, so the dollar appreciates and the euro depreciates"], c: 3, w: "Dollars per euro is the reciprocal: 1 ÷ 0.80 = 1.25 before and 1 ÷ 1.00 = 1.00 after. One dollar now buys more euros, so the dollar appreciates, and one euro buys fewer dollars, so the euro depreciates. Choice A gets the numbers right but the direction wrong." },
+    { s: "On a correctly labeled graph of the foreign exchange market for euros, the vertical axis should be labeled:", o: ["Euros per dollar", "Dollars per euro", "Quantity of euros", "Nominal interest rate"], c: 1, w: "The vertical axis shows the price of the currency being graphed, stated in the other currency. The price of a euro is dollars per euro. Euros per dollar belongs on the graph of the market for dollars." },
+    { s: "A jacket sells for $100 in the United States. The exchange rate rises from 0.80 euros per dollar to 0.90 euros per dollar. What happens to the price of the jacket for a European buyer?", o: ["It falls from €90 to €80", "It stays at €100", "It rises from €80 to €90", "It falls from €125 to €111"], c: 2, w: "Multiply the dollar price by euros per dollar: $100 × 0.80 = €80 before and $100 × 0.90 = €90 after. The dollar appreciated, so U.S. goods cost Europeans more." },
+    { s: "At the same time, European investors buy more U.S. bonds and Americans buy more European cars. In the market for U.S. dollars, which of the following must be true?", o: ["The dollar appreciates", "The dollar depreciates", "The quantity of dollars traded falls", "The quantity of dollars traded rises, and the change in the exchange rate is indeterminate"], c: 3, w: "European investors raise demand for dollars and American car buyers raise supply of dollars. Both shifts increase the quantity traded. The rate rises if the demand shift is larger and falls if the supply shift is larger, so without sizes it is indeterminate." },
+    { s: "In the foreign exchange market for dollars, the demand for dollars increases because Europeans want more U.S. goods. In the foreign exchange market for euros, the same event appears as:", o: ["An increase in the supply of euros", "An increase in the demand for euros", "A decrease in the supply of euros", "No change, because the euro market is separate"], c: 0, w: "Europeans get dollars by trading euros away, so the same trade that demands dollars supplies euros. The supply of euros shifts right and the euro depreciates while the dollar appreciates." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("6.3");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [6], topic: "6.3", compact: true, storageKey: "topic-6.3" });</script>
+</body>
+</html>

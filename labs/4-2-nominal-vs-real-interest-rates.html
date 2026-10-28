@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nominal vs. Real Interest Rates Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.controls.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.side-card { display: grid; gap: 14px; align-content: start; }
+.parties { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.party { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; display: grid; gap: 6px; align-content: start; }
+.party h4 { margin: 0; font-family: var(--display); font-size: 1rem; }
+.party p { font-size: .88rem; color: var(--muted); }
+.party.win { border-color: var(--good); background: var(--good-soft); }
+.party.lose { border-color: var(--bad); background: var(--bad-soft); }
+.calc .row span:last-child { font-family: var(--mono); text-align: right; }
+.seg { justify-self: start; display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nums input { font: inherit; font-family: var(--mono); width: 100%; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.problem { font-size: .95rem; background: var(--paper); border-left: 4px solid var(--c3); padding: 10px 12px; border-radius: 0 8px 8px 0; }
+.calc-out { display: grid; gap: 12px; align-content: start; }
+@media (max-width: 860px) { .controls.three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .controls.three, .parties, .nums { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 4 · Topic 4.2</span>
+  <h1>Nominal vs. Real Interest Rates Study Lab</h1>
+  <p class="lede">The nominal interest rate is the rate written on the loan. The real interest rate subtracts inflation, so it measures what the lender really earns in purchasing power. Set up a loan, then choose what inflation actually turns out to be and watch who gains and who loses. Finish with the calculator to practice the two AP calculations.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Loan simulator</h2>
+    <p>A lender and a borrower sign a one-year, fixed-rate loan. They set the nominal rate with the Fisher equation: <span class="formula">nominal rate = real rate + expected inflation</span>. After the year, the real rate the lender actually earns is <span class="formula">nominal rate − actual inflation</span>.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>The loan in percentages <small>the lender's real return</small></h3>
+      <svg class="chart" id="bars" role="img" aria-label="Bar chart of the nominal rate, expected and actual inflation, and the planned and actual real interest rate"></svg>
+    </div>
+    <div class="card side-card">
+      <h3>Who gains, who loses</h3>
+      <div class="parties">
+        <div class="party" id="p-lend"><h4>Lender</h4><div id="p-lend-pill"></div><p id="p-lend-txt"></p></div>
+        <div class="party" id="p-borr"><h4>Borrower</h4><div id="p-borr-pill"></div><p id="p-borr-txt"></p></div>
+      </div>
+      <div>
+        <div class="tag" style="margin-bottom:6px;">On a $1,000 loan for one year</div>
+        <div class="calc" id="dollars"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Nominal rate</span><span class="l-c3">Expected inflation</span><span class="l-srpc">Actual inflation</span><span class="l-lrpc">Real rate (planned)</span><span>Real rate (actual): red if the lender loses, green if it gains</span><span class="l-ghost">Planned real rate marker</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls three">
+      <div class="ctl">
+        <label for="s-r">Real rate the lender wants <output id="o-r"></output></label>
+        <input type="range" id="s-r" min="0" max="6" step="0.5">
+        <span class="hint">Step 1: agreed before the loan</span>
+      </div>
+      <div class="ctl">
+        <label for="s-pe">Expected inflation <output id="o-pe"></output></label>
+        <input type="range" id="s-pe" min="0" max="10" step="0.5">
+        <span class="hint">Step 1: both sides' forecast</span>
+      </div>
+      <div class="ctl">
+        <label for="s-pa">Actual inflation <output id="o-pa"></output></label>
+        <input type="range" id="s-pa" min="-2" max="14" step="0.5">
+        <span class="hint">Step 2: what really happens during the year</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-match" type="button">Make inflation match expectations</button>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Nominal rate on the loan</div><div class="v" id="r-i"></div></div>
+    <div class="stat"><div class="k">Ex ante real rate (planned)</div><div class="v" id="r-ea"></div></div>
+    <div class="stat"><div class="k">Ex post real rate (actual)</div><div class="v" id="r-ep"></div></div>
+    <div class="stat"><div class="k">Inflation surprise</div><div class="v" id="r-s"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="sec-head" style="margin-top:8px;">
+    <h3>AP calculator</h3>
+    <p>Pick a preset problem or type your own numbers. The work is shown the way you would write it on the exam.</p>
+  </div>
+  <div class="lab">
+    <div class="card side-card">
+      <div class="seg" role="group" aria-label="What to solve for">
+        <button type="button" id="m-real" aria-pressed="true">Find the real rate</button>
+        <button type="button" id="m-nom" aria-pressed="false">Find the nominal rate</button>
+      </div>
+      <div>
+        <div class="tag" style="margin-bottom:8px;">AP-style presets</div>
+        <div class="scenarios" id="presets"></div>
+      </div>
+      <div class="problem" id="problem"></div>
+      <div class="nums">
+        <div class="ctl"><label for="c-a" id="c-a-lbl">Nominal interest rate (%)</label><input type="number" id="c-a" step="0.5"></div>
+        <div class="ctl"><label for="c-b" id="c-b-lbl">Inflation rate (%)</label><input type="number" id="c-b" step="0.5"></div>
+      </div>
+    </div>
+    <div class="card calc-out">
+      <h3>Show your work</h3>
+      <div><span class="formula" id="c-formula"></span></div>
+      <div class="calc" id="c-steps" aria-live="polite"></div>
+      <p id="c-say" style="font-size:.94rem;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">The stated rate</span><h3>Nominal interest rate</h3><p>The rate written on a loan, bond, or savings account. It tells you how many more dollars you get back, without adjusting for what those dollars can buy.</p></div>
+    <div class="card"><span class="tag">r = i − π</span><h3>Real interest rate</h3><p>The nominal rate minus inflation. It tells you how much your purchasing power grows. A 5% nominal rate with 3% inflation is a 2% real rate. If inflation is higher than the nominal rate, the real rate is negative.</p></div>
+    <div class="card"><span class="tag">i = r + πᵉ</span><h3>The Fisher equation</h3><p>Lenders add expected inflation to the real return they want. When expected inflation rises, the nominal rate rises by the same amount and the expected real rate stays the same. This is the Fisher effect.</p></div>
+    <div class="card"><span class="tag">Before vs. after</span><h3>Ex ante and ex post</h3><p>The ex ante real rate is planned: nominal rate minus <b>expected</b> inflation. The ex post real rate is realized: nominal rate minus <b>actual</b> inflation. They differ only when inflation surprises people.</p></div>
+    <div class="card"><span class="tag">Redistribution</span><h3>Unanticipated inflation</h3><p>If inflation is higher than expected, borrowers repay with dollars that buy less, so borrowers gain and lenders lose. If inflation is lower than expected, lenders gain and borrowers lose. Anticipated inflation is already built into the nominal rate, so it moves no purchasing power between them.</p></div>
+    <div class="card"><span class="tag">Which graph</span><h3>Two rates, two graphs</h3><p>The money market graph has the <b>nominal</b> interest rate on its vertical axis. The loanable funds graph has the <b>real</b> interest rate. Using the wrong label costs a point on the FRQ.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Worked examples</h2>
+    <p>Each row is a one-year, fixed-rate loan. Cover the last three columns and work them out yourself. Compare the ex post rate with the ex ante rate to see who gained.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Nominal rate</th><th>Expected inflation</th><th>Actual inflation</th><th>Ex ante real rate</th><th>Ex post real rate</th><th>Who gains</th></tr></thead>
+    <tbody>
+      <tr><td>6%</td><td>2%</td><td>2%</td><td>6 − 2 = 4%</td><td>6 − 2 = 4%</td><td>Neither: inflation was anticipated</td></tr>
+      <tr><td>6%</td><td>2%</td><td>5%</td><td>6 − 2 = 4%</td><td>6 − 5 = 1%</td><td><b>Borrower</b> (inflation higher than expected)</td></tr>
+      <tr><td>7%</td><td>4%</td><td>1%</td><td>7 − 4 = 3%</td><td>7 − 1 = 6%</td><td><span class="shift">Lender</span> (inflation lower than expected)</td></tr>
+      <tr><td>4%</td><td>3%</td><td>8%</td><td>4 − 3 = 1%</td><td>4 − 8 = −4%</td><td><b>Borrower</b>; the lender loses purchasing power outright</td></tr>
+      <tr><td>5%</td><td>2%</td><td>−1% (deflation)</td><td>5 − 2 = 3%</td><td>5 − (−1) = 6%</td><td><span class="shift">Lender</span> (prices fell instead of rising)</td></tr>
+      <tr><td>Find it: 3 + 6 = 9%</td><td>6%</td><td>6%</td><td>3% wanted</td><td>9 − 6 = 3%</td><td>Neither: the Fisher effect protected the lender</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. On the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>How to earn the points</h3>
+      <ul>
+        <li>Write the formula, then the numbers, then the answer: "real interest rate = nominal interest rate − inflation rate = 5% − 3% = 2%." Graders give credit for the work.</li>
+        <li>To find the nominal rate a lender should charge, <b>add</b> expected inflation to the real rate it wants: 4% + 3% = 7%.</li>
+        <li>Keep the sign. A real rate of −2% is a correct answer; say the lender's purchasing power falls.</li>
+        <li>For who gains, name the group and give the reason: "Borrowers gain because they repay the loan with dollars that have less purchasing power than expected."</li>
+        <li>Use the word <b>unanticipated</b> (or unexpected). Only inflation that differs from expectations redistributes purchasing power.</li>
+        <li>Label axes: money market uses "Nominal interest rate"; loanable funds uses "Real interest rate".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Subtracting backward. Real rate = nominal − inflation, so 8% nominal and 3% inflation gives 5%, not −5%.</li>
+        <li>Saying "inflation always hurts lenders." Expected inflation is already in the nominal rate. Lenders lose only when inflation is higher than expected.</li>
+        <li>Mixing up who gains. Higher-than-expected inflation helps <b>borrowers</b> (debtors). Lower-than-expected inflation helps <b>lenders</b> (creditors and savers with fixed rates).</li>
+        <li>Using actual inflation for the rate a lender sets in advance. The lender cannot know actual inflation yet, so it uses <b>expected</b> inflation.</li>
+        <li>Dividing or multiplying. AP uses simple subtraction and addition for these questions.</li>
+        <li>Thinking a positive nominal rate means savers gain. If inflation is above the nominal rate, savers lose purchasing power.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 4.2. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-4.html">Unit 4 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+  // Signed percent with a true minus sign.
+  function pct(v) { var r = Math.round(v * 10) / 10; return (r < 0 ? "−" : "") + f(Math.abs(r)) + "%"; }
+  function pp(v) { var r = Math.round(v * 10) / 10; return (r > 0 ? "+" : r < 0 ? "−" : "") + f(Math.abs(r)) + " pts"; }
+  function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
+
+  // ---------- Loan model (AP approximation: r = i − π) ----------
+  var BASE = { r: 3, pe: 2, pa: 4 };
+  var S = Object.assign({}, BASE);
+  function model(s) {
+    var i = s.r + s.pe;            // Fisher equation: nominal = real + expected inflation
+    var exAnte = i - s.pe;         // planned real rate
+    var exPost = i - s.pa;         // realized real rate
+    var surprise = s.pa - s.pe;    // > 0: borrower gains; < 0: lender gains
+    return { i: i, exAnte: exAnte, exPost: exPost, surprise: surprise };
+  }
+
+  // ---------- Bar chart ----------
+  var svg = document.getElementById("bars");
+  function drawBars(m, s) {
+    var vals = [m.i, s.pe, s.pa, m.exAnte, m.exPost];
+    var lo = Math.min(0, Math.min.apply(null, vals)), hi = Math.max(8, Math.max.apply(null, vals));
+    lo = Math.floor((lo - (lo < 0 ? 1.5 : 0)) / 2) * 2; hi = Math.ceil((hi + 2) / 2) * 2;
+    var step = hi - lo > 20 ? 4 : 2, ticks = [];
+    for (var t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks.push(t);
+    var names = ["Nominal rate", "Expected π", "Actual π", "Real (planned)", "Real (actual)"];
+    var F = Lab.frame(svg, { x: [0.4, 5.6], y: [lo, hi], width: 520, xLabel: "", yLabel: "Percent per year",
+      xTicks: [1, 2, 3, 4, 5], yTicks: ticks,
+      fmtX: function (v) { return names[v - 1]; }, fmtY: function (v) { return (v < 0 ? "−" : "") + Math.abs(v) + "%"; } });
+    var postColor = Math.abs(m.surprise) < 1e-9 ? "var(--lrpc)" : m.surprise > 0 ? "var(--bad)" : "var(--good)";
+    var colors = ["var(--accent)", "var(--c3)", "var(--srpc)", "var(--lrpc)", postColor];
+    var pad = (hi - lo) * 0.035;
+    vals.forEach(function (v, k) {
+      var x = k + 1;
+      if (Math.abs(v) > 1e-9) Lab.rect(F, x - 0.32, 0, x + 0.32, v, colors[k], 0.88);
+      Lab.tag(F, x, v >= 0 ? v + pad : v - pad * 2.4, pct(v), colors[k], "middle");
+    });
+    Lab.line(F, [[F.xr[0], 0], [F.xr[1], 0]], "var(--ink)", 1.5);
+    // planned real rate marker across the realized bar
+    if (Math.abs(m.surprise) > 1e-9) {
+      Lab.line(F, [[3.6, m.exAnte], [5.45, m.exAnte]], "var(--ghost)", 2, "6 5");
+      Lab.arrow(F, 5.45, m.exAnte, 5.45, m.exPost + (m.exPost > m.exAnte ? -0.1 : 0.1), "var(--muted)");
+    }
+  }
+
+  // ---------- Who gains panel ----------
+  function setParty(id, state, txt) {
+    var box = document.getElementById(id);
+    box.classList.toggle("win", state === "win"); box.classList.toggle("lose", state === "lose");
+    document.getElementById(id + "-pill").innerHTML = state === "win" ? '<span class="pill lr">Gains</span>' : state === "lose" ? '<span class="pill infl">Loses</span>' : '<span class="pill rec">As planned</span>';
+    document.getElementById(id + "-txt").textContent = txt;
+  }
+  function drawParties(m, s) {
+    var gap = Math.abs(m.surprise);
+    if (gap < 1e-9) {
+      setParty("p-lend", "even", "Earns the " + pct(m.exAnte) + " real return it asked for. Inflation was fully anticipated.");
+      setParty("p-borr", "even", "Pays the " + pct(m.exAnte) + " real cost it agreed to. No surprise, no transfer.");
+    } else if (m.surprise > 0) {
+      setParty("p-lend", "lose", "Is repaid in dollars that buy less than expected. Real return " + pct(m.exPost) + " instead of " + pct(m.exAnte) + ".");
+      setParty("p-borr", "win", "Repays with cheaper dollars. The real cost of borrowing fell by " + f(gap) + " points.");
+    } else {
+      setParty("p-lend", "win", "Is repaid in dollars that buy more than expected. Real return " + pct(m.exPost) + " instead of " + pct(m.exAnte) + ".");
+      setParty("p-borr", "lose", "Repays with dollars worth more than expected. The real cost of borrowing rose by " + f(gap) + " points.");
+    }
+    var P = 1000;
+    document.getElementById("dollars").innerHTML =
+      '<div class="row"><span>Borrower repays (nominal)</span><span>' + money(P * (1 + m.i / 100)) + '</span></div>' +
+      '<div class="row"><span>Planned real interest (' + pct(m.exAnte) + ' of $1,000)</span><span>' + money(P * m.exAnte / 100) + '</span></div>' +
+      '<div class="row"><span>Actual real interest (' + pct(m.exPost) + ' of $1,000)</span><span>' + money(P * m.exPost / 100) + '</span></div>' +
+      '<div class="row"><span>' + (gap < 1e-9 ? "Purchasing power moved between them" : m.surprise > 0 ? "Purchasing power moved from lender to borrower" : "Purchasing power moved from borrower to lender") + '</span><span>about ' + money(P * gap / 100) + '</span></div>';
+  }
+
+  // ---------- Story ----------
+  function story(m, s) {
+    var h = "<p><b>Step 1, the deal.</b> The lender wants a " + pct(s.r) + " real return and both sides expect " + pct(s.pe) + " inflation, so they agree on a nominal rate of " + pct(s.r) + " + " + pct(s.pe) + " = <b>" + pct(m.i) + "</b>. The ex ante (planned) real rate is " + pct(m.i) + " − " + pct(s.pe) + " = " + pct(m.exAnte) + ".</p>";
+    h += "<p><b>Step 2, what happened.</b> Actual inflation is " + pct(s.pa) + ", so the ex post (realized) real rate is " + pct(m.i) + " − " + (s.pa < 0 ? "(" + pct(s.pa) + ")" : pct(s.pa)) + " = <b>" + pct(m.exPost) + "</b>.</p>";
+    var gap = Math.abs(m.surprise), lines = [];
+    if (gap < 1e-9) {
+      h += "<p><b>No surprise, no redistribution.</b> Inflation matched expectations, so the ex post real rate equals the ex ante real rate. The inflation was anticipated and built into the nominal rate, so neither side gains at the other's expense.</p>";
+    } else if (m.surprise > 0) {
+      h += "<p><b>Unanticipated inflation: the borrower gains, the lender loses.</b> Inflation was " + f(gap) + " points higher than expected. The borrower repays the same nominal dollars, but each dollar buys less, so the real rate fell from " + pct(m.exAnte) + " to " + pct(m.exPost) + ".</p>";
+      if (m.exPost < 0) lines.push("The ex post real rate is negative. The lender gets back more dollars but less purchasing power than it lent.");
+      lines.push("AP answer: \"Borrowers benefit because they repay the loan with dollars that have less purchasing power than expected; lenders are hurt.\"");
+    } else {
+      h += "<p><b>Inflation lower than expected: the lender gains, the borrower loses.</b> Inflation was " + f(gap) + " points lower than expected. Each dollar repaid buys more than planned, so the real rate rose from " + pct(m.exAnte) + " to " + pct(m.exPost) + ".</p>";
+      if (s.pa < 0) lines.push("Prices actually fell (deflation). Subtracting a negative inflation rate adds to the real rate.");
+      lines.push("AP answer: \"Lenders benefit because they are repaid with dollars that have more purchasing power than expected; borrowers are hurt.\"");
+    }
+    if (s.pe >= 5 && gap < 1e-9) lines.push("Fisher effect: high expected inflation produced a high nominal rate, yet the real rate is still " + pct(m.exAnte) + ". Raise expected inflation and the nominal rate rises one-for-one.");
+    if (lines.length) h += "<ul>" + lines.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    return h;
+  }
+
+  // ---------- Controls ----------
+  var elR = document.getElementById("s-r"), elPE = document.getElementById("s-pe"), elPA = document.getElementById("s-pa");
+  function render() {
+    var m = model(S);
+    elR.value = S.r; elPE.value = S.pe; elPA.value = S.pa;
+    document.getElementById("o-r").textContent = pct(S.r);
+    document.getElementById("o-pe").textContent = pct(S.pe);
+    document.getElementById("o-pa").textContent = pct(S.pa);
+    drawBars(m, S); drawParties(m, S);
+    document.getElementById("r-i").textContent = pct(m.i);
+    document.getElementById("r-ea").textContent = pct(m.exAnte);
+    document.getElementById("r-ep").textContent = pct(m.exPost);
+    var g = document.getElementById("r-s");
+    g.innerHTML = Math.abs(m.surprise) < 1e-9 ? '<span class="pill rec">none</span>' : m.surprise > 0 ? '<span class="pill infl">' + pp(m.surprise) + ' higher</span>' : '<span class="pill lr">' + pp(m.surprise) + ' lower</span>';
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  elR.addEventListener("input", function () { S.r = parseFloat(elR.value); render(); });
+  elPE.addEventListener("input", function () { S.pe = parseFloat(elPE.value); render(); });
+  elPA.addEventListener("input", function () { S.pa = parseFloat(elPA.value); render(); });
+  document.getElementById("btn-match").addEventListener("click", function () { S.pa = S.pe; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Inflation as expected", { r: 3, pe: 2, pa: 2 }],
+    ["Surprise inflation", { r: 3, pe: 2, pa: 5 }],
+    ["Inflation runs far ahead (negative real rate)", { r: 2, pe: 3, pa: 9 }],
+    ["Inflation lower than expected", { r: 3, pe: 4, pa: 1 }],
+    ["Surprise deflation", { r: 3, pe: 2, pa: -1 }],
+    ["Fisher effect: high expected inflation", { r: 3, pe: 8, pa: 8 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- AP calculator ----------
+  var C = { mode: "real", a: 5, b: 3, text: "" };
+  var PRE = [
+    ["Savings account", "real", 5, 3, "A bank pays a 5% nominal interest rate on savings accounts. The inflation rate is 3%. What is the real interest rate?"],
+    ["Negative real rate", "real", 2, 4, "A bond pays a 2% nominal interest rate. Inflation is 4% during the year. What real interest rate does the bondholder earn?"],
+    ["After the fact", "real", 9, 6, "A loan carries a 9% nominal interest rate. Inflation turns out to be 6%. What real interest rate did the lender actually earn (the ex post real rate)?"],
+    ["Set the loan rate", "nom", 4, 3, "A bank wants to earn a 4% real interest rate on a loan. It expects inflation of 3%. What nominal interest rate should it charge?"],
+    ["Fisher effect", "nom", 3, 5, "Expected inflation rises from 2% to 5%. A lender still wants a 3% real return. What nominal interest rate should it now charge?"]
+  ];
+  var elA = document.getElementById("c-a"), elB = document.getElementById("c-b");
+  var bReal = document.getElementById("m-real"), bNom = document.getElementById("m-nom");
+  function num(v) { return (v < 0 ? "(" + pct(v) + ")" : pct(v)); }
+  function renderCalc() {
+    var real = C.mode === "real";
+    bReal.setAttribute("aria-pressed", real); bNom.setAttribute("aria-pressed", !real);
+    document.getElementById("c-a-lbl").textContent = real ? "Nominal interest rate (%)" : "Real rate the lender wants (%)";
+    document.getElementById("c-b-lbl").textContent = real ? "Inflation rate (%)" : "Expected inflation (%)";
+    elA.value = C.a; elB.value = C.b;
+    document.getElementById("problem").textContent = C.text || (real ? "Your numbers: find the real interest rate from a nominal rate and an inflation rate." : "Your numbers: find the nominal rate a lender should charge.");
+    var steps, ans, say;
+    if (real) {
+      ans = C.a - C.b;
+      document.getElementById("c-formula").textContent = "real rate = nominal rate − inflation rate";
+      steps = [["Write the formula", "r = i − π"], ["Substitute", "r = " + pct(C.a) + " − " + num(C.b)], ["Real interest rate", pct(ans)]];
+      say = ans > 0 ? "The lender's or saver's purchasing power grows about " + pct(ans) + " a year." : ans < 0 ? "The real rate is negative: the lender or saver gets more dollars back but loses about " + pct(-ans) + " of purchasing power. Borrowers benefit." : "The real rate is zero: the interest just keeps up with inflation, so purchasing power does not change.";
+    } else {
+      ans = C.a + C.b;
+      document.getElementById("c-formula").textContent = "nominal rate = real rate + expected inflation";
+      steps = [["Write the formula", "i = r + πᵉ"], ["Substitute", "i = " + pct(C.a) + " + " + num(C.b)], ["Nominal rate to charge", pct(ans)]];
+      say = "If inflation turns out to be " + pct(C.b) + ", the lender earns its " + pct(C.a) + " real return. If inflation is higher, the borrower gains; if lower, the lender gains.";
+    }
+    document.getElementById("c-steps").innerHTML = steps.map(function (r) { return '<div class="row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>'; }).join("");
+    document.getElementById("c-say").textContent = say;
+  }
+  function readNum(el, fallback) { var v = parseFloat(el.value); return isFinite(v) ? Math.max(-50, Math.min(100, v)) : fallback; }
+  elA.addEventListener("input", function () { C.a = readNum(elA, C.a); C.text = ""; renderCalc(); });
+  elB.addEventListener("input", function () { C.b = readNum(elB, C.b); C.text = ""; renderCalc(); });
+  bReal.addEventListener("click", function () { C.mode = "real"; C.text = ""; renderCalc(); });
+  bNom.addEventListener("click", function () { C.mode = "nom"; C.text = ""; renderCalc(); });
+  var pr = document.getElementById("presets");
+  PRE.forEach(function (p) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p[0];
+    b.addEventListener("click", function () { C = { mode: p[1], a: p[2], b: p[3], text: p[4] }; renderCalc(); });
+    pr.appendChild(b);
+  });
+  C = { mode: PRE[0][1], a: PRE[0][2], b: PRE[0][3], text: PRE[0][4] };
+  renderCalc();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "A savings account pays a nominal interest rate of 8%. The inflation rate is 3%. What is the real interest rate?", o: ["11%", "5%", "2.67%", "−5%"], c: 1, w: "Real interest rate = nominal rate − inflation rate = 8% − 3% = 5%. Adding gives 11%, which is the mistake of treating inflation as extra return. Dividing (8 ÷ 3) is not how AP computes the real rate." },
+    { s: "A lender wants to earn a real interest rate of 4% and expects inflation of 2%. What nominal interest rate should the lender charge?", o: ["2%", "8%", "4%", "6%"], c: 3, w: "By the Fisher equation, nominal rate = real rate + expected inflation = 4% + 2% = 6%. Charging 2% (subtracting) would give a real return of 0%." },
+    { s: "A bank makes a fixed-rate loan. Inflation then turns out to be higher than both sides expected. Which of the following is true?", o: ["The borrower gains and the bank loses, because the loan is repaid with dollars that have less purchasing power", "The bank gains and the borrower loses, because the nominal interest rate rises automatically", "Neither gains, because the nominal rate already included inflation", "Both gain, because nominal incomes rise with inflation"], c: 0, w: "Unanticipated inflation lowers the ex post real interest rate. The borrower repays dollars that buy less than expected, so purchasing power moves from the lender to the borrower. Only expected inflation is built into the nominal rate, so C is wrong here." },
+    { s: "According to the Fisher effect, if expected inflation rises by 2 percentage points, what happens?", o: ["The nominal interest rate stays the same and the real interest rate falls by 2 points", "The nominal and real interest rates both rise by 2 points", "The nominal interest rate rises by 2 points and the expected real interest rate is unchanged", "The real interest rate rises by 2 points and the nominal rate is unchanged"], c: 2, w: "Lenders add expected inflation to the real return they require, so the nominal rate rises one-for-one with expected inflation. The expected real rate stays the same." },
+    { s: "A loan is made at a 7% nominal interest rate when both sides expect 3% inflation. Actual inflation turns out to be 5%. What is the ex post real interest rate?", o: ["4%", "−2%", "12%", "2%"], c: 3, w: "The ex post real rate uses actual inflation: 7% − 5% = 2%. The 4% answer is the ex ante (planned) real rate, which uses expected inflation: 7% − 3%." },
+    { s: "Which graph has the nominal interest rate on its vertical axis?", o: ["The loanable funds market", "The money market", "The aggregate demand and aggregate supply model", "The production possibilities curve"], c: 1, w: "The money market graph plots the nominal interest rate against the quantity of money. The loanable funds market uses the real interest rate, which is the tempting wrong answer." },
+    { s: "Inflation turns out to be lower than borrowers and lenders expected when they signed fixed-rate loans. Who is hurt?", o: ["Borrowers, because they repay with dollars that have more purchasing power than expected", "Lenders, because they receive less interest than expected", "Neither, because the nominal interest rate was fixed", "Savers, because the real interest rate falls"], c: 0, w: "Lower-than-expected inflation raises the ex post real interest rate above the ex ante rate. Borrowers pay a higher real cost than they planned, and lenders gain. The real rate rises, so D has the direction backward." },
+    { s: "A saver earns a 2% nominal interest rate while the inflation rate is 4%. What happens to the purchasing power of her savings over the year?", o: ["It rises by about 6%", "It rises by about 2%", "It falls by about 2%", "It does not change, because the nominal rate is positive"], c: 2, w: "Real interest rate = 2% − 4% = −2%. She has more dollars at the end of the year, but they buy about 2% less. A positive nominal rate does not guarantee a gain in purchasing power." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("4.2");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [4], topic: "4.2", compact: true, storageKey: "topic-4.2" });</script>
+</body>
+</html>

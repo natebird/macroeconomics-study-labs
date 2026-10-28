@@ -163,7 +163,9 @@
           lastU = u;
         }
         if (!opts.topic && tp !== lastT) {
-          body.appendChild(h("h4", { "class": "g-tp", id: anchor(tp) }, [h("span", { "class": "g-tpn", text: tp }), " " + UNITS[u].topics[tp]]));
+          var lab = window.Lab && Lab.READY.indexOf(u) >= 0 ? Lab.TOPICS.filter(function (z) { return z.id === tp; })[0] : null;
+          body.appendChild(h("h4", { "class": "g-tp", id: anchor(tp) }, [h("span", { "class": "g-tpn", text: tp }), " " + UNITS[u].topics[tp],
+            lab ? h("a", { "class": "g-lablink", href: (opts.labBase || "../labs/") + lab.file, text: "Open the lab \u2192" }) : null]));
           lastT = tp; grid = null;
         }
         if (!grid) { grid = h("div", { "class": "g-grid" }); body.appendChild(grid); }

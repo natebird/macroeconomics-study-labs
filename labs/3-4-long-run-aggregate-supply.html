@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Long-Run Aggregate Supply Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.controls.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.mode-row { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: end; }
+.mode-row .ctl { min-width: 240px; flex: 1 1 260px; max-width: 420px; }
+.stat .v .pill { margin-left: 6px; vertical-align: middle; }
+@media (max-width: 860px) { .controls.five { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .controls.five { grid-template-columns: 1fr; } .seg { border-radius: 10px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.4</span>
+  <h1>The Long-Run Aggregate Supply Study Lab</h1>
+  <p class="lede">Long-run aggregate supply (LRAS) shows how much real GDP the economy produces once every price and wage has adjusted. It is a vertical line at full-employment output, and it moves only when the economy's resources or technology change. Use the lab to shift the PPC and LRAS together, then switch between the short run and the long run to see why LRAS ignores the price level.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Linked graphs: PPC and AD–AS</h2>
+    <p>Both graphs describe the same economy. Dashed grey lines show where it started (full-employment output Yf = 100, price level 100, unemployment at a natural rate of 5%). Solid lines show where it is now.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Production possibilities curve <small>capital vs. consumer goods</small></h3>
+      <svg class="chart" id="ppc" role="img" aria-label="Production possibilities curve with the economy's current point"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD-AS graph with a vertical LRAS curve"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-lrpc">PPC / LRAS</span><span class="l-srpc">SRAS</span><span class="l-ad">AD</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Resources and technology (shift the PPC and LRAS)</div>
+      <div class="controls five">
+        <div class="ctl">
+          <label for="s-lab">Labor force <output id="o-lab"></output></label>
+          <input type="range" id="s-lab" min="-2" max="2" step="1">
+          <span class="hint">Number of workers available</span>
+        </div>
+        <div class="ctl">
+          <label for="s-cap">Physical capital <output id="o-cap"></output></label>
+          <input type="range" id="s-cap" min="-2" max="2" step="1">
+          <span class="hint">Factories, machines, tools</span>
+        </div>
+        <div class="ctl">
+          <label for="s-hum">Human capital <output id="o-hum"></output></label>
+          <input type="range" id="s-hum" min="-2" max="2" step="1">
+          <span class="hint">Education, skills, training</span>
+        </div>
+        <div class="ctl">
+          <label for="s-nat">Natural resources <output id="o-nat"></output></label>
+          <input type="range" id="s-nat" min="-2" max="2" step="1">
+          <span class="hint">Land, minerals, energy supplies</span>
+        </div>
+        <div class="ctl">
+          <label for="s-tech">Technology <output id="o-tech"></output></label>
+          <input type="range" id="s-tech" min="-2" max="2" step="1">
+          <span class="hint">Better ways to combine inputs</span>
+        </div>
+      </div>
+    </div>
+    <div class="mode-row">
+      <div class="ctl">
+        <label for="s-ad">Aggregate demand <output id="o-ad"></output></label>
+        <input type="range" id="s-ad" min="-2" max="2" step="0.5">
+        <span class="hint">Spending changes. Not a resource, so it never moves LRAS.</span>
+      </div>
+      <div style="display:grid; gap:6px;">
+        <span style="font-size:.86rem; font-weight:500;">Time horizon</span>
+        <div class="seg" role="group" aria-label="Time horizon">
+          <button type="button" id="mode-sr" aria-pressed="true">Short run (wages sticky)</button>
+          <button type="button" id="mode-lr" aria-pressed="false">Long run (all prices and wages adjust)</button>
+        </div>
+      </div>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Full-employment output (Yf)</div><div class="v" id="r-yf">100.0</div></div>
+    <div class="stat"><div class="k">Real GDP</div><div class="v" id="r-y">100.0</div></div>
+    <div class="stat"><div class="k">Price level</div><div class="v" id="r-p">100.0</div></div>
+    <div class="stat"><div class="k">Unemployment rate (natural rate 5%)</div><div class="v" id="r-u">5.0%</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Long-run aggregate supply</h3><p>LRAS is a vertical line at full-employment output (Yf). It shows that in the long run the amount of real GDP the economy produces does not depend on the price level.</p></div>
+    <div class="card"><span class="tag">Why vertical</span><h3>Every price adjusts</h3><p>In the long run, nominal wages and other input prices have time to catch up with the price level. If all prices and wages rise 10%, firms' real costs and real revenues are unchanged, so they produce the same amount. Output depends on resources and technology, not on the price level.</p></div>
+    <div class="card"><span class="tag">Yf</span><h3>Full-employment output</h3><p>Also called potential output. It is the real GDP the economy produces when it uses its resources at normal, sustainable rates. Real GDP below Yf is a recessionary gap; above Yf is an inflationary gap.</p></div>
+    <div class="card"><span class="tag">u = frictional + structural</span><h3>Natural rate of unemployment</h3><p>At full employment, unemployment is not zero. It equals the natural rate: frictional plus structural unemployment, with zero cyclical unemployment. In a recessionary gap, cyclical unemployment pushes the rate above the natural rate.</p></div>
+    <div class="card"><span class="tag">PPC link</span><h3>Same idea, two graphs</h3><p>A point on the PPC matches output at LRAS: full employment. A point inside the PPC matches a recessionary gap: idle workers and machines. An outward PPC shift matches LRAS shifting right.</p></div>
+    <div class="card"><span class="tag">Shifters</span><h3>What moves LRAS</h3><p>Changes in the quantity or quality of resources (labor, physical capital, human capital, natural resources) and changes in technology. A change in the price level, in AD, or in input prices does not shift LRAS.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Does it shift LRAS? Cheat sheet</h2>
+    <p>Memorize the pattern: if the economy's capacity to produce changes, the PPC and LRAS move together. If only spending or prices change, they stay put.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>PPC</th><th>LRAS</th><th>Full-employment output (Yf)</th></tr></thead>
+    <tbody>
+      <tr><td>Labor force grows (more working-age people, immigration)</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Right</span></td><td>↑</td></tr>
+      <tr><td>Firms invest in new factories and equipment</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Right</span></td><td>↑</td></tr>
+      <tr><td>Workers gain education and training (human capital)</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Right</span></td><td>↑</td></tr>
+      <tr><td>Discovery of new natural resources</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Right</span></td><td>↑</td></tr>
+      <tr><td>Improvement in technology</td><td><span class="lshift">Shifts outward</span></td><td><span class="lshift">Right</span></td><td>↑</td></tr>
+      <tr><td>Natural disaster or war destroys capital</td><td><span class="shift">Shifts inward</span></td><td><span class="shift">Left</span></td><td>↓</td></tr>
+      <tr><td>Consumer or business pessimism (AD falls)</td><td>No shift; point moves inside</td><td>No shift</td><td>No change (recessionary gap in the short run)</td></tr>
+      <tr><td>Nominal wages or other input prices rise</td><td>No shift</td><td>No shift (SRAS shifts left)</td><td>No change</td></tr>
+      <tr><td>The price level rises</td><td>No shift</td><td>No shift (movement along AD and SRAS)</td><td>No change</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price level</b>. Horizontal axis: <b>Real GDP</b> (or Real output). Never "Quantity" or "Price."</li>
+        <li>Draw LRAS as a vertical line and label <b>Yf</b> where it meets the horizontal axis.</li>
+        <li>To show growth, draw <b>LRAS₂</b> to the right of LRAS₁, add an arrow, and label the new full-employment output Yf₂.</li>
+        <li>On a PPC, label both axes with goods (for example, Capital goods and Consumer goods). Show growth with an outward shift labeled PPC₂. Show unemployment with a point inside the curve.</li>
+        <li>When asked why LRAS is vertical, write: "In the long run, nominal wages and all other prices fully adjust, so real output depends on resources and technology, not on the price level."</li>
+        <li>For a recessionary gap, mark real GDP (Y₁) to the left of Yf and say unemployment is above the natural rate.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting LRAS when AD changes. A change in spending moves the economy along or away from LRAS; LRAS stays at Yf.</li>
+        <li>Saying full employment means 0% unemployment. At Yf, unemployment equals the natural rate.</li>
+        <li>Showing a recession as an inward PPC shift. A recession is a point <b>inside</b> the PPC; the economy's capacity has not changed.</li>
+        <li>Shifting LRAS for a change in nominal wages or oil prices. Input prices shift SRAS.</li>
+        <li>Drawing LRAS with a slope. It is vertical because output in the long run does not respond to the price level.</li>
+        <li>Mixing up the natural rate with cyclical unemployment. Cyclical unemployment is zero at Yf.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.4. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+  var KEYS = ["lab", "cap", "hum", "nat", "tech"];
+  var BASE = { lab: 0, cap: 0, hum: 0, nat: 0, tech: 0, ad: 0, mode: "sr", adj: 1 };
+  var S = Object.assign({}, BASE);
+  var STEP = 0.3;        // LRAS shift per slider step (graph units)
+  var NAT = 5;           // natural rate of unemployment (%)
+  var THETA = 0.75;      // where the economy sits along its PPC
+
+  // ---------- Model ----------
+  // Graph space 0..10. LRAS at x = 5 + L. Resource changes move SRAS with LRAS so that,
+  // with AD unchanged, the new short-run equilibrium sits on the new LRAS.
+  // Short run: nominal wages are sticky, so an AD change moves output away from Yf.
+  // Long run: wages adjust and SRAS shifts until output returns to Yf; only the price level changes.
+  function model(s) {
+    var L = 0; KEYS.forEach(function (k) { L += STEP * s[k]; });
+    var a = s.ad;
+    var t = s.mode === "lr" ? s.adj : 0;
+    var ss = 2 * L - t * a;
+    var x = 5 + (a + ss) / 2, y = 5 + 0.8 * (a - ss) / 2;
+    var Yf = 100 + 8 * L, Y = 100 + 8 * (x - 5), P = 100 + 8 * (y - 5);
+    var gap = (Y - Yf) / Yf * 100;
+    var u = NAT - 0.4 * gap;
+    return { L: L, a: a, ss: ss, x: x, y: y, Yf: Yf, Y: Y, P: P, gap: gap, u: u, t: t };
+  }
+  function gapKind(m) { return m.gap < -0.05 ? "rec" : m.gap > 0.05 ? "infl" : "full"; }
+
+  // ---------- Graphs ----------
+  var svgPPC = document.getElementById("ppc"), svgAD = document.getElementById("adas");
+
+  function drawPPC(m) {
+    var g = m.Yf / 100, X = 8 * g, moved = Math.abs(g - 1) > 1e-9;
+    var r = m.gap < 0 ? 1 + 2.2 * m.gap / 100 : 1;   // schematic: a recessionary gap sits inside; an inflationary gap stays on the curve
+    var px = X * Math.sin(THETA) * r, py = X * Math.cos(THETA) * r;
+    var kind = gapKind(m);
+    Lab.ppc(svgPPC, {
+      xLabel: "Consumer goods", yLabel: "Capital goods",
+      xMax: X, yMax: X, start: { xMax: 8, yMax: 8 }, bowed: true,
+      curveLabel: moved ? "PPC₂" : "PPC",
+      point: [px, py],
+      extra: function (F) {
+        if (moved) {
+          Lab.tag(F, 8 * Math.sin(1.32) + (g > 1 ? -0.3 : 0.3), 8 * Math.cos(1.32) + (g > 1 ? -0.5 : 0.5), "PPC₁", "var(--muted)", g > 1 ? "end" : "start");
+          var th = 0.35;
+          Lab.arrow(F, 8 * Math.sin(th), 8 * Math.cos(th), X * Math.sin(th), X * Math.cos(th), g > 1 ? "var(--lrpc)" : "var(--bad)");
+        }
+        var lbl = kind === "rec" ? "Inside: recessionary gap" : kind === "infl" ? "On the PPC, resources overused" : "On PPC: full employment";
+        var col = kind === "rec" ? "var(--accent)" : kind === "infl" ? "var(--bad)" : "var(--ink)";
+        Lab.tag(F, 0.35, py * 0.45, lbl, col, "start");
+      }
+    });
+  }
+
+  function drawADAS(m) {
+    var movedL = Math.abs(m.L) > 1e-9, movedS = Math.abs(m.ss) > 1e-9, movedA = Math.abs(m.a) > 1e-9;
+    var kind = gapKind(m);
+    var moved = movedL || movedS || movedA;
+    var onLRAS = Math.abs(m.x - (5 + m.L)) < 0.02;
+    var xl = onLRAS ? (movedL ? "Yf₂" : moved ? "Yf" : "Y₁ = Yf") : (moved ? "Y₂" : "Y₁");
+    Lab.market(svgAD, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: m.a, label: movedA ? "AD₂" : "AD" },
+      supply: { shift: m.ss, label: movedS ? "SRAS₂" : "SRAS" },
+      longRun: { shift: m.L, label: movedL ? "LRAS₂" : "LRAS" },
+      start: { demand: 0, supply: 0, longRun: 0 },
+      eqLabels: [xl, moved ? "PL₂" : "PL₁"],
+      startLabels: [movedL && Math.abs(m.x - 5) > 0.5 ? "Yf₁" : "", "PL₁"],
+      arrows: false,
+      extra: function (F, eq, C) {
+        if (movedL) {
+          Lab.tag(F, m.L > 0 ? 4.85 : 5.15, 9.5, "LRAS₁", "var(--muted)", m.L > 0 ? "end" : "start");
+          Lab.arrow(F, 5, 8.7, 5 + m.L, 8.7, m.L > 0 ? "var(--lrpc)" : "var(--bad)");
+        }
+        if (movedA) { var yA = 7.6; Lab.arrow(F, 5 - (yA - 5) / 0.8, yA, 5 + m.a - (yA - 5) / 0.8, yA, "var(--muted)"); }
+        if (movedS) { var yS = 2.6, x0 = 5 + (yS - 5) / 0.8, x1 = 5 + m.ss + (yS - 5) / 0.8; if (x1 > 0.3 && x1 < 9.7) Lab.arrow(F, x0, yS, x1, yS, "var(--muted)"); }
+        if (!onLRAS) {
+          var xf = 5 + m.L;
+          Lab.line(F, [[Math.min(eq.x, xf), 0.45], [Math.max(eq.x, xf), 0.45]], kind === "rec" ? "var(--accent)" : "var(--bad)", 5);
+          Lab.tag(F, (eq.x + xf) / 2, 0.85, kind === "rec" ? "Recessionary gap" : "Inflationary gap", kind === "rec" ? "var(--accent)" : "var(--bad)", "middle");
+          if (Math.abs(eq.x - xf) > 0.5 && (!movedL || Math.abs(xf - 5) > 0.5))
+            Lab.el("text", { x: F.sx(xf), y: F.H - F.M.b + 16, "text-anchor": "middle", style: "fill:var(--lrpc); font-weight:600" }, F.svg, movedL ? "Yf₂" : "Yf");
+        }
+      }
+    });
+  }
+
+  // ---------- Story ----------
+  var NAMES = { lab: "Labor force", cap: "Physical capital", hum: "Human capital", nat: "Natural resources", tech: "Technology" };
+  var UP = { lab: "More workers are available, so the economy can produce more.",
+    cap: "Workers have more machines and tools, so each one produces more.",
+    hum: "Better-educated, better-trained workers produce more per hour.",
+    nat: "More land, minerals, or energy supplies are available as inputs.",
+    tech: "Better methods let the same workers and machines produce more." };
+  var DOWN = { lab: "Fewer workers are available, so the economy can produce less.",
+    cap: "Capital was destroyed or wore out, so workers have fewer tools.",
+    hum: "Workers lost skills or training, so each produces less.",
+    nat: "Fewer natural resources are available as inputs.",
+    tech: "Productive methods were lost or blocked." };
+
+  function story(m, s) {
+    var parts = [];
+    var resList = [];
+    KEYS.forEach(function (k) {
+      if (s[k] > 0) resList.push("<b>" + NAMES[k] + " up.</b> " + UP[k]);
+      if (s[k] < 0) resList.push("<b>" + NAMES[k] + " down.</b> " + DOWN[k]);
+    });
+    var kind = gapKind(m);
+    if (Math.abs(m.L) < 1e-9 && Math.abs(m.a) < 1e-9) {
+      parts.push("<p><b>Starting point.</b> The economy is on its PPC and producing at full-employment output, Yf = 100, where AD, SRAS, and LRAS meet. Unemployment equals the natural rate of 5%: frictional and structural unemployment only, with no cyclical unemployment.</p>");
+      parts.push("<p>Move a resource or technology slider to shift the PPC and LRAS. Move the AD slider to see what does <b>not</b> shift LRAS.</p>");
+      return parts.join("");
+    }
+    if (Math.abs(m.L) > 1e-9) {
+      var dir = m.L > 0;
+      parts.push("<p><b>" + (dir ? "The economy's capacity grew." : "The economy's capacity shrank.") + "</b> The PPC shifts <b>" + (dir ? "outward" : "inward") + "</b> and LRAS shifts <b>" + (dir ? "right" : "left") + "</b>. Full-employment output " + (dir ? "rises" : "falls") + " from 100 to <b>" + f(m.Yf) + "</b>. Both graphs show the same change: the economy can now produce " + (dir ? "more" : "less") + " when its resources are fully employed.</p>");
+    } else {
+      parts.push("<p><b>Resources and technology are unchanged,</b> so the PPC and LRAS stay where they are. Full-employment output is still " + f(m.Yf) + ".</p>");
+    }
+    if (resList.length) parts.push("<ul>" + resList.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>");
+
+    if (Math.abs(m.a) > 1e-9) {
+      var up = m.a > 0;
+      if (s.mode === "sr") {
+        if (kind === "rec") parts.push("<p><b>Short run: AD fell and wages are sticky.</b> Real GDP drops to " + f(m.Y) + ", below Yf. That is a <b>recessionary gap</b>. On the PPC the economy sits <b>inside</b> the curve: workers and machines are idle. Unemployment rises to " + f(m.u) + "%, above the natural rate, because cyclical unemployment appears. The PPC and LRAS do not move: the economy can still produce " + f(m.Yf) + "; it just is not doing so.</p>");
+        else parts.push("<p><b>Short run: AD rose and wages are sticky.</b> Real GDP rises to " + f(m.Y) + ", above Yf. That is an <b>inflationary gap</b>. Output is above Yf because resources are used beyond their normal rates: firms run overtime and extra shifts. Unemployment falls to " + f(m.u) + "%, below the natural rate. The point stays on the PPC, but the economy cannot stay there in the long run. LRAS does not move.</p>");
+        parts.push("<p>Switch to <b>Long run</b> to let nominal wages adjust.</p>");
+      } else {
+        parts.push("<p><b>Long run: wages and prices adjust.</b> " + (up
+          ? "With output above Yf, workers are scarce, so nominal wages and other input prices rise. SRAS shifts <b>left</b>"
+          : "With output below Yf, workers are plentiful, so nominal wages and other input prices fall. SRAS shifts <b>right</b>") +
+          " until the economy is back on LRAS. Real GDP returns to <b>" + f(m.Y) + "</b> and unemployment returns to the natural rate of " + f(m.u) + "%. Only the price level changed: it is now <b>" + f(m.P) + "</b>.</p>");
+        parts.push("<p><b>This is why LRAS is vertical.</b> When every price and wage has adjusted, a change in AD changes the price level but not real GDP. Long-run output is set by resources and technology.</p>");
+      }
+    } else if (Math.abs(m.L) > 1e-9) {
+      parts.push("<p>With AD unchanged, the new equilibrium is on LRAS₂ at real GDP " + f(m.Y) + ", and the price level " + (m.P < 100 ? "falls" : "rises") + " to " + f(m.P) + ". The economy stays on its PPC and unemployment stays at the natural rate of " + f(m.u) + "%. On the AP exam, show this change by shifting LRAS (and the PPC); shifting SRAS with it is also correct.</p>");
+    }
+    return parts.join("");
+  }
+
+  // ---------- Controls ----------
+  var stopAnim = function () {};
+  function signed(v, d) { return v === 0 ? "start" : (v > 0 ? "+" : "−") + (d ? f(Math.abs(v)) : Math.abs(v)); }
+  function render() {
+    var m = model(S);
+    KEYS.forEach(function (k) { document.getElementById("s-" + k).value = S[k]; document.getElementById("o-" + k).textContent = signed(S[k]); });
+    document.getElementById("s-ad").value = S.ad;
+    document.getElementById("o-ad").textContent = S.ad === 0 ? "start" : (S.ad > 0 ? "rises " : "falls ") + f(Math.abs(S.ad));
+    document.getElementById("mode-sr").setAttribute("aria-pressed", S.mode === "sr");
+    document.getElementById("mode-lr").setAttribute("aria-pressed", S.mode === "lr");
+    drawPPC(m); drawADAS(m);
+    var kind = gapKind(m);
+    document.getElementById("r-yf").textContent = f(m.Yf);
+    document.getElementById("r-y").innerHTML = f(m.Y) + (kind === "rec" ? '<span class="pill rec">Recessionary gap</span>' : kind === "infl" ? '<span class="pill infl">Inflationary gap</span>' : '<span class="pill lr">At Yf</span>');
+    document.getElementById("r-p").textContent = f(m.P);
+    document.getElementById("r-u").textContent = f(m.u) + "%";
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  function setState(next, animateAdj) {
+    stopAnim();
+    S = next;
+    if (animateAdj && S.mode === "lr" && S.ad !== 0) {
+      stopAnim = Lab.animate(900, function (t) { S.adj = t; render(); });
+    } else { S.adj = 1; render(); }
+  }
+  KEYS.concat(["ad"]).forEach(function (k) {
+    document.getElementById("s-" + k).addEventListener("input", function (e) {
+      stopAnim(); S[k] = parseFloat(e.target.value); S.adj = 1; render();
+    });
+  });
+  document.getElementById("mode-sr").addEventListener("click", function () { setState(Object.assign({}, S, { mode: "sr" }), false); });
+  document.getElementById("mode-lr").addEventListener("click", function () {
+    var was = S.mode; setState(Object.assign({}, S, { mode: "lr", adj: 0 }), was !== "lr");
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { setState(Object.assign({}, BASE), false); });
+
+  var scen = [
+    ["Labor force grows", { lab: 2 }],
+    ["New technology", { tech: 2 }],
+    ["More schooling and training", { hum: 2 }],
+    ["Natural disaster destroys capital", { cap: -2, nat: -1 }],
+    ["Spending falls (short run)", { ad: -1.5, mode: "sr" }],
+    ["Spending falls, then wages adjust", { ad: -1.5, mode: "lr" }],
+    ["Spending boom, then wages adjust", { ad: 1.5, mode: "lr" }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { setState(Object.assign({}, BASE, x[1], { adj: 0 }), true); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Why is the long-run aggregate supply curve vertical?", o: ["In the long run, prices and wages are sticky and cannot change", "In the long run, nominal wages and other input prices fully adjust to the price level, so real output depends on resources and technology", "In the long run, aggregate demand cannot change", "In the long run, the government sets the level of real GDP"], c: 1, w: "Once wages and input prices have caught up with the price level, firms' real costs and revenues are the same as before, so they produce the same output. Option A describes the short run, which is why SRAS slopes upward." },
+    { s: "Which of the following would shift the long-run aggregate supply curve to the right?", o: ["An increase in the price level", "An increase in government spending", "A decrease in nominal wages", "An increase in the labor force through immigration"], c: 3, w: "More workers is an increase in the quantity of resources, so full-employment output rises. A lower nominal wage is tempting, but input prices shift SRAS, not LRAS. Government spending shifts AD, and the price level causes movements along curves." },
+    { s: "An economy is producing at a point inside its production possibilities curve. On an AD–AS graph, this economy is:", o: ["Producing below full-employment output, with unemployment above the natural rate", "Producing at full-employment output, with unemployment equal to the natural rate", "Producing above full-employment output, with unemployment below the natural rate", "Experiencing a leftward shift of LRAS"], c: 0, w: "A point inside the PPC means some resources are idle. That matches real GDP below Yf (a recessionary gap) with cyclical unemployment. The PPC and LRAS have not shifted; the economy is just not using all its capacity." },
+    { s: "In an economy, frictional unemployment is 2%, structural unemployment is 3%, and the actual unemployment rate is 8%. Which statement is correct?", o: ["The natural rate is 8% and the economy is at full employment", "Cyclical unemployment is 5% and real GDP is above full-employment output", "Cyclical unemployment is 3% and real GDP is below full-employment output", "The natural rate is 3% and real GDP equals full-employment output"], c: 2, w: "Natural rate = frictional + structural = 2% + 3% = 5%. Cyclical unemployment = 8% − 5% = 3%. Positive cyclical unemployment means real GDP is below Yf, a recessionary gap." },
+    { s: "An economy starts at full employment. Aggregate demand increases. After all wages and prices have adjusted, compared with the starting point:", o: ["Real GDP is higher and the price level is unchanged", "Real GDP is unchanged and the price level is higher", "Real GDP is higher and the price level is higher", "Real GDP and the price level are both unchanged"], c: 1, w: "In the short run output rises above Yf. Then nominal wages rise, SRAS shifts left, and the economy returns to LRAS. In the long run, real GDP is back at Yf and only the price level is higher. Option C describes the short run only." },
+    { s: "When an economy produces at its full-employment output, the unemployment rate equals:", o: ["Zero", "The cyclical unemployment rate", "The frictional unemployment rate only", "The natural rate of unemployment"], c: 3, w: "Full employment allows for frictional and structural unemployment. Together they make the natural rate. Only cyclical unemployment is zero at Yf." },
+    { s: "Full-employment output is $800 billion and current real GDP is $760 billion. Which describes the economy?", o: ["A recessionary gap of $40 billion; the economy is at a point inside its PPC", "An inflationary gap of $40 billion; resources are overused", "A recessionary gap of $40 billion; the economy is on its PPC", "No output gap, because LRAS is vertical"], c: 0, w: "Real GDP is $800 − $760 = $40 billion below Yf, so there is a recessionary gap. Idle resources put the economy inside its PPC. Option C is tempting, but points on the PPC mean full employment." },
+    { s: "A country discovers large new oil deposits and adopts a better production technology. Which describes the effects?", o: ["The PPC shifts inward and LRAS shifts left", "The PPC is unchanged and only SRAS shifts right", "The PPC shifts outward and LRAS shifts right", "The PPC shifts outward and LRAS does not change"], c: 2, w: "More natural resources and better technology both raise the economy's capacity. The PPC shifts outward and LRAS shifts right, raising full-employment output. The PPC and LRAS always move in the same direction." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.4");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.4", compact: true, storageKey: "topic-3.4" });</script>
+</body>
+</html>

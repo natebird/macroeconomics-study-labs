@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supply Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub-h { font-size: 1.2rem; }
+.panel { display: grid; gap: 16px; align-content: start; }
+.panel .controls { grid-template-columns: 1fr; }
+.scenarios button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.sc-group { display: grid; gap: 6px; }
+.game { display: grid; gap: 14px; align-content: start; }
+.g-count2 { font-family: var(--mono); font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.mkt { font-family: var(--mono); font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.item { font-family: var(--display); font-size: 1.18rem; font-weight: 600; line-height: 1.35; min-height: 3.3em; margin: 0; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.choices button { text-align: left; border-radius: 8px; }
+.choices button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choices button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choices button:disabled { cursor: default; }
+.fb { border-left: 4px solid var(--rule); padding: 8px 12px; font-size: .93rem; background: var(--paper); border-radius: 0 8px 8px 0; min-height: 2.6em; }
+.fb.ok { border-left-color: var(--good); }
+.fb.no { border-left-color: var(--bad); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.rules { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .9rem; }
+@media (max-width: 520px) { .choices { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 1 · Topic 1.5</span>
+  <h1>Supply Study Lab</h1>
+  <p class="lede">Supply shows how much sellers are willing and able to offer at each price. A change in the good's own price moves sellers along the supply curve; a change in anything else that affects sellers shifts the whole curve. Move the price, try the determinant scenarios on a wheat market, then drill yourself on shift versus movement.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Move along it or shift it</h2>
+    <p>The market for wheat. Price is in dollars per bushel and quantity is in thousands of bushels per month. The dashed grey line and point show where sellers started: S₁ at $5.00 and 50 thousand bushels.</p>
+  </div>
+
+  <h3 class="sub-h">A. The supply graph</h3>
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Supply of wheat <small>price vs. quantity supplied</small></h3>
+      <svg class="chart" id="sg" role="img" aria-label="Supply graph for wheat with price on the vertical axis and quantity on the horizontal axis"></svg>
+      <div class="legend"><span class="l-srpc">Supply now</span><span class="l-ghost">Starting supply S₁</span></div>
+    </div>
+    <div class="card panel">
+      <div class="sc-group">
+        <div class="tag">Change the price (movement along S)</div>
+        <div class="scenarios" id="sc-price"></div>
+      </div>
+      <div class="sc-group">
+        <div class="tag">Change a determinant (shift of S)</div>
+        <div class="scenarios" id="sc-det"></div>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label for="s-p">Price of wheat <output id="o-p"></output></label>
+          <input type="range" id="s-p" min="2.5" max="7.5" step="0.5">
+          <span class="hint">The good's own price. Sellers slide along the curve.</span>
+        </div>
+        <div class="ctl">
+          <label for="s-s">Supply shifter <output id="o-s"></output></label>
+          <input type="range" id="s-s" min="-2" max="2" step="0.5">
+          <span class="hint">Any non-price determinant. Right = increase in supply.</span>
+        </div>
+      </div>
+      <div class="btnrow"><button type="button" id="btn-reset">Reset to start</button></div>
+    </div>
+  </div>
+
+  <div class="readout" style="margin-top:16px;">
+    <div class="stat"><div class="k">Change type</div><div class="v" id="r-type">None</div></div>
+    <div class="stat"><div class="k">Direction</div><div class="v" id="r-dir">None</div></div>
+    <div class="stat"><div class="k">Price per bushel</div><div class="v" id="r-p">$5.00</div></div>
+    <div class="stat"><div class="k">Quantity supplied (thousand)</div><div class="v" id="r-q">50</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite" style="margin-top:16px;"></div>
+
+  <h3 class="sub-h" style="margin-top:28px;">B. Drill: shift or movement, and which direction?</h3>
+  <div class="lab">
+    <div class="card game">
+      <div class="g-count2"><span id="g-pos">Case 1 of 14</span><span id="g-score">0 / 0 correct</span></div>
+      <span class="mkt" id="g-mkt"></span>
+      <p class="item" id="g-item"></p>
+      <div class="choices" id="g-choices" role="group" aria-label="What happens to supply in this market?"></div>
+      <div class="fb" id="g-fb" aria-live="polite">Pick an answer. Think about the market named above the case.</div>
+      <div class="btnrow">
+        <button type="button" class="primary" id="g-next">Next case</button>
+        <button type="button" id="g-shuffle">Reshuffle and restart</button>
+      </div>
+    </div>
+    <div class="card game">
+      <h3>How to decide</h3>
+      <ol class="rules">
+        <li>Find the market the question names. Ask: did <b>this good's own price</b> change, or did something else change?</li>
+        <li>Own price changed: <b>movement along</b> supply. Price up means quantity supplied up; price down means quantity supplied down.</li>
+        <li>Something else changed: <b>shift</b>. Ask whether sellers now want to sell more or less at every price.</li>
+        <li>Cheaper inputs, better technology, more sellers, a subsidy: supply <b>increases</b> (right).</li>
+        <li>Costlier inputs, a per-unit tax, fewer sellers, a better-paying alternative good, expecting a higher price later: supply <b>decreases</b> (left).</li>
+        <li>A change in demand never shifts supply. If demand pushes the price up, sellers move <b>up along</b> their supply curve.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Supply</h3><p>Supply is the whole schedule of quantities sellers are willing and able to offer at each possible price, other things held constant. Quantity supplied is one number on that schedule, at one price.</p></div>
+    <div class="card"><span class="tag">P ↑ → Qs ↑</span><h3>Law of supply</h3><p>Other things equal, a higher price raises the quantity supplied. A higher price makes each unit more profitable, so existing firms produce more and new output becomes worth making.</p></div>
+    <div class="card"><span class="tag">Why it slopes up</span><h3>Increasing marginal cost</h3><p>Producing more usually means overtime, less suitable land, and crowded equipment, so each extra unit costs more than the last. Sellers only supply those extra units if the price rises enough to cover the higher marginal cost.</p></div>
+    <div class="card"><span class="tag">Movement</span><h3>Change in quantity supplied</h3><p>Only a change in the good's own price causes it. The curve stays put and sellers slide to a new point on it.</p></div>
+    <div class="card"><span class="tag">Shift</span><h3>Change in supply</h3><p>A change in a determinant moves the whole curve. An increase in supply shifts it right (more at every price). A decrease shifts it left, which is the same as up: sellers need a higher price for each quantity.</p></div>
+    <div class="card"><span class="tag">Six determinants</span><h3>What shifts supply</h3><p>Input prices, technology, number of sellers, taxes and subsidies, prices of other goods the producer could make, and producer expectations about future prices.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Determinants of supply cheat sheet</h2>
+    <p>Memorize the direction for each row. On the exam, name the determinant, then the shift.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Determinant</th><th>Example (wheat market)</th><th>Effect on supply</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Input (resource) prices rise</td><td>Fertilizer or farm wages cost more</td><td><b>Decrease</b> (left)</td><td>Higher cost per unit makes each quantity less profitable</td></tr>
+      <tr><td>Input (resource) prices fall</td><td>Diesel fuel gets cheaper</td><td><b>Increase</b> (right)</td><td>Lower cost per unit</td></tr>
+      <tr><td>Better technology</td><td>A higher-yield seed or faster harvester</td><td><b>Increase</b> (right)</td><td>More output from the same inputs lowers cost per unit</td></tr>
+      <tr><td>More sellers</td><td>New farms start growing wheat</td><td><b>Increase</b> (right)</td><td>Market supply adds up every seller's supply</td></tr>
+      <tr><td>Fewer sellers</td><td>Farms close or switch out of wheat for good</td><td><b>Decrease</b> (left)</td><td>Fewer sellers to add up</td></tr>
+      <tr><td>Per-unit tax on producers</td><td>$1.50 tax on each bushel sold</td><td><b>Decrease</b> (left, or up by the tax)</td><td>The tax works like a higher cost per unit</td></tr>
+      <tr><td>Subsidy to producers</td><td>$1.50 payment for each bushel sold</td><td><b>Increase</b> (right, or down by the subsidy)</td><td>The subsidy works like a lower cost per unit</td></tr>
+      <tr><td>Price of another good the producer could make rises</td><td>Corn price rises; farmers can plant corn on the same land</td><td><b>Decrease</b> in wheat supply (left)</td><td>Resources move to the more profitable good</td></tr>
+      <tr><td>Producers expect a higher price later</td><td>Farmers expect wheat prices to rise next season and store grain</td><td><b>Decrease</b> today (left)</td><td>Sellers hold back output now to sell later at the higher price</td></tr>
+      <tr><td>Producers expect a lower price later</td><td>Farmers expect a price drop and sell stored grain now</td><td><b>Increase</b> today (right)</td><td>Sellers sell now before the price falls</td></tr>
+      <tr><td>The good's own price changes</td><td>Wheat rises from $5 to $7 a bushel</td><td><b>No shift.</b> Movement up along S</td><td>Price is on the axis, so it moves you along the curve</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price</b> (or P). Horizontal axis: <b>Quantity</b> (or Q). Write the good's name above the graph.</li>
+        <li>Draw supply sloping <b>upward</b> and label it S (or S₁). Label the new curve S₂ and draw an arrow showing the shift.</li>
+        <li>For a movement, mark two points on the same curve and label P₁, Q₁ and P₂, Q₂ on the axes with dashed lines.</li>
+        <li>Use the exact phrases: "increase in supply" or "decrease in supply" for a shift, "increase in quantity supplied" or "decrease in quantity supplied" for a movement.</li>
+        <li>When asked to explain, name the determinant: "Fertilizer is an input, so a higher fertilizer price raises production costs and decreases supply."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Saying "supply increased" when the price rose. A higher price raises the <b>quantity supplied</b>; the curve does not move.</li>
+        <li>Shifting supply right for a decrease because the curve "moves up." A decrease in supply is a shift to the <b>left</b>, which also looks like a shift up.</li>
+        <li>Shifting supply because demand changed. Buyers' incomes, tastes, and the prices of related goods for buyers shift <b>demand</b>.</li>
+        <li>Getting expectations backward. If sellers expect a higher price later, supply today <b>decreases</b>.</li>
+        <li>Getting other goods backward. If a good the producer could make instead becomes more profitable, supply of this good <b>decreases</b>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 1.5. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-1.html">Unit 1 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  // ---------- Model ----------
+  // Lab.market space: supply is y = 5 + K*(x - 5 - s). Price y is dollars per bushel.
+  // Quantity supplied at price p: x = 5 + s + (p - 5)/K; shown as 10*x thousand bushels.
+  // With K = 1 a horizontal shift of s also equals a vertical shift of s dollars.
+  var K = 1, P0 = 5, S0 = 0;
+  var BASE = { p: P0, s: S0, why: null };
+  var S = Object.assign({}, BASE);
+  function qx(p, s) { return 5 + s + (p - 5) / K; }
+  function qty(p, s) { return Math.round(qx(p, s) * 10); }
+  function money(v) { return "$" + v.toFixed(2); }
+
+  // ---------- Scenarios ----------
+  var PRICE = [
+    { b: "Price rises to $7.00", p: 7, txt: "Buyers bid the price of wheat up to $7.00 a bushel." },
+    { b: "Price falls to $3.00", p: 3, txt: "The price of wheat falls to $3.00 a bushel." }
+  ];
+  var DET = [
+    { b: "Fertilizer costs more", s: -1.5, cat: "Input prices", txt: "Fertilizer, an input to growing wheat, becomes more expensive. Each bushel now costs more to produce, so at every price farmers offer less wheat." },
+    { b: "Fertilizer costs less", s: 1.5, cat: "Input prices", txt: "Fertilizer, an input, becomes cheaper. Each bushel costs less to produce, so at every price farmers offer more wheat." },
+    { b: "Higher-yield seed", s: 1.5, cat: "Technology", txt: "A new seed grows more wheat per acre. Better technology gets more output from the same inputs, which lowers the cost per bushel." },
+    { b: "New farms enter", s: 1.5, cat: "Number of sellers", txt: "More farms start growing wheat. Market supply is the sum of every seller's supply, so it increases." },
+    { b: "Farms leave the market", s: -1.5, cat: "Number of sellers", txt: "Some farms stop growing wheat for good. With fewer sellers to add up, market supply decreases." },
+    { b: "$1.50 per-bushel tax", s: -1.5, cat: "Taxes", txt: "The government taxes producers $1.50 on each bushel sold. The tax works like a higher cost, so the curve shifts up by $1.50 at every quantity, which is a shift to the left." },
+    { b: "$1.50 per-bushel subsidy", s: 1.5, cat: "Subsidies", txt: "The government pays producers $1.50 for each bushel sold. The subsidy works like a lower cost, so the curve shifts down by $1.50, which is a shift to the right." },
+    { b: "Corn price rises", s: -1.5, cat: "Prices of other goods the producer could make", txt: "Corn, which farmers could grow on the same land, becomes more profitable. Farmers move acres from wheat to corn, so the supply of wheat decreases." },
+    { b: "Farmers expect higher prices next season", s: -1.5, cat: "Producer expectations", txt: "Farmers expect wheat to sell for more next season, so they store grain and sell less today. Current supply decreases." },
+    { b: "Farmers expect lower prices next season", s: 1.5, cat: "Producer expectations", txt: "Farmers expect wheat to sell for less next season, so they sell stored grain now. Current supply increases." }
+  ];
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("sg");
+  function draw() {
+    var moved = S.p !== P0, shifted = S.s !== S0;
+    var x0 = qx(P0, S0), x1 = qx(S.p, S.s);
+    Lab.market(svg, {
+      xLabel: "Quantity", yLabel: "Price", slope: K,
+      supply: { shift: S.s, label: shifted ? "S₂" : "S₁" },
+      start: { supply: S0 },
+      extra: function (F) {
+        if (shifted) Lab.tag(F, qx(2, S0) + (S.s > 0 ? -0.35 : 0.35), 2, "S₁", "var(--muted)", S.s > 0 ? "end" : "start");
+        if (moved || shifted) {
+          Lab.dot(F, x0, P0, "var(--ghost)", true, "Q₁", "P₁");
+          var sg = S.p > P0 ? 0.35 : -0.35; // arrow runs parallel to S, just below and right of it
+          if (moved && !shifted) Lab.arrow(F, x0 + 0.45 + sg, P0 - 0.45 + sg, x1 + 0.45 - sg, S.p - 0.45 - sg, "var(--muted)");
+          if (shifted && !moved && Math.abs(x1 - x0) > 0.5) Lab.arrow(F, x0 + (x1 > x0 ? 0.3 : -0.3), P0 + 0.45, x1 - (x1 > x0 ? 0.6 : -0.6), P0 + 0.45, "var(--srpc)");
+          Lab.dot(F, x1, S.p, "var(--ink)", true, "Q₂", moved ? "P₂" : null);
+        } else {
+          Lab.dot(F, x0, P0, "var(--ink)", true, "Q₁", "P₁");
+        }
+      }
+    });
+  }
+
+  // ---------- Story ----------
+  function story() {
+    var moved = S.p !== P0, shifted = S.s !== S0;
+    var q0 = qty(P0, S0), q1 = qty(S.p, S.s), qAtStart = qty(P0, S.s);
+    var html = "";
+    if (!moved && !shifted) {
+      html = "<p><b>Starting point.</b> At $5.00 a bushel, wheat farmers are willing and able to sell 50 thousand bushels a month. That is one point on supply curve S₁.</p>" +
+        "<p><b>Law of supply:</b> the curve slopes upward. A higher price makes each bushel more profitable, and producing more raises marginal cost (overtime, less fertile land, older equipment pressed into use), so farmers supply more only at a higher price. Try a price button to move along S₁, or a determinant button to shift it.</p>";
+      return html;
+    }
+    if (moved) {
+      var up = S.p > P0;
+      var pricePart = S.why && S.why.kind === "p" ? S.why.txt + " " : "The price of wheat " + (up ? "rises" : "falls") + " from $5.00 to " + money(S.p) + ". ";
+      html += "<p><b>Price change: movement along the curve.</b> " + pricePart +
+        (up ? "A higher price makes each bushel more profitable and covers the higher marginal cost of extra output, so farmers plant more and sell more." :
+              "A lower price no longer covers the marginal cost of the last bushels, so farmers cut back output.") +
+        (shifted ? "" : " Quantity supplied " + (up ? "rises" : "falls") + " from " + q0 + " to " + q1 + " thousand bushels.") + "</p>" +
+        "<p>AP answer: <b>" + (up ? "an increase" : "a decrease") + " in quantity supplied</b>. The curve does not shift, because the good's own price is on the vertical axis.</p>";
+    }
+    if (shifted) {
+      var inc = S.s > 0;
+      var detPart = S.why && S.why.kind === "s" ? "<b>" + S.why.cat + ".</b> " + S.why.txt : "<b>A non-price determinant changed.</b> Sellers now offer " + (inc ? "more" : "less") + " at every price.";
+      html += "<p>" + detPart + "</p>" +
+        "<p>AP answer: <b>" + (inc ? "an increase in supply" : "a decrease in supply") + "</b>. The whole curve shifts " + (inc ? "right" : "left") + " from S₁ to S₂. At the same $5.00 price, quantity supplied is now " + qAtStart + " thousand bushels instead of 50.</p>";
+    }
+    if (moved && shifted) {
+      html += "<p><b>Both happened.</b> The curve shifted to S₂, and the price changed, so sellers also moved along S₂ to " + money(S.p) + ". Quantity supplied is now " + q1 + " thousand bushels. On an FRQ, show these as two separate steps: first the shift, then the movement along the new curve.</p>";
+    }
+    return html;
+  }
+
+  // ---------- Readouts and controls ----------
+  var elP = document.getElementById("s-p"), elS = document.getElementById("s-s");
+  var btns = [];
+  function render() {
+    var moved = S.p !== P0, shifted = S.s !== S0;
+    elP.value = S.p; elS.value = S.s;
+    document.getElementById("o-p").textContent = money(S.p);
+    document.getElementById("o-s").textContent = S.s === 0 ? "none" : (S.s > 0 ? "right +" : "left −") + Math.abs(S.s * 10);
+    draw();
+    var type = !moved && !shifted ? "None" : moved && shifted ? "Shift + movement" : moved ? "Movement along S" : "Shift of S";
+    var dir = [];
+    if (shifted) dir.push(S.s > 0 ? '<span class="pill lr">Supply ↑ right</span>' : '<span class="pill infl">Supply ↓ left</span>');
+    if (moved) dir.push(S.p > P0 ? '<span class="pill rec">Qs ↑ up the curve</span>' : '<span class="pill rec">Qs ↓ down the curve</span>');
+    document.getElementById("r-type").textContent = type;
+    document.getElementById("r-dir").innerHTML = dir.length ? dir.join(" ") : "None";
+    document.getElementById("r-p").textContent = money(S.p);
+    document.getElementById("r-q").textContent = qty(S.p, S.s);
+    document.getElementById("story").innerHTML = story();
+    btns.forEach(function (b) {
+      var on = (b._k === "p" && S.why && S.why.kind === "p" && S.p === b._v.p) || (b._k === "s" && S.why && S.why.kind === "s" && S.why.b === b._v.b && S.s === b._v.s);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  elP.addEventListener("input", function () {
+    S.p = parseFloat(elP.value);
+    if (S.why && S.why.kind === "p") S.why = null;
+    render();
+  });
+  elS.addEventListener("input", function () {
+    S.s = parseFloat(elS.value);
+    if (S.why && S.why.kind === "s") S.why = null;
+    render();
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+  function addBtn(parent, x, kind) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x.b; b._k = kind; b._v = x;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () {
+      if (kind === "p") S = { p: x.p, s: S0, why: { kind: "p", txt: x.txt } };
+      else S = { p: P0, s: x.s, why: { kind: "s", b: x.b, cat: x.cat, txt: x.txt } };
+      render();
+    });
+    parent.appendChild(b); btns.push(b);
+  }
+  var scP = document.getElementById("sc-price"), scD = document.getElementById("sc-det");
+  PRICE.forEach(function (x) { addBtn(scP, x, "p"); });
+  DET.forEach(function (x) { addBtn(scD, x, "s"); });
+  render();
+
+  // ---------- Drill ----------
+  var CH = ["Movement up along S (quantity supplied increases)", "Movement down along S (quantity supplied decreases)", "Supply shifts right (increase in supply)", "Supply shifts left (decrease in supply)"];
+  var CASES = [
+    { m: "Wheat", t: "The price of wheat rises from $4 to $6 a bushel.", a: 0, w: "The good's own price changed, so farmers move up along the supply curve. Quantity supplied increases; supply does not shift." },
+    { m: "Wheat", t: "The price of fertilizer rises sharply.", a: 3, w: "Fertilizer is an input. Higher input prices raise the cost of each bushel, so supply decreases." },
+    { m: "Wheat", t: "Scientists develop a seed that doubles the yield per acre.", a: 2, w: "Better technology gets more output from the same inputs, which lowers cost per unit. Supply increases." },
+    { m: "Wheat", t: "The government gives wheat farmers a $1 subsidy for every bushel they sell.", a: 2, w: "A per-unit subsidy works like a lower production cost. Supply increases (shifts right, or down by $1)." },
+    { m: "Wheat", t: "The price of corn rises. Farmers can grow either crop on the same land.", a: 3, w: "Corn is another good the farmer could produce. It is now more profitable, so land shifts away from wheat. Wheat supply decreases." },
+    { m: "Wheat", t: "The price of wheat falls from $6 to $4 a bushel.", a: 1, w: "Only the good's own price changed, so farmers move down along the curve. Quantity supplied decreases." },
+    { m: "Gasoline", t: "The government places a per-gallon tax on gasoline producers.", a: 3, w: "A per-unit tax on sellers acts like a higher cost. Supply decreases (shifts left, or up by the amount of the tax)." },
+    { m: "Laptops", t: "The price of memory chips used in laptops falls.", a: 2, w: "Memory chips are an input. Cheaper inputs lower production costs, so supply of laptops increases." },
+    { m: "Laptops", t: "Students suddenly want more laptops, and the price of laptops rises.", a: 0, w: "The change started on the demand side. The higher price moves sellers up along their supply curve. Supply itself does not shift." },
+    { m: "Crude oil", t: "Oil producers expect the price of oil to be much higher next year.", a: 3, w: "Producers hold back output today so they can sell later at the higher price. Current supply decreases." },
+    { m: "Coffee", t: "Wages for workers on coffee farms rise.", a: 3, w: "Labor is an input. Higher wages raise production costs, so supply of coffee decreases." },
+    { m: "T-shirts", t: "Dozens of new factories open to make T-shirts.", a: 2, w: "More sellers in the market means more total supply at every price. Supply increases." },
+    { m: "Beef", t: "Consumers lose their taste for beef, and the price of beef falls.", a: 1, w: "Tastes are a demand determinant. The lower price moves ranchers down along their supply curve. Quantity supplied decreases; supply does not shift." },
+    { m: "Smartphones", t: "Three large smartphone makers go out of business.", a: 3, w: "Fewer sellers means less total supply at every price. Supply decreases." }
+  ];
+
+  var gOrder = [], gPos = 0, gRight = 0, gDone = 0, gAnswered = false;
+  var elItem = document.getElementById("g-item"), elMkt = document.getElementById("g-mkt"), elCh = document.getElementById("g-choices"), elFb = document.getElementById("g-fb");
+  function shuffle() {
+    gOrder = CASES.map(function (_, i) { return i; });
+    for (var i = gOrder.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = gOrder[i]; gOrder[i] = gOrder[j]; gOrder[j] = t; }
+    gPos = 0; gRight = 0; gDone = 0; showCase();
+  }
+  function showCase() {
+    gAnswered = false;
+    var fin = gPos >= gOrder.length;
+    document.getElementById("g-pos").textContent = fin ? "All " + CASES.length + " cases done" : "Case " + (gPos + 1) + " of " + CASES.length;
+    document.getElementById("g-score").textContent = gRight + " / " + gDone + " correct";
+    elCh.innerHTML = "";
+    elFb.className = "fb";
+    if (fin) {
+      elMkt.textContent = "Finished";
+      elItem.textContent = "You scored " + gRight + " out of " + CASES.length + ". Reshuffle to try again.";
+      elFb.textContent = "Every case was either a movement (own price changed) or a shift (a determinant changed).";
+      document.getElementById("g-next").disabled = true;
+      return;
+    }
+    document.getElementById("g-next").disabled = false;
+    var c = CASES[gOrder[gPos]];
+    elMkt.textContent = "Market for " + c.m.toLowerCase();
+    elItem.textContent = c.t;
+    elFb.textContent = "Pick an answer. Think about supply in the market named above the case.";
+    CH.forEach(function (t, j) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = t;
+      b.addEventListener("click", function () {
+        if (gAnswered) return;
+        gAnswered = true; gDone++;
+        var all = elCh.querySelectorAll("button");
+        all.forEach(function (x) { x.disabled = true; });
+        all[c.a].classList.add("right");
+        if (j === c.a) { gRight++; elFb.className = "fb ok"; elFb.innerHTML = "<b style='color:var(--good)'>Correct.</b> " + c.w; }
+        else { b.classList.add("wrong"); elFb.className = "fb no"; elFb.innerHTML = "<b style='color:var(--bad)'>Not quite.</b> " + c.w; }
+        document.getElementById("g-score").textContent = gRight + " / " + gDone + " correct";
+      });
+      elCh.appendChild(b);
+    });
+  }
+  document.getElementById("g-next").addEventListener("click", function () { if (!gAnswered && gPos < gOrder.length) gDone++; gPos++; showCase(); });
+  document.getElementById("g-shuffle").addEventListener("click", shuffle);
+  shuffle();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The law of supply states that, other things equal,", o: ["an increase in supply lowers the price of a good", "a higher price causes buyers to purchase less of a good", "a higher price of a good leads to a larger quantity supplied of that good", "an increase in input prices increases supply"], c: 2, w: "The law of supply links a good's own price to quantity supplied: as price rises, quantity supplied rises. Option B describes the law of demand." },
+    { s: "Which of the following causes a decrease in the quantity supplied of pizza, rather than a decrease in supply?", o: ["An increase in the price of cheese", "A decrease in the price of pizza", "A new per-unit tax on pizza sellers", "Several pizza restaurants closing"], c: 1, w: "Only a change in pizza's own price moves sellers along the curve. A, C, and D are determinants that shift supply left, which is a decrease in supply." },
+    { s: "On a graph of the market for bicycles, the supply curve shifts from S₁ to S₂, to the right. Which event could cause this shift?", o: ["An increase in the price of bicycles", "An increase in the price of steel used to make bicycles", "An increase in consumer incomes", "An improvement in the technology used to build bicycles"], c: 3, w: "Better technology lowers the cost per unit, so supply increases (shifts right). A higher bicycle price is a movement along S, steel is an input whose higher price decreases supply, and income shifts demand." },
+    { s: "A farmer can grow either corn or soybeans on the same land. If the price of soybeans rises, what happens in the market for corn?", o: ["The supply of corn decreases", "The supply of corn increases", "The quantity supplied of corn increases", "The demand for corn decreases"], c: 0, w: "Soybeans are another good the farmer could produce. A higher soybean price pulls land away from corn, so corn supply shifts left. The price of corn itself did not change, so this is a shift, not a movement." },
+    { s: "A firm's supply schedule shows 200 units at a price of $4 and 300 units at a price of $6. If the price rises from $4 to $6, which is correct?", o: ["Supply increases by 100 units", "Supply decreases by 100 units", "Quantity supplied increases by 100 units", "Quantity supplied increases by 50 units"], c: 2, w: "300 − 200 = 100. Because the good's own price changed, this is a change in quantity supplied along one schedule, not a change in supply." },
+    { s: "Before a tax, sellers were willing to supply 500 units at a price of $10. The government then places a $2 per-unit tax on sellers. What is the lowest price at which they will now supply 500 units?", o: ["$8", "$10", "$5", "$12"], c: 3, w: "A per-unit tax shifts the supply curve up by the amount of the tax at every quantity. Sellers need $10 + $2 = $12 to be just as willing to supply 500 units. Picking $8 shifts the curve the wrong way." },
+    { s: "Producers of a storable good expect its price to rise sharply next month. What happens to the supply of the good this month?", o: ["Supply decreases", "Supply increases", "Quantity supplied increases with no shift", "Supply does not change because only current prices matter"], c: 0, w: "Sellers hold output back now so they can sell it later at the higher price. Current supply shifts left. Many students pick B by mixing this up with buyers' expectations, which shift demand." },
+    { s: "Why does a typical supply curve slope upward?", o: ["Buyers are willing to pay more when the good is scarce", "Marginal cost rises as output increases, so sellers need a higher price to produce more", "Higher prices raise input costs for every firm", "Firms always produce the quantity that maximizes revenue"], c: 1, w: "As output expands, firms use overtime, less suitable resources, and crowded facilities, so each extra unit costs more. A higher price is needed to cover that rising marginal cost and make the extra output profitable." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("1.5");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [1], topic: "1.5", compact: true, storageKey: "topic-1.5" });</script>
+</body>
+</html>

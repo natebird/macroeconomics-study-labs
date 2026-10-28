@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limitations of GDP Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub-h { font-size: 1.2rem; }
+.game { display: grid; gap: 14px; align-content: start; }
+.g-count2 { font-family: var(--mono); font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.item { font-family: var(--display); font-size: 1.22rem; font-weight: 600; line-height: 1.35; min-height: 3.3em; }
+.step { display: grid; gap: 6px; }
+.step .tag { margin: 0; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices button { text-align: left; border-radius: 8px; }
+.choices button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.choices button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choices button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choices button:disabled { cursor: default; }
+.choices .hold { font-size: .86rem; color: var(--muted); font-style: italic; }
+.fb { border-left: 4px solid var(--rule); padding: 8px 12px; font-size: .93rem; background: var(--paper); border-radius: 0 8px 8px 0; }
+.fb.ok { border-left-color: var(--good); }
+.fb.no { border-left-color: var(--bad); }
+.fb.half { border-left-color: var(--srpc); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.bins { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bin { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: .84rem; display: grid; gap: 4px; align-content: start; }
+.bin h4 { margin: 0; font-size: .8rem; font-family: var(--mono); font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.bin ul { margin: 0; padding-left: 16px; display: grid; gap: 3px; }
+.bin .none { color: var(--muted); font-style: italic; }
+.bin .why { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+.in { color: var(--good); font-weight: 600; }
+.out { color: var(--bad); font-weight: 600; }
+.rules { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .88rem; }
+.stat .v small { font-size: .8rem; color: var(--muted); }
+.ctl2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+@media (max-width: 520px) { .ctl2 { grid-template-columns: 1fr; } }
+.ca { color: var(--accent); } .cb { color: var(--srpc); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 2 · Topic 2.2</span>
+  <h1>Limitations of GDP Study Lab</h1>
+  <p class="lede">GDP measures the market value of final goods and services produced inside a country in a year. It leaves out some production, like unpaid housework and the underground economy, and it says nothing about leisure, pollution, or who gets the income. Sort items into "counts" or "does not count," then compare two countries with the same GDP per capita to see what the number hides.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Sort it, then compare two countries</h2>
+    <p>Part A asks one question about each item: does it count in this year's U.S. GDP? Part B holds GDP per capita fixed and lets you change everything GDP misses.</p>
+  </div>
+
+  <h3 class="sub-h">A. Does it count in this year's U.S. GDP?</h3>
+  <div class="lab">
+    <div class="card game">
+      <div class="g-count2"><span id="g-pos">Item 1 of 16</span><span id="g-score">0 / 0 fully correct</span></div>
+      <p class="item" id="g-item"></p>
+      <div class="step">
+        <span class="tag">Step 1: Counted in this year's U.S. GDP?</span>
+        <div class="choices" id="g-yn" role="group" aria-label="Counted or not counted"></div>
+      </div>
+      <div class="step">
+        <span class="tag" id="g-step2">Step 2: Why?</span>
+        <div class="choices" id="g-why" role="group" aria-label="Choose the reason"></div>
+      </div>
+      <div class="btnrow">
+        <button type="button" class="primary" id="g-check" disabled>Check answer</button>
+        <button type="button" id="g-next">Next item</button>
+        <button type="button" id="g-shuffle">Reshuffle and restart</button>
+      </div>
+      <div class="fb" id="g-fb" aria-live="polite"></div>
+    </div>
+    <div class="card game">
+      <h3>How to decide</h3>
+      <ol class="rules">
+        <li>Is it a <b>new final</b> good or service <b>produced this year</b>? If it was made in an earlier year (a used car), it was already counted then.</li>
+        <li>Was it produced <b>inside U.S. borders</b>? GDP is about location, not who owns the firm.</li>
+        <li>Was it <b>sold in a market</b> and reported? Unpaid work at home and hidden cash or illegal sales are left out.</li>
+        <li>Is it only money or ownership changing hands? Stock purchases and transfer payments (Social Security) buy no new output.</li>
+        <li>Is it an <b>intermediate good</b> used up in making something else? Count only the final good, or you count the input twice.</li>
+        <li>If it counts, name the part: <b>C</b> (household purchases), <b>I</b> (new capital, new houses, inventory), <b>G</b> (government purchases), or <b>exports</b> in net exports.</li>
+      </ol>
+      <h3>Sorted correctly so far</h3>
+      <div class="bins" id="g-bins"></div>
+    </div>
+  </div>
+
+  <h3 class="sub-h">B. Same GDP per capita, different lives</h3>
+  <div class="lab">
+    <div class="card graph-card" style="align-content:start;">
+      <h3>Country A vs. Country B <small>each row on its own scale</small></h3>
+      <svg class="chart" id="cmp" role="img" aria-label="Paired bar chart comparing Country A and Country B on GDP per capita, hours worked, income of the bottom 80 percent, air pollution, and unpaid home production"></svg>
+      <div class="legend"><span class="l-ad">Country A (fixed)</span><span class="l-srpc">Country B (your sliders)</span></div>
+    </div>
+    <div class="card" style="display:grid; gap:14px; align-content:start;">
+      <div>
+        <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+        <div class="scenarios" id="scenarios"></div>
+      </div>
+      <p style="margin:0; font-size:.9rem; color:var(--muted);">Both countries have real GDP per capita of $50,000. Country A works 35 hours a week, the top 20% of earners get 40% of income, its air pollution index is 30, and each person does $6,000 of unpaid home production a year. Move Country B's sliders.</p>
+      <div class="controls ctl2">
+        <div class="ctl">
+          <label for="s-hrs">B: hours worked per week <output id="o-hrs"></output></label>
+          <input type="range" id="s-hrs" min="25" max="60" step="1">
+          <span class="hint">Leisure: fewer hours, more free time</span>
+        </div>
+        <div class="ctl">
+          <label for="s-top">B: income share of top 20% <output id="o-top"></output></label>
+          <input type="range" id="s-top" min="25" max="70" step="1">
+          <span class="hint">Distribution of income</span>
+        </div>
+        <div class="ctl">
+          <label for="s-pol">B: air pollution index <output id="o-pol"></output></label>
+          <input type="range" id="s-pol" min="0" max="100" step="5">
+          <span class="hint">0 = clean, 100 = very dirty</span>
+        </div>
+        <div class="ctl">
+          <label for="s-home">B: unpaid home production <output id="o-home"></output></label>
+          <input type="range" id="s-home" min="0" max="20000" step="1000">
+          <span class="hint">Per person per year: cooking, childcare, repairs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real GDP per capita (A and B)</div><div class="v" id="r-gdp">$50,000</div></div>
+    <div class="stat"><div class="k">GDP per hour worked (A / B)</div><div class="v" id="r-hr"></div></div>
+    <div class="stat"><div class="k">Avg. income, bottom 80% (A / B)</div><div class="v" id="r-b80"></div></div>
+    <div class="stat"><div class="k">GDP + home production (A / B)</div><div class="v" id="r-tot"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Left out: unpaid work</span><h3>Nonmarket activities</h3><p>Cooking at home, cleaning, caring for your own children, and volunteering are real production, but nobody pays a market price for them. GDP leaves them out, so it understates total production. Hire a cleaner for the same work and GDP rises.</p></div>
+    <div class="card"><span class="tag">Left out: hidden sales</span><h3>Underground economy</h3><p>Illegal sales and legal work paid in unreported cash never reach government records. GDP misses them, so it understates production most in countries with large underground economies.</p></div>
+    <div class="card"><span class="tag">Free time</span><h3>Leisure</h3><p>GDP counts what people produce, not the time they spend producing it. If a country works longer hours to reach the same GDP, its people have less free time, and GDP per capita does not show that loss.</p></div>
+    <div class="card"><span class="tag">Better and new goods</span><h3>Quality changes</h3><p>A phone that costs the same as last year's but does far more adds about the same to GDP. Measured GDP does not fully capture gains in quality or the arrival of new goods, so it can understate improvements in living standards.</p></div>
+    <div class="card"><span class="tag">Who gets it</span><h3>Distribution of income</h3><p>GDP per capita is an average. Two countries with the same average can have very different incomes for the typical family if one country's income goes mostly to the top earners.</p></div>
+    <div class="card"><span class="tag">Side effects</span><h3>Externalities and the environment</h3><p>GDP does not subtract the harm from pollution or the use of natural resources. Spending to clean up pollution adds to GDP, even though it only repairs damage. GDP can rise while the environment gets worse.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Counted or not? Cheat sheet</h2>
+    <p>Memorize the reason for each row. AP questions often pair a counted item with an uncounted one that looks similar.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Item</th><th>In this year's U.S. GDP?</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>New car or haircut bought by a household</td><td><span class="in">Yes</span></td><td><b>Consumption (C)</b>: a new final good or service</td></tr>
+      <tr><td>New house, new factory equipment, unsold inventory</td><td><span class="in">Yes</span></td><td><b>Investment (I)</b>: new capital goods, residential construction, and changes in inventories</td></tr>
+      <tr><td>Government buys a fighter jet, pays a teacher, or pays for a river cleanup</td><td><span class="in">Yes</span></td><td><b>Government purchases (G)</b> of goods and services</td></tr>
+      <tr><td>Car built in Michigan and sold in Canada</td><td><span class="in">Yes</span></td><td><b>Exports</b>, added in net exports (X − M)</td></tr>
+      <tr><td>Foreign-owned plant in the U.S. (a Toyota built in Kentucky)</td><td><span class="in">Yes</span></td><td>Produced inside U.S. borders. GDP is about location, not ownership</td></tr>
+      <tr><td>U.S.-owned factory in Mexico</td><td><span class="out">No</span></td><td>Produced outside the U.S. It is in Mexico's GDP (and U.S. GNP)</td></tr>
+      <tr><td>Used car, used textbook, an old house resold</td><td><span class="out">No</span></td><td><span class="shift">Secondhand sale</span>: counted the year it was made. A dealer's or agent's fee does count</td></tr>
+      <tr><td>Stocks, bonds, a savings deposit</td><td><span class="out">No</span></td><td><span class="shift">Financial transaction</span>: ownership changes, nothing is produced. A broker's fee counts</td></tr>
+      <tr><td>Social Security, unemployment benefits, welfare payments</td><td><span class="out">No</span></td><td><span class="shift">Transfer payment</span>: no good or service is bought, so it is not G</td></tr>
+      <tr><td>Tires, steel, or flour sold to a firm that uses them in a final product</td><td><span class="out">No</span></td><td><span class="shift">Intermediate good</span>: already in the price of the final good</td></tr>
+      <tr><td>Home cooking, unpaid housework, volunteering</td><td><span class="out">No</span></td><td><span class="shift">Nonmarket activity</span>: GDP understates production</td></tr>
+      <tr><td>Illegal sales, unreported cash work</td><td><span class="out">No</span></td><td><span class="shift">Underground economy</span>: GDP understates production</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Answering it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Moves that earn points</h3>
+      <ul>
+        <li>When asked if something counts, give a yes or no and then the reason in one sentence, such as "No, a used car was counted in GDP the year it was produced."</li>
+        <li>If it counts, name the component: consumption, investment, government purchases, or net exports. New houses and unsold inventory are <b>investment</b>.</li>
+        <li>For a GDP calculation, write GDP = C + I + G + (X − M) first, then plug in only the items that belong. Cross out transfers, used goods, stock purchases, and intermediate goods.</li>
+        <li>For "why is GDP an imperfect measure of well-being," name a specific omission: leisure, income distribution, pollution and other externalities, nonmarket production, the underground economy, or quality changes.</li>
+        <li>Say the direction: nonmarket and underground activity make GDP <b>understate</b> production. Pollution cleanup makes GDP rise without making people better off than before the damage.</li>
+        <li>To compare living standards across countries, use <b>real GDP per capita</b>: real GDP divided by population.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Counting a stock or bond purchase as investment. In GDP, investment means new capital goods, new houses, and inventory changes.</li>
+        <li>Counting Social Security or unemployment checks as government purchases. They are transfer payments.</li>
+        <li>Leaving out a foreign-owned factory inside the U.S. GDP counts production by location.</li>
+        <li>Thinking unsold goods do not count. They count as inventory investment in the year they are made.</li>
+        <li>Adding the price of the tires and the price of the car. Count only the final good, or use value added at each stage.</li>
+        <li>Saying higher GDP per capita always means people are better off. It ignores leisure, distribution, and the environment.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 2.2. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-2.html">Unit 2 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- A. Sorting game ----------
+  var YES = { C: "Consumption (C)", I: "Investment (I)", G: "Government purchases (G)", X: "Exports (net exports)" };
+  var NO = { used: "Secondhand sale", fin: "Financial transaction", tr: "Transfer payment", inter: "Intermediate good", nonmkt: "Nonmarket activity", under: "Underground economy", abroad: "Produced outside the U.S." };
+  var ITEMS = [
+    { t: "A family sells its five-year-old car to a neighbor.", y: false, r: "used", w: "The car was counted in GDP the year it was built. Reselling it creates no new production. If a used-car dealer handled the sale, the dealer's fee would count as a service." },
+    { t: "A builder finishes a new house this year and sells it to a family.", y: true, r: "I", w: "New residential construction is counted as investment in GDP, even when a household buys it." },
+    { t: "Your aunt buys $5,000 of shares in a tech company.", y: false, r: "fin", w: "Shares change owners and nothing new is produced. Investment in GDP means new capital goods, not stocks. A broker's commission would count as a service." },
+    { t: "A parent cleans the family's house without pay.", y: false, r: "nonmkt", w: "The work is real, but it is not sold in a market, so GDP leaves it out. If the family hired a cleaning service, the same work would count." },
+    { t: "A dealer sells illegal drugs for cash.", y: false, r: "under", w: "Illegal sales are part of the underground economy. They are not reported, so GDP does not capture them." },
+    { t: "A retiree receives a Social Security check.", y: false, r: "tr", w: "This is a transfer payment: the government buys no good or service in return, so it is not part of G. When the retiree spends the money on new goods, that spending counts as consumption." },
+    { t: "A car built in Michigan this year is sold to a buyer in Canada.", y: true, r: "X", w: "It was produced inside the U.S. this year. Sold abroad, it is an export, which adds to U.S. GDP through net exports." },
+    { t: "Toyota builds a car at its plant in Kentucky, and an American family buys it.", y: true, r: "C", w: "GDP counts production inside U.S. borders, no matter who owns the factory. The family's purchase is consumption. The Japanese owners' profit counts toward Japan's GNP, not Japan's GDP." },
+    { t: "A U.S. company's factory in Mexico produces refrigerators.", y: false, r: "abroad", w: "The output is produced in Mexico, so it is part of Mexico's GDP. The U.S. owners' profit counts in U.S. GNP, which measures output by ownership." },
+    { t: "A tire maker sells new tires to an automaker, which puts them on new cars.", y: false, r: "inter", w: "The tires are an intermediate good. Their value is already in the price of the finished car. Counting both would count the tires twice. Tires a driver buys as replacements would count as consumption." },
+    { t: "A clothing firm makes sweaters this year that are still unsold in its warehouse on December 31.", y: true, r: "I", w: "Unsold output counts as inventory investment in the year it is produced. When the sweaters sell next year, consumption rises and inventory falls by the same amount, so they are not counted twice." },
+    { t: "A parent cooks dinner for the family at home.", y: false, r: "nonmkt", w: "The groceries were counted when they were bought, but the cooking itself is unpaid nonmarket work. The same meal at a restaurant would count in full." },
+    { t: "A volunteer spends Saturday serving meals at a food bank.", y: false, r: "nonmkt", w: "Volunteer work is unpaid, so it is a nonmarket activity. GDP understates total production by leaving it out." },
+    { t: "A state government pays a company to clean up a polluted river.", y: true, r: "G", w: "The cleanup is a government purchase of a service, so GDP rises. The harm from the pollution was never subtracted. That is how GDP misses negative externalities." },
+    { t: "You pay a barber $20 for a haircut.", y: true, r: "C", w: "A haircut is a final service bought by a household, so it is consumption. Services count in GDP just like goods." },
+    { t: "A teenager babysits for cash and never reports the income.", y: false, r: "under", w: "The work is legal, but it is unreported, so it is part of the underground economy. GDP misses it." }
+  ];
+
+  var order = ITEMS.map(function (_, i) { return i; });
+  var G = { pos: 0, yn: null, why: null, checked: false, right: 0, done: 0, sorted: [] };
+  var elYn = document.getElementById("g-yn"), elWhy = document.getElementById("g-why");
+  var elCheck = document.getElementById("g-check"), elFb = document.getElementById("g-fb");
+
+  var ynBtns = {};
+  [[true, "Yes, it counts"], [false, "No, it does not count"]].forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.id = x[0] ? "yn-yes" : "yn-no"; b.textContent = x[1];
+    b.addEventListener("click", function () { if (G.checked) return; if (G.yn !== x[0]) G.why = null; G.yn = x[0]; drawGame(); });
+    elYn.appendChild(b); ynBtns[x[0]] = b;
+  });
+
+  function cur() { return ITEMS[order[G.pos]]; }
+  function finished() { return G.pos >= order.length; }
+  function label(it) { return it.y ? YES[it.r] : NO[it.r]; }
+
+  function drawGame() {
+    var fin = finished(), it = fin ? null : cur();
+    document.getElementById("g-pos").textContent = fin ? "All " + order.length + " items done" : "Item " + (G.pos + 1) + " of " + order.length;
+    document.getElementById("g-score").textContent = G.right + " / " + G.done + " fully correct";
+    document.getElementById("g-item").textContent = fin ? "You sorted every item. Reshuffle to play again." : it.t;
+    [true, false].forEach(function (v) {
+      var b = ynBtns[v];
+      b.className = ""; b.disabled = fin || G.checked;
+      b.setAttribute("aria-pressed", G.yn === v ? "true" : "false");
+      if (G.checked) { if (v === it.y) b.className = "right"; else if (v === G.yn) b.className = "wrong"; }
+    });
+    // Step 2 options depend on step 1.
+    elWhy.innerHTML = "";
+    var set = G.yn === true ? YES : G.yn === false ? NO : null;
+    document.getElementById("g-step2").textContent = G.yn === true ? "Step 2: Which part of GDP?" : G.yn === false ? "Step 2: Why is it left out?" : "Step 2: Why?";
+    if (!set || fin) {
+      var h = document.createElement("span"); h.className = "hold";
+      h.textContent = fin ? "" : "Answer step 1 to see the choices.";
+      elWhy.appendChild(h);
+    } else {
+      Object.keys(set).forEach(function (k) {
+        var b = document.createElement("button"); b.type = "button"; b.id = "why-" + k; b.textContent = set[k];
+        b.disabled = G.checked;
+        b.setAttribute("aria-pressed", G.why === k ? "true" : "false");
+        if (G.checked) { if (k === it.r && G.yn === it.y) b.className = "right"; else if (k === G.why) b.className = "wrong"; }
+        b.addEventListener("click", function () { if (G.checked) return; G.why = k; drawGame(); });
+        elWhy.appendChild(b);
+      });
+    }
+    elCheck.disabled = fin || G.checked || G.yn === null || G.why === null;
+    document.getElementById("g-next").disabled = fin;
+    // bins
+    var bins = document.getElementById("g-bins"); bins.innerHTML = "";
+    [[true, "Counted in GDP"], [false, "Not counted"]].forEach(function (bx) {
+      var d = document.createElement("div"); d.className = "bin";
+      var hh = document.createElement("h4"); hh.textContent = bx[1]; d.appendChild(hh);
+      var list = G.sorted.filter(function (i) { return ITEMS[i].y === bx[0]; });
+      if (!list.length) { var n = document.createElement("span"); n.className = "none"; n.textContent = "Nothing yet"; d.appendChild(n); }
+      else {
+        var ul = document.createElement("ul");
+        list.forEach(function (i) {
+          var li = document.createElement("li");
+          li.appendChild(document.createTextNode(ITEMS[i].t + " "));
+          var w = document.createElement("span"); w.className = "why"; w.textContent = label(ITEMS[i]);
+          li.appendChild(w); ul.appendChild(li);
+        });
+        d.appendChild(ul);
+      }
+      bins.appendChild(d);
+    });
+  }
+
+  function setFb(html, cls) { elFb.className = "fb" + (cls ? " " + cls : ""); elFb.innerHTML = html; }
+  var START_FB = "Read the item, decide whether it counts, pick the reason, then check. You get the explanation either way.";
+
+  elCheck.addEventListener("click", function () {
+    var it = cur(); G.checked = true; G.done++;
+    var okY = G.yn === it.y, okR = okY && G.why === it.r, html, cls;
+    if (okR) { G.right++; G.sorted.push(order[G.pos]); html = "<b style='color:var(--good)'>Correct.</b> "; cls = "ok"; }
+    else if (okY) {
+      html = "<b style='color:var(--srpc)'>Half right.</b> It " + (it.y ? "does count, as <b>" : "is left out, as a <b>") + label(it).toLowerCase() + "</b>. "; cls = "half";
+    } else {
+      html = "<b style='color:var(--bad)'>Not quite.</b> It " + (it.y ? "counts in U.S. GDP as <b>" : "does not count. It is a <b>") + label(it).toLowerCase() + "</b>. "; cls = "no";
+    }
+    setFb(html + it.w, cls);
+    drawGame();
+    document.getElementById("g-next").focus();
+  });
+  document.getElementById("g-next").addEventListener("click", function () {
+    G.pos++; G.yn = null; G.why = null; G.checked = false;
+    setFb(finished() ? "Final score: " + G.right + " of " + G.done + " fully correct. Reshuffle to try a new order." : START_FB);
+    drawGame();
+  });
+  document.getElementById("g-shuffle").addEventListener("click", function () {
+    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+    G = { pos: 0, yn: null, why: null, checked: false, right: 0, done: 0, sorted: [] };
+    setFb(START_FB); drawGame();
+  });
+  setFb(START_FB);
+  drawGame();
+
+  // ---------- B. Two countries ----------
+  var GDPPC = 50000, WEEKS = 50;
+  var A = { hrs: 35, top: 40, pol: 30, home: 6000 };
+  var B = { hrs: 48, top: 58, pol: 30, home: 6000 };
+  function b80(top) { return (100 - top) / 100 * GDPPC / 0.8; }   // average income of the bottom 80%
+  function perHr(h) { return GDPPC / (h * WEEKS); }
+  function usd(v) { return "$" + Math.round(v).toLocaleString("en-US"); }
+
+  var S = { hrs: document.getElementById("s-hrs"), top: document.getElementById("s-top"), pol: document.getElementById("s-pol"), home: document.getElementById("s-home") };
+  var svg = document.getElementById("cmp");
+
+  function drawChart() {
+    var rows = [
+      ["Real GDP per capita", GDPPC, GDPPC, 60000, usd],
+      ["Hours worked per week", A.hrs, B.hrs, 60, function (v) { return v + " hr"; }],
+      ["Avg. income, bottom 80%", b80(A.top), b80(B.top), 60000, usd],
+      ["Air pollution index", A.pol, B.pol, 100, function (v) { return String(v); }],
+      ["Unpaid home production", A.home, B.home, 20000, usd]
+    ];
+    // Paired horizontal bars drawn with Lab.el. Each row is scaled to its own maximum (r[3]).
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var W = 440, L = 8, BW = 330, RH = 66, T = 6, H = T + rows.length * RH + 6;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    rows.forEach(function (r, i) {
+      var top = T + i * RH;
+      Lab.el("text", { x: L, y: top + 16, "class": "lbl", style: "fill:var(--ink)" }, svg, r[0]);
+      [[r[1], "var(--accent)", 25], [r[2], "var(--srpc)", 44]].forEach(function (b) {
+        var len = Math.max(0, Math.min(1, b[0] / r[3])) * BW;
+        Lab.el("rect", { x: L, y: top + b[2], width: Math.max(1, len), height: 15, rx: 2, fill: b[1], opacity: 0.85 }, svg);
+        Lab.el("text", { x: L + len + 6, y: top + b[2] + 12, style: "fill:" + b[1] + "; font-weight:600" }, svg, r[4](b[0]));
+      });
+      if (i < rows.length - 1) Lab.el("line", { x1: L, x2: W - 8, y1: top + RH, y2: top + RH, stroke: "var(--rule)" }, svg);
+    });
+  }
+
+  function story() {
+    var p = [], favA = [], favB = [];
+    p.push("<p><b>GDP per capita says the two countries are equal: $50,000 each.</b> Here is what that number leaves out.</p>");
+    var li = [];
+    var dh = B.hrs - A.hrs;
+    if (dh !== 0) {
+      li.push("<li><b>Leisure.</b> Country B works " + B.hrs + " hours a week and Country A works " + A.hrs + ". " +
+        (dh > 0 ? "B's people give up " + dh + " hours of free time a week to produce the same output, so they produce less per hour (" + usd(perHr(B.hrs)) + " vs. " + usd(perHr(A.hrs)) + ")."
+                : "B's people get " + (-dh) + " more hours of free time a week and produce more per hour (" + usd(perHr(B.hrs)) + " vs. " + usd(perHr(A.hrs)) + ").") + " GDP does not count leisure.</li>");
+      (dh > 0 ? favA : favB).push("leisure");
+    }
+    var dt = B.top - A.top;
+    if (dt !== 0) {
+      li.push("<li><b>Distribution of income.</b> The top 20% get " + B.top + "% of income in B and " + A.top + "% in A. The bottom 80% average " + usd(b80(B.top)) + " in B and " + usd(b80(A.top)) + " in A. " +
+        (dt > 0 ? "The typical family in B has less to spend even though the average is the same." : "Income in B is spread more evenly, so the typical family has more to spend.") + " GDP per capita is an average and cannot show this.</li>");
+      (dt > 0 ? favA : favB).push("the typical family's income");
+    }
+    var dp = B.pol - A.pol;
+    if (dp !== 0) {
+      li.push("<li><b>Environment.</b> B's pollution index is " + B.pol + " and A's is " + A.pol + ". " +
+        (dp > 0 ? "B's dirtier air harms health, a negative externality that GDP never subtracts." : "B's cleaner air is a benefit GDP never adds.") + "</li>");
+      (dp > 0 ? favA : favB).push("air quality");
+    }
+    var dm = B.home - A.home;
+    if (dm !== 0) {
+      li.push("<li><b>Nonmarket production.</b> People in B do " + usd(B.home) + " of unpaid home production per person and people in A do " + usd(A.home) + ". Counting it, total production is " + usd(GDPPC + B.home) + " in B and " + usd(GDPPC + A.home) + " in A. " +
+        "GDP leaves this work out, so it " + (dm > 0 ? "understates B's production by more than A's." : "understates A's production by more than B's.") + "</li>");
+      (dm > 0 ? favB : favA).push("unpaid home production");
+    }
+    if (li.length) p.push("<ul>" + li.join("") + "</ul>");
+    var v;
+    if (!favA.length && !favB.length) v = "<b>The countries match on everything shown here,</b> so GDP per capita gives a fair comparison. It still misses the underground economy and quality changes, which this panel does not show.";
+    else if (!favB.length) v = "<b>Country A comes out ahead on every measure that differs</b> (" + favA.join(", ") + "). People in A are likely better off, even though GDP per capita is identical.";
+    else if (!favA.length) v = "<b>Country B comes out ahead on every measure that differs</b> (" + favB.join(", ") + "). People in B are likely better off, even though GDP per capita is identical.";
+    else v = "<b>The picture is mixed.</b> A is ahead on " + favA.join(" and ") + "; B is ahead on " + favB.join(" and ") + ". Which country is better off depends on how much people value each one, so GDP per capita alone cannot rank them.";
+    p.push("<p>" + v + "</p>");
+    p.push("<p><b>AP answer:</b> real GDP per capita is the standard measure of living standards, but it is an imperfect measure of well-being because it ignores leisure, the distribution of income, environmental damage and other externalities, and nonmarket production.</p>");
+    return p.join("");
+  }
+
+  function render() {
+    Object.keys(S).forEach(function (k) { S[k].value = B[k]; });
+    document.getElementById("o-hrs").textContent = B.hrs + " hr";
+    document.getElementById("o-top").textContent = B.top + "%";
+    document.getElementById("o-pol").textContent = B.pol;
+    document.getElementById("o-home").textContent = usd(B.home);
+    drawChart();
+    document.getElementById("r-hr").innerHTML = '<span class="ca">' + usd(perHr(A.hrs)) + '</span> <small>/</small> <span class="cb">' + usd(perHr(B.hrs)) + "</span>";
+    document.getElementById("r-b80").innerHTML = '<span class="ca">' + usd(b80(A.top)) + '</span> <small>/</small> <span class="cb">' + usd(b80(B.top)) + "</span>";
+    document.getElementById("r-tot").innerHTML = '<span class="ca">' + usd(GDPPC + A.home) + '</span> <small>/</small> <span class="cb">' + usd(GDPPC + B.home) + "</span>";
+    document.getElementById("story").innerHTML = story();
+  }
+
+  Object.keys(S).forEach(function (k) {
+    S[k].addEventListener("input", function () { B[k] = +S[k].value; render(); });
+  });
+
+  var scen = [
+    ["Long hours, unequal incomes", { hrs: 48, top: 58, pol: 30, home: 6000 }],
+    ["B works longer hours", { hrs: 50, top: 40, pol: 30, home: 6000 }],
+    ["B's income goes to the top", { hrs: 35, top: 62, pol: 30, home: 6000 }],
+    ["B has dirtier air", { hrs: 35, top: 40, pol: 75, home: 6000 }],
+    ["B does more home production", { hrs: 35, top: 40, pol: 30, home: 16000 }],
+    ["Mixed: long hours, clean air", { hrs: 50, top: 40, pol: 10, home: 6000 }],
+    ["Identical countries", { hrs: 35, top: 40, pol: 30, home: 6000 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { B = { hrs: x[1].hrs, top: x[1].top, pol: x[1].pol, home: x[1].home }; render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following is included in U.S. GDP?", o: ["Refrigerators made at a U.S.-owned factory in Mexico", "Cars produced at a Japanese-owned plant in Ohio", "A household's purchase of shares of a U.S. corporation", "A retiree's Social Security payment"], c: 1, w: "GDP counts final goods and services produced inside U.S. borders, regardless of who owns the factory. The Mexico factory's output is in Mexico's GDP. Stock purchases are financial transactions, and Social Security is a transfer payment." },
+    { s: "In a year, a country has consumption of new goods and services of $500 billion, purchases of used cars of $40 billion, gross private investment of $150 billion, government purchases of $200 billion, government transfer payments of $100 billion, exports of $80 billion, and imports of $100 billion. What is GDP?", o: ["$730 billion", "$970 billion", "$830 billion", "$930 billion"], c: 2, w: "GDP = C + I + G + (X − M) = 500 + 150 + 200 + (80 − 100) = $830 billion. Used cars and transfer payments are left out. Choice B wrongly adds them in ($970 billion), and choice D forgets to subtract imports ($930 billion)." },
+    { s: "Which of the following best explains why GDP understates the total production of an economy?", o: ["GDP leaves out nonmarket production such as unpaid childcare and home cooking", "GDP counts intermediate goods twice", "GDP includes government transfer payments", "GDP includes the value of exports"], c: 0, w: "Unpaid work at home is real production that is never sold in a market, so GDP leaves it out and understates total output. GDP excludes intermediate goods and transfer payments, and exports are correctly part of production inside the country." },
+    { s: "Country X and Country Y have the same real GDP per capita. Workers in Country X average 30 hours a week, and workers in Country Y average 50 hours a week. Which conclusion is best supported?", o: ["Country Y has a higher standard of living because its people work more", "The two countries must have the same level of well-being", "Country X must have a larger underground economy", "Country X may have higher well-being because GDP per capita does not count the value of leisure"], c: 3, w: "Both countries produce the same output per person, but people in X get 20 more hours of free time a week. GDP does not value leisure, so equal GDP per capita can hide a difference in well-being. Nothing given tells us about the underground economy." },
+    { s: "A farmer sells wheat to a miller for $1.00. The miller sells flour to a baker for $2.50. The baker sells bread to consumers for $4.00. By how much does GDP increase?", o: ["$7.50", "$4.00", "$1.00", "$3.00"], c: 1, w: "Only the final good counts: the $4.00 loaf. The same answer comes from adding value added at each stage: $1.00 + $1.50 + $1.50 = $4.00. Choice A adds the intermediate goods and counts the wheat and flour twice." },
+    { s: "A chemical plant's waste pollutes a river. Later, the city pays a firm $10 million to clean it up. How do these events affect GDP?", o: ["The pollution reduces GDP, and the cleanup increases it", "Neither event affects GDP", "The pollution is subtracted from GDP, and the cleanup is not counted", "The pollution is not subtracted from GDP, and the cleanup adds $10 million to GDP"], c: 3, w: "GDP never subtracts the harm from a negative externality like pollution. The cleanup is a government purchase of a service, so GDP rises by $10 million even though it only repairs damage. That is one reason GDP is an imperfect measure of well-being." },
+    { s: "A firm produces $2 million of furniture in 2025 and sells all of it in 2026. How is the furniture treated in GDP?", o: ["It is added to 2025 GDP as inventory investment", "It is added to 2026 GDP when it is sold", "It is never counted because it was not sold in the year it was made", "It is added to both 2025 and 2026 GDP"], c: 0, w: "GDP counts production in the year it happens. Unsold goods count as inventory investment in 2025. In 2026, consumption rises by $2 million and inventory investment falls by $2 million, so 2026 GDP does not change from the sale." },
+    { s: "Over ten years, the price of a typical laptop stays about the same while laptops become much faster and lighter. Measured GDP most likely", o: ["overstates the gain in well-being, because the price did not fall", "measures the gain in well-being exactly, because prices reflect value", "understates the gain in well-being, because it does not fully capture improvements in quality", "is not affected, because laptops are intermediate goods"], c: 2, w: "A much better laptop at the same price adds about the same dollar amount to GDP as the old model did. GDP does not fully capture quality improvements, so it tends to understate how much better off people are. Laptops bought by households are final goods." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("2.2");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [2], topic: "2.2", compact: true, storageKey: "topic-2.2" });</script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparative Advantage and Gains from Trade Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub { display: grid; gap: 6px; margin-top: 8px; }
+.sub h3 { font-size: 1.2rem; }
+.sub p { color: var(--muted); max-width: 70ch; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.calc-card { display: grid; gap: 12px; align-content: start; }
+.calc .row span:last-child { font-family: var(--mono); text-align: right; }
+.prob { background: var(--paper); border-left: 4px solid var(--c3); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: .95rem; }
+.aid { font-size: .9rem; color: var(--muted); }
+.aid b { color: var(--ink); }
+.grid-in { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px 10px; align-items: center; }
+.grid-in .h { font-size: .8rem; color: var(--muted); font-weight: 600; }
+.grid-in .rl { font-size: .9rem; font-weight: 500; }
+.num { font: inherit; font-size: .95rem; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); width: 100%; }
+.num:disabled { opacity: .5; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.oc table { min-width: 0; }
+.oc td, .oc th { padding: 6px 10px; }
+.verdicts { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: .93rem; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.legend .l-good { color: var(--good); }
+.legend .l-dash { color: var(--c3); }
+.legend .l-dash::before { background: none; border-top: 2px dashed currentColor; height: 0; }
+.controls.two-c { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 520px) { .controls.two-c { grid-template-columns: 1fr; } .calc .row { flex-wrap: wrap; } .calc .row span:last-child { text-align: left; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 1 · Topic 1.3</span>
+  <h1>Comparative Advantage and Gains from Trade Study Lab</h1>
+  <p class="lede">A country has a comparative advantage in a good when it can make that good at a lower opportunity cost than another country. When each country specializes in its comparative advantage and trades, both can consume a combination outside their own PPC. Use the calculator to work output and input problems step by step, then test terms of trade on the PPC graphs.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Comparative advantage calculator</h2>
+    <p>Pick a preset or type your own numbers. Then flip between an output problem and an input problem with the same numbers and watch the answer reverse.</p>
+  </div>
+
+  <div class="sub">
+    <h3>A. Find opportunity costs and who specializes</h3>
+  </div>
+
+  <div class="lab">
+    <div class="card calc-card">
+      <div>
+        <div class="tag" style="margin-bottom:8px;">AP-style presets</div>
+        <div class="scenarios" id="presets"></div>
+      </div>
+      <div style="display:grid; gap:6px;">
+        <span style="font-size:.86rem; font-weight:500;">What do the numbers in the table mean?</span>
+        <div class="seg" role="group" aria-label="Type of problem">
+          <button type="button" id="m-out" aria-pressed="true">Output: units produced</button>
+          <button type="button" id="m-in" aria-pressed="false">Input: hours per unit</button>
+        </div>
+      </div>
+      <div class="grid-in" id="grid-in">
+        <span class="h" id="g-corner">Units produced</span>
+        <span class="h" id="g-hx" aria-hidden="true"></span>
+        <span class="h" id="g-hy" aria-hidden="true"></span>
+        <span class="rl" id="g-ra" aria-hidden="true"></span>
+        <span><label class="sr" for="v-ax" id="l-ax"></label><input class="num" type="number" id="v-ax" min="0" step="any"></span>
+        <span><label class="sr" for="v-ay" id="l-ay"></label><input class="num" type="number" id="v-ay" min="0" step="any"></span>
+        <span class="rl" id="g-rb" aria-hidden="true"></span>
+        <span><label class="sr" for="v-bx" id="l-bx"></label><input class="num" type="number" id="v-bx" min="0" step="any"></span>
+        <span><label class="sr" for="v-by" id="l-by"></label><input class="num" type="number" id="v-by" min="0" step="any"></span>
+      </div>
+      <div class="ctl">
+        <label for="v-h">Hours of labor in each country</label>
+        <input class="num" type="number" id="v-h" min="1" step="any">
+        <span class="hint" id="h-h"></span>
+      </div>
+    </div>
+    <div class="card calc-card">
+      <div class="prob" id="prob"></div>
+      <div><span class="formula" id="formula"></span></div>
+      <p class="aid" id="aid"></p>
+      <div class="calc" id="calc" aria-live="polite"></div>
+      <div class="oc" id="oc"></div>
+      <ul class="verdicts" id="verdicts"></ul>
+    </div>
+  </div>
+
+  <div class="sub">
+    <h3>B. PPCs and the terms-of-trade checker</h3>
+    <p>Each country specializes in its comparative advantage and trades. Propose a trade ratio and an amount to trade. Solid green PPCs show what each country can make on its own; the dashed purple line shows what it can consume after trading at your terms.</p>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div class="controls two-c">
+      <div class="ctl">
+        <label for="t-in" id="l-t">Terms of trade</label>
+        <input class="num" type="number" id="t-in" min="0" step="0.05">
+        <span class="hint" id="h-t"></span>
+      </div>
+      <div class="ctl">
+        <label for="q-in" id="l-q">Amount traded <output id="o-q"></output></label>
+        <input type="range" id="q-in" min="0" max="10" step="0.5">
+        <span class="hint" id="h-q"></span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" id="btn-mid">Use the midpoint of the range</button>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3 id="h-ga">Country A <small>straight-line PPC</small></h3>
+      <svg class="chart" id="ppc-a" viewBox="0 0 440 330" role="img" aria-label="PPC for the first country"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3 id="h-gb">Country B <small>straight-line PPC</small></h3>
+      <svg class="chart" id="ppc-b" viewBox="0 0 440 330" role="img" aria-label="PPC for the second country"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-lrpc">PPC (production on its own)</span><span class="l-dash">Consumption possibilities with trade</span><span class="l-ghost">Point on the PPC with the same amount of the first good</span><span class="l-good">Consumption after trade</span></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k" id="k-cx">Comparative advantage in good 1</div><div class="v" id="r-cx"></div></div>
+    <div class="stat"><div class="k" id="k-cy">Comparative advantage in good 2</div><div class="v" id="r-cy"></div></div>
+    <div class="stat"><div class="k">Terms that help both</div><div class="v" id="r-range" style="font-size:1rem"></div></div>
+    <div class="stat"><div class="k">Your terms</div><div class="v" id="r-you"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">More or faster</span><h3>Absolute advantage</h3><p>A producer has an absolute advantage in a good if it can make more of it with the same resources (output problem) or make one unit with fewer resources (input problem). One country can have an absolute advantage in both goods.</p></div>
+    <div class="card"><span class="tag">Lower opportunity cost</span><h3>Comparative advantage</h3><p>A producer has a comparative advantage in a good if it gives up less of the other good to make one unit. Unless the opportunity costs are equal, each country has a comparative advantage in exactly one of the two goods.</p></div>
+    <div class="card"><span class="tag">Output: other over</span><h3>Output problems</h3><p>The table shows how many units each country can produce. Opportunity cost of one good = the <b>other</b> good's output ÷ this good's output. If A makes 40 wheat or 20 cloth, 1 wheat costs 20 ÷ 40 = 0.5 cloth.</p></div>
+    <div class="card"><span class="tag">Input: in on top</span><h3>Input problems</h3><p>The table shows the hours (or workers, or acres) needed to make one unit. Opportunity cost of one good = the input for the good you are asking about ÷ the other good's input. If a shirt takes 6 hours and a hat takes 3, 1 shirt costs 6 ÷ 3 = 2 hats. Lower numbers mean absolute advantage here.</p></div>
+    <div class="card"><span class="tag">The trade price</span><h3>Terms of trade</h3><p>The terms of trade are how much of one good trades for one unit of the other. Both countries gain only if the terms fall between their two opportunity costs. Outside that range, one country could do better by making the good itself.</p></div>
+    <div class="card"><span class="tag">Why comparative</span><h3>Gains from trade</h3><p>Trade lets each country get a good for less than it would cost to make at home. What matters is the opportunity cost each country faces, which comparative advantage measures. Production stays on each PPC, but consumption moves outside it.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Worked examples</h2>
+    <p>First, the two setups side by side. Then the presets from the calculator worked out the way an answer key would.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Setup</th><th>What the numbers mean</th><th>Absolute advantage goes to</th><th>Opportunity cost of 1 X</th><th>Memory aid</th></tr></thead>
+    <tbody>
+      <tr><td><b>Output problem</b></td><td>Units of each good made with the same resources (per day, per worker, in total)</td><td>The <b>larger</b> number</td><td>Y output ÷ X output</td><td>Output: the <b>other</b> good goes on top</td></tr>
+      <tr><td><span class="shift">Input problem</span></td><td>Hours, workers, or acres needed to make 1 unit</td><td>The <span class="shift">smaller</span> number</td><td>X input ÷ Y input</td><td>Input: the good you are <span class="shift">in</span> goes on top</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Problem</th><th>Opportunity costs</th><th>Absolute advantage</th><th>Comparative advantage</th><th>Terms that help both</th></tr></thead>
+    <tbody>
+      <tr><td>Output. A: 40 wheat or 20 cloth. B: 10 wheat or 15 cloth.</td><td>A: 1 wheat = 0.5 cloth, 1 cloth = 2 wheat<br>B: 1 wheat = 1.5 cloth, 1 cloth = 2/3 wheat</td><td>A in both</td><td>A in wheat, B in cloth</td><td>Between 0.5 and 1.5 cloth per wheat</td></tr>
+      <tr><td>Input. A: 6 hours per shirt, 3 per hat. B: 8 hours per shirt, 2 per hat.</td><td>A: 1 shirt = 6 ÷ 3 = 2 hats<br>B: 1 shirt = 8 ÷ 2 = 4 hats</td><td>A in shirts, B in hats</td><td>A in shirts, B in hats</td><td>Between 2 and 4 hats per shirt</td></tr>
+      <tr><td>Input. A: 2 hours per corn, 4 per steel. B: 6 hours per corn, 8 per steel.</td><td>A: 1 corn = 2 ÷ 4 = 0.5 steel<br>B: 1 corn = 6 ÷ 8 = 0.75 steel</td><td>A in both (fewer hours)</td><td>A in corn, B in steel</td><td>Between 0.5 and 0.75 steel per corn</td></tr>
+      <tr><td>Output. A: 20 rice or 10 fish. B: 10 rice or 5 fish.</td><td>Both: 1 rice = 0.5 fish</td><td>A in both</td><td>Neither</td><td>None. Equal opportunity costs mean no gains from trade.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Answering it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>What graders want to see</h3>
+      <ul>
+        <li>Write the opportunity cost with the numbers and units: "A's opportunity cost of 1 wheat = 20 cloth ÷ 40 wheat = 0.5 units of cloth."</li>
+        <li>Justify comparative advantage with a comparison of opportunity costs: "A has a comparative advantage in wheat because its opportunity cost of wheat (0.5 cloth) is lower than B's (1.5 cloth)."</li>
+        <li>Justify absolute advantage with the raw numbers: "A can produce more wheat (40 &gt; 10)" or "A needs fewer hours per unit (2 &lt; 6)."</li>
+        <li>For terms of trade, state the range and check your answer against both opportunity costs: "1 wheat for 1 cloth benefits both because 0.5 &lt; 1 &lt; 1.5."</li>
+        <li>On a PPC, put one good on each axis, label the intercepts, and draw a straight line for constant opportunity cost. The slope's size is the opportunity cost of the horizontal-axis good.</li>
+        <li>For gains from trade, say consumption moves to a point outside the PPC. Production stays on the PPC.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Using the output formula on an input table. In an input problem, the good you are asking about goes on top.</li>
+        <li>Calling the larger number in an input table an absolute advantage. More hours per unit means slower, so the smaller number wins.</li>
+        <li>Deciding specialization by absolute advantage. A country with an absolute advantage in both goods still specializes only in its comparative advantage.</li>
+        <li>Saying one country has a comparative advantage in both goods. With two goods, a lower cost of one good always means a higher cost of the other.</li>
+        <li>Choosing terms of trade outside the range between the two opportunity costs, or exactly at one end (that country gains nothing).</li>
+        <li>Dropping units. "0.5" earns less than "0.5 units of cloth."</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 1.3. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-1.html">Unit 1 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var EPS = 1e-9;
+
+  // ---------- Presets ----------
+  // goods: [first good (horizontal axis), second good (vertical axis)], each { one, many }
+  var PRESETS = [
+    { label: "Output: A is better at both", mode: "out", names: ["Country A", "Country B"],
+      goods: [{ one: "wheat", many: "wheat" }, { one: "cloth", many: "cloth" }], v: [[40, 20], [10, 15]], h: 24, t: 1, q: 10 },
+    { label: "Input: hours per unit", mode: "in", names: ["Country A", "Country B"],
+      goods: [{ one: "shirt", many: "shirts" }, { one: "hat", many: "hats" }], v: [[6, 3], [8, 2]], h: 24, t: 3, q: 2 },
+    { label: "Output: two workers", mode: "out", names: ["Ana", "Ben"],
+      goods: [{ one: "loaf", many: "loaves" }, { one: "scarf", many: "scarves" }], v: [[12, 4], [6, 6]], h: 8, t: 0.5, q: 6 },
+    { label: "Input: A is faster at both", mode: "in", names: ["Country A", "Country B"],
+      goods: [{ one: "corn", many: "corn" }, { one: "steel", many: "steel" }], v: [[2, 4], [6, 8]], h: 48, t: 0.6, q: 5 },
+    { label: "Same opportunity costs", mode: "out", names: ["Country A", "Country B"],
+      goods: [{ one: "rice", many: "rice" }, { one: "fish", many: "fish" }], v: [[20, 10], [10, 5]], h: 24, t: 0.5, q: 4 },
+    { label: "Terms outside the range", mode: "out", names: ["Country A", "Country B"],
+      goods: [{ one: "wheat", many: "wheat" }, { one: "cloth", many: "cloth" }], v: [[40, 20], [10, 15]], h: 24, t: 2, q: 5 }
+  ];
+  function copy(p) { return JSON.parse(JSON.stringify(p)); }
+  var S = copy(PRESETS[0]);
+
+  // ---------- Number formatting ----------
+  function n2(v) { var r = Math.round(v * 100) / 100; return String(r); }
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a; }
+  function isInt(v) { return Math.abs(v - Math.round(v)) < EPS; }
+  // a ÷ b shown as a reduced fraction with a decimal when both are whole numbers
+  function quot(a, b) {
+    var v = a / b;
+    if (isInt(a) && isInt(b) && !isInt(v)) {
+      var g = gcd(Math.round(a), Math.round(b)), p = Math.round(a) / g, q = Math.round(b) / g;
+      var dec = n2(v);
+      return Math.abs(+dec - v) < EPS ? p + "/" + q + " = " + dec : p + "/" + q + " ≈ " + dec;
+    }
+    return Math.abs(+n2(v) - v) < EPS ? n2(v) : "≈ " + n2(v);
+  }
+  function u(g, v) { return Math.abs(v - 1) < EPS ? g.one : g.many; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ---------- Model ----------
+  function model(s) {
+    var m = { ok: true, oc: [], max: [], abs: [null, null], ca: [null, null] };
+    var vals = [s.v[0][0], s.v[0][1], s.v[1][0], s.v[1][1]];
+    if (vals.some(function (x) { return !(x > 0) || !isFinite(x); }) || (s.mode === "in" && !(s.h > 0))) { m.ok = false; return m; }
+    for (var c = 0; c < 2; c++) {
+      var x = s.v[c][0], y = s.v[c][1];
+      // oc[c][g] = units of the other good given up for 1 unit of good g
+      m.oc[c] = s.mode === "out" ? [y / x, x / y] : [x / y, y / x];
+      m.max[c] = s.mode === "out" ? [x, y] : [s.h / x, s.h / y];
+    }
+    for (var g = 0; g < 2; g++) {
+      var a = s.v[0][g], b = s.v[1][g];
+      if (Math.abs(a - b) > EPS) m.abs[g] = (s.mode === "out" ? a > b : a < b) ? 0 : 1;
+      if (Math.abs(m.oc[0][g] - m.oc[1][g]) > EPS) m.ca[g] = m.oc[0][g] < m.oc[1][g] ? 0 : 1;
+    }
+    m.trade = m.ca[0] != null;
+    if (!m.trade) return m;
+    var E = m.ca[0], M = 1 - E;               // E exports the first good, M exports the second
+    m.E = E; m.M = M;
+    m.lo = m.oc[E][0]; m.hi = m.oc[M][0];     // terms (second good per first good) must lie between these
+    var t = s.t;
+    m.tOk = t > 0 && isFinite(t);
+    if (!m.tOk) return m;
+    m.qMax = Math.min(m.max[E][0], m.max[M][1] / t);
+    var q = Math.max(0, Math.min(s.q, m.qMax));
+    m.q = q;
+    // E produces only good 1, keeps max - q, receives q*t of good 2
+    m.cE = [m.max[E][0] - q, q * t];
+    m.pE = [m.max[E][0] - q, q * m.lo];       // point on E's PPC with the same amount of good 1
+    m.gE = q * (t - m.lo);
+    // M produces only good 2, receives q of good 1, gives q*t of good 2
+    m.cM = [q, m.max[M][1] - q * t];
+    m.pM = [q, m.max[M][1] - q * m.hi];
+    m.gM = q * (m.hi - t);
+    m.status = t > m.lo + EPS && t < m.hi - EPS ? "both" : (t <= m.lo + EPS ? (t < m.lo - EPS ? "Eloses" : "Ezero") : (t > m.hi + EPS ? "Mloses" : "Mzero"));
+    return m;
+  }
+
+  // ---------- Calculator panel ----------
+  var $ = function (id) { return document.getElementById(id); };
+  var inV = [[$("v-ax"), $("v-ay")], [$("v-bx"), $("v-by")]], inH = $("v-h");
+
+  function renderCalc(m) {
+    var G = S.goods, N = S.names, out = S.mode === "out";
+    $("m-out").setAttribute("aria-pressed", out); $("m-in").setAttribute("aria-pressed", !out);
+    $("g-corner").textContent = out ? "Units produced" : "Hours per unit";
+    $("g-hx").textContent = cap(G[0].many); $("g-hy").textContent = cap(G[1].many);
+    $("g-ra").textContent = N[0]; $("g-rb").textContent = N[1];
+    [["l-ax", 0, 0], ["l-ay", 0, 1], ["l-bx", 1, 0], ["l-by", 1, 1]].forEach(function (r) {
+      $(r[0]).textContent = N[r[1]] + ", " + (out ? "units of " + G[r[2]].many + " produced" : "hours to make 1 " + G[r[2]].one);
+    });
+    for (var c = 0; c < 2; c++) for (var g = 0; g < 2; g++) if (document.activeElement !== inV[c][g]) inV[c][g].value = S.v[c][g];
+    if (document.activeElement !== inH) inH.value = S.h;
+    inH.disabled = out;
+    $("h-h").textContent = out ? "Not needed for output problems. The table already gives each country's maximum output." : "Used only to draw the PPCs. Opportunity costs do not depend on it.";
+
+    var v = S.v;
+    var prob = out
+      ? "Using the same amount of resources, " + N[0] + " can produce either " + n2(v[0][0]) + " " + u(G[0], v[0][0]) + " or " + n2(v[0][1]) + " " + u(G[1], v[0][1]) + ". " + N[1] + " can produce either " + n2(v[1][0]) + " " + u(G[0], v[1][0]) + " or " + n2(v[1][1]) + " " + u(G[1], v[1][1]) + "."
+      : N[0] + " needs " + n2(v[0][0]) + " hours to make 1 " + G[0].one + " and " + n2(v[0][1]) + " hours to make 1 " + G[1].one + ". " + N[1] + " needs " + n2(v[1][0]) + " hours per " + G[0].one + " and " + n2(v[1][1]) + " hours per " + G[1].one + ". Each has " + n2(S.h) + " hours of labor.";
+    $("prob").innerHTML = "<b>Problem.</b> " + prob;
+    $("formula").textContent = out ? "OC of 1 " + G[0].one + " = " + G[1].many + " output ÷ " + G[0].many + " output" : "OC of 1 " + G[0].one + " = hours per " + G[0].one + " ÷ hours per " + G[1].one;
+    $("aid").innerHTML = out
+      ? "<b>Output: other over.</b> In an output table, the <b>other</b> good goes on top. A country that makes more of the other good gives up more of it for each unit of this good."
+      : "<b>Input: in on top.</b> In an input table, the good you are <b>in</b> (the one you are finding the cost of) goes on top. The hours spent on 1 " + G[0].one + " could have made (hours per " + G[0].one + " ÷ hours per " + G[1].one + ") " + G[1].many + ".";
+
+    if (!m.ok) {
+      $("calc").innerHTML = '<div class="row"><span>Enter a positive number in every box.</span><span></span></div>';
+      $("oc").innerHTML = ""; $("verdicts").innerHTML = ""; return;
+    }
+    var rows = [];
+    for (c = 0; c < 2; c++) for (g = 0; g < 2; g++) {
+      var o = 1 - g, top = out ? v[c][o] : v[c][g], bot = out ? v[c][g] : v[c][o];
+      var work = out
+        ? n2(top) + " " + u(G[o], top) + " ÷ " + n2(bot) + " " + u(G[g], bot)
+        : n2(top) + " hrs ÷ " + n2(bot) + " hrs";
+      rows.push('<div class="row"><span>' + N[c] + ": OC of 1 " + G[g].one + "</span><span>" + work + " = " + quot(top, bot).replace(/^≈ /, "≈ ") + " " + u(G[o], m.oc[c][g]) + "</span></div>");
+    }
+    rows.push('<div class="row"><span>Specialize</span><span>' + (m.trade ? N[m.ca[0]] + ": " + G[0].many + " · " + N[m.ca[1]] + ": " + G[1].many : "No gain from specializing") + "</span></div>");
+    $("calc").innerHTML = rows.join("");
+
+    $("oc").innerHTML = '<div class="tbl-wrap"><table><thead><tr><th>Opportunity cost</th><th>1 ' + G[0].one + "</th><th>1 " + G[1].one + "</th></tr></thead><tbody>" +
+      [0, 1].map(function (c) {
+        return "<tr><td>" + N[c] + "</td>" + [0, 1].map(function (g) {
+          var txt = n2(m.oc[c][g]) + " " + u(G[1 - g], m.oc[c][g]);
+          return "<td>" + (m.ca[g] === c ? "<b>" + txt + "</b>" : txt) + "</td>";
+        }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div>";
+
+    var ver = [];
+    for (g = 0; g < 2; g++) {
+      var a = v[0][g], b = v[1][g];
+      ver.push("Absolute advantage in " + G[g].many + ": " + (m.abs[g] == null ? "neither (the numbers are equal)" :
+        "<b>" + N[m.abs[g]] + "</b> (" + (out ? n2(Math.max(a, b)) + " &gt; " + n2(Math.min(a, b)) + " units" : n2(Math.min(a, b)) + " &lt; " + n2(Math.max(a, b)) + " hours") + ")"));
+    }
+    for (g = 0; g < 2; g++) {
+      ver.push("Comparative advantage in " + G[g].many + ": " + (m.ca[g] == null ? "neither (equal opportunity costs)" :
+        "<b>" + N[m.ca[g]] + "</b> (" + n2(m.oc[m.ca[g]][g]) + " &lt; " + n2(m.oc[1 - m.ca[g]][g]) + " " + u(G[1 - g], m.oc[1 - m.ca[g]][g]) + ")"));
+    }
+    $("verdicts").innerHTML = ver.map(function (x) { return "<li>" + x + "</li>"; }).join("");
+  }
+
+  // ---------- Graphs ----------
+  function niceStep(raw) {
+    var p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+  }
+  function axis(maxV) {
+    var step = niceStep(maxV / 5), top = Math.ceil(maxV * 1.08 / step) * step, ticks = [];
+    for (var k = 0; k <= top + EPS; k += step) ticks.push(Math.round(k * 1000) / 1000);
+    return { top: top, ticks: ticks };
+  }
+
+  function drawCountry(svg, c, m, ax, ay) {
+    var G = S.goods;
+    var F = Lab.frame(svg, { x: [0, ax.top], y: [0, ay.top], xLabel: "Quantity of " + G[0].many, yLabel: "Quantity of " + G[1].many,
+      xTicks: ax.ticks, yTicks: ay.ticks, fmtX: n2, fmtY: n2 });
+    if (!m.ok) return;
+    var X = m.max[c][0], Y = m.max[c][1];
+    Lab.line(F, [[0, Y], [X, 0]], "var(--lrpc)", 3);
+    var t = S.t, isE = m.trade && m.tOk && c === m.E;
+    // label the PPC at the intercept that is not the production point
+    if (m.trade && m.tOk && !isE) Lab.tag(F, X + ax.top * 0.02, ay.top * 0.08, "PPC", "var(--lrpc)");
+    else Lab.tag(F, ax.top * 0.02, Y + ay.top * 0.03, "PPC", "var(--lrpc)");
+    if (!m.trade || !m.tOk) return;
+    var cons = isE ? m.cE : m.cM, onP = isE ? m.pE : m.pM, gain = isE ? m.gE : m.gM;
+    // consumption possibilities line from the specialization point, slope -t
+    if (isE) Lab.line(F, [[X, 0], [0, X * t]], "var(--c3)", 2, "6 4");
+    else Lab.line(F, [[0, Y], [Y / t, 0]], "var(--c3)", 2, "6 4");
+    var pp = isE ? [X, 0] : [0, Y];
+    Lab.dot(F, pp[0], pp[1], "var(--c3)", false);
+    Lab.tag(F, pp[0] + (isE ? -ax.top * 0.06 : ax.top * 0.03), pp[1] + ay.top * (isE ? 0.03 : -0.06), "Produce here", "var(--c3)", isE ? "end" : "start");
+    if (m.q <= EPS) return;
+    var good = gain > EPS, col = good ? "var(--good)" : (gain < -EPS ? "var(--bad)" : "var(--muted)");
+    Lab.dot(F, onP[0], onP[1], "var(--ghost)", false);
+    if (Math.abs(gain) > ay.top * 0.03) Lab.arrow(F, onP[0], onP[1], cons[0], cons[1] + (good ? -1 : 1) * ay.top * 0.025, col);
+    Lab.dot(F, cons[0], cons[1], col, true);
+    var right = cons[0] < ax.top * 0.6;
+    var anc = right ? "start" : "end", dx = (right ? 1 : -1) * ax.top * 0.03;
+    Lab.tag(F, cons[0] + dx, cons[1] + ay.top * 0.03, "After trade", col, anc);
+    Lab.tag(F, onP[0] - dx, Math.max(onP[1] - ay.top * 0.02, ay.top * 0.04), "On its own", "var(--muted)", right ? "end" : "start");
+  }
+
+  function renderGraphs(m) {
+    var N = S.names;
+    $("h-ga").firstChild.textContent = N[0] + " ";
+    $("h-gb").firstChild.textContent = N[1] + " ";
+    $("ppc-a").setAttribute("aria-label", "PPC for " + N[0]);
+    $("ppc-b").setAttribute("aria-label", "PPC for " + N[1]);
+    var mx = 1, my = 1;
+    if (m.ok) {
+      mx = Math.max(m.max[0][0], m.max[1][0]); my = Math.max(m.max[0][1], m.max[1][1]);
+      if (m.trade && m.tOk) my = Math.max(my, m.cE[1], m.cM[1]);
+    }
+    var ax = axis(mx), ay = axis(my);
+    drawCountry($("ppc-a"), 0, m, ax, ay);
+    drawCountry($("ppc-b"), 1, m, ax, ay);
+  }
+
+  // ---------- Trade controls, readout, story ----------
+  var tIn = $("t-in"), qIn = $("q-in");
+  function renderTrade(m) {
+    var G = S.goods, N = S.names;
+    $("l-t").textContent = "Terms of trade: " + G[1].many + " per 1 " + G[0].one;
+    if (document.activeElement !== tIn) tIn.value = S.t;
+    $("h-t").textContent = S.t > 0 ? "1 " + G[0].one + " trades for " + n2(S.t) + " " + u(G[1], S.t) + ", so 1 " + G[1].one + " trades for " + n2(1 / S.t) + " " + u(G[0], 1 / S.t) + "." : "Enter a positive ratio.";
+    var canTrade = m.ok && m.trade && m.tOk;
+    qIn.disabled = !canTrade; $("btn-mid").disabled = !(m.ok && m.trade);
+    if (canTrade) {
+      var step = m.qMax >= 10 ? 1 : 0.5, top = Math.floor(m.qMax / step + EPS) * step;
+      qIn.step = step; qIn.max = top; qIn.value = Math.min(m.q, top);
+      $("l-q").firstChild.textContent = cap(G[0].many) + " sent from " + N[m.E] + " to " + N[m.M] + " ";
+      $("o-q").textContent = n2(m.q);
+      $("h-q").textContent = "Up to " + n2(m.qMax) + ": " + N[m.E] + " can make at most " + n2(m.max[m.E][0]) + " " + u(G[0], m.max[m.E][0]) + ", and " + N[m.M] + " can pay at most " + n2(m.max[m.M][1]) + " " + u(G[1], m.max[m.M][1]) + ".";
+    } else {
+      $("l-q").firstChild.textContent = "Amount traded ";
+      $("o-q").textContent = "–";
+      $("h-q").textContent = m.ok && !m.trade ? "No trade: neither country has a comparative advantage." : "Fix the numbers above to trade.";
+    }
+
+    $("k-cx").textContent = "Comparative advantage in " + G[0].many;
+    $("k-cy").textContent = "Comparative advantage in " + G[1].many;
+    $("r-cx").textContent = m.ok ? (m.ca[0] == null ? "Neither" : N[m.ca[0]]) : "–";
+    $("r-cy").textContent = m.ok ? (m.ca[1] == null ? "Neither" : N[m.ca[1]]) : "–";
+    $("r-range").textContent = m.ok && m.trade ? n2(m.lo) + " to " + n2(m.hi) + " " + G[1].many + " per " + G[0].one : "None";
+    var you = "–";
+    if (canTrade) {
+      you = m.status === "both" ? '<span class="pill lr">Both gain</span>'
+        : m.status === "Eloses" ? '<span class="pill infl">' + N[m.E] + ' loses</span>'
+        : m.status === "Mloses" ? '<span class="pill infl">' + N[m.M] + ' loses</span>'
+        : '<span class="pill rec">' + N[m.status === "Ezero" ? m.E : m.M] + ' gains nothing</span>';
+    } else if (m.ok && !m.trade) you = '<span class="pill rec">No gains</span>';
+    $("r-you").innerHTML = you;
+    $("story").innerHTML = story(m);
+  }
+
+  function story(m) {
+    var G = S.goods, N = S.names, out = S.mode === "out", P = [];
+    if (!m.ok) return "<p>Enter a positive number in every box" + (out ? "" : ", including the hours of labor") + ".</p>";
+    P.push(out
+      ? "<b>Output problem.</b> Each number is how much a country can make with the same resources, so the bigger number is the absolute advantage and the other good goes on top when you find opportunity cost."
+      : "<b>Input problem.</b> Each number is the hours needed for one unit, so the smaller number is the absolute advantage and the good you are asking about goes on top when you find opportunity cost.");
+    if (!m.trade) {
+      P.push("Both countries give up " + n2(m.oc[0][0]) + " " + u(G[1], m.oc[0][0]) + " for each " + G[0].one + ". With equal opportunity costs, neither has a comparative advantage, the PPCs have the same slope, and there are <b>no gains from trade</b>. " + (m.abs[0] != null ? "That holds even though " + N[m.abs[0]] + " has an absolute advantage" : "The two countries have the same costs, so there is nothing to gain from trade") + ". Absolute advantage alone never creates gains from trade.");
+      return P.map(function (x) { return "<p>" + x + "</p>"; }).join("");
+    }
+    var E = m.E, M = m.M;
+    var absBoth = m.abs[0] != null && m.abs[0] === m.abs[1];
+    var ca = N[E] + " gives up " + n2(m.oc[E][0]) + " " + u(G[1], m.oc[E][0]) + " per " + G[0].one + ", while " + N[M] + " gives up " + n2(m.oc[M][0]) + ". So " + N[E] + " has the comparative advantage in " + G[0].many + ". " +
+      N[M] + " gives up " + n2(m.oc[M][1]) + " " + u(G[0], m.oc[M][1]) + " per " + G[1].one + " versus " + n2(m.oc[E][1]) + " for " + N[E] + ", so " + N[M] + " has the comparative advantage in " + G[1].many + ".";
+    if (absBoth) ca += " Notice that " + N[m.abs[0]] + " has an absolute advantage in <b>both</b> goods, yet " + N[1 - m.abs[0]] + " still has a comparative advantage in one. That is why comparative advantage, not absolute advantage, decides who specializes.";
+    P.push(ca);
+    P.push("<b>Specialize:</b> " + N[E] + " in " + G[0].many + ", " + N[M] + " in " + G[1].many + ". Both gain if 1 " + G[0].one + " trades for between <b>" + n2(m.lo) + " and " + n2(m.hi) + " " + G[1].many + "</b>. Below " + n2(m.lo) + ", " + N[E] + " would rather keep its " + G[0].many + "; above " + n2(m.hi) + ", " + N[M] + " would rather make " + G[0].many + " itself.");
+    if (!m.tOk) { P.push("Enter a positive terms-of-trade ratio to check a trade."); return P.map(function (x) { return "<p>" + x + "</p>"; }).join(""); }
+    var t = S.t, q = m.q;
+    if (q <= EPS) P.push("Move the slider to trade some " + G[0].many + " at " + n2(t) + " " + u(G[1], t) + " each.");
+    else {
+      var gE = m.gE, gM = m.gM;
+      var e = N[E] + " sends " + n2(q) + " " + u(G[0], q) + " and gets " + n2(q * t) + " " + u(G[1], q * t) + ". It consumes " + n2(m.cE[0]) + " " + u(G[0], m.cE[0]) + " and " + n2(m.cE[1]) + " " + u(G[1], m.cE[1]) + ". On its own, keeping " + n2(m.cE[0]) + " " + u(G[0], m.cE[0]) + " would leave it " + n2(m.pE[1]) + " " + u(G[1], m.pE[1]) + ", so it " + (gE > EPS ? "<b>gains " + n2(gE) + " " + u(G[1], gE) + "</b> and consumes outside its PPC." : gE < -EPS ? "<b>loses " + n2(-gE) + " " + u(G[1], -gE) + "</b> and ends up inside its PPC." : "gains nothing: it ends up on its PPC.");
+      var mm = N[M] + " gets " + n2(q) + " " + u(G[0], q) + " for " + n2(q * t) + " " + u(G[1], q * t) + " and consumes " + n2(m.cM[0]) + " " + u(G[0], m.cM[0]) + " and " + n2(m.cM[1]) + " " + u(G[1], m.cM[1]) + ". Making " + n2(q) + " " + u(G[0], q) + " itself would leave it " + n2(m.pM[1]) + " " + u(G[1], m.pM[1]) + ", so it " + (gM > EPS ? "<b>gains " + n2(gM) + " " + u(G[1], gM) + "</b> and consumes outside its PPC." : gM < -EPS ? "<b>loses " + n2(-gM) + " " + u(G[1], -gM) + "</b> and ends up inside its PPC." : "gains nothing: it ends up on its PPC.");
+      P.push("<b>At " + n2(t) + " " + u(G[1], t) + " per " + G[0].one + ":</b> " + e + " " + mm);
+      if (m.status === "Eloses" || m.status === "Mloses") {
+        var L = m.status === "Eloses" ? E : M;
+        P.push("These terms are outside the range, so " + N[L] + " would refuse the trade. " + (L === E ? N[E] + " is paid less for each " + G[0].one + " than the " + n2(m.lo) + " " + u(G[1], m.lo) + " it gives up to make one." : N[M] + " pays more for each " + G[0].one + " than the " + n2(m.hi) + " " + u(G[1], m.hi) + " it would give up to make one itself."));
+      } else if (m.status !== "both") {
+        P.push("These terms sit exactly at one end of the range, so one country is no better off. Pick a ratio strictly between " + n2(m.lo) + " and " + n2(m.hi) + ".");
+      }
+    }
+    P.push("<b>AP answer:</b> \"" + N[E] + " should specialize in " + G[0].many + " because it has a lower opportunity cost of producing " + G[0].many + " (" + n2(m.oc[E][0]) + " vs. " + n2(m.oc[M][0]) + " " + G[1].many + ").\"");
+    return P.map(function (x) { return "<p>" + x + "</p>"; }).join("");
+  }
+
+  function render() {
+    var m = model(S);
+    renderCalc(m); renderGraphs(m); renderTrade(m);
+  }
+
+  // ---------- Events ----------
+  $("m-out").addEventListener("click", function () { S.mode = "out"; render(); });
+  $("m-in").addEventListener("click", function () { S.mode = "in"; render(); });
+  [[0, 0], [0, 1], [1, 0], [1, 1]].forEach(function (k) {
+    inV[k[0]][k[1]].addEventListener("input", function () { S.v[k[0]][k[1]] = parseFloat(inV[k[0]][k[1]].value); render(); });
+  });
+  inH.addEventListener("input", function () { S.h = parseFloat(inH.value); render(); });
+  tIn.addEventListener("input", function () { S.t = parseFloat(tIn.value); render(); });
+  qIn.addEventListener("input", function () { S.q = parseFloat(qIn.value); render(); });
+  $("btn-mid").addEventListener("click", function () {
+    var m = model(S); if (!m.ok || !m.trade) return;
+    S.t = Math.round((m.lo + m.hi) / 2 * 100) / 100;
+    var m2 = model(S); S.q = Math.min(S.q > 0 ? S.q : 1, Math.floor(m2.qMax)); render();
+  });
+  var pr = $("presets");
+  PRESETS.forEach(function (p) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p.label;
+    b.addEventListener("click", function () { S = copy(p); render(); });
+    pr.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Using the same resources, Country A can produce 30 units of wheat or 10 units of cloth, and Country B can produce 20 units of wheat or 20 units of cloth. What is Country A's opportunity cost of producing 1 unit of cloth?", o: ["1/3 unit of wheat", "3 units of wheat", "10 units of cloth", "1 unit of wheat"], c: 1, w: "This is an output problem, so the other good goes on top: 30 wheat ÷ 10 cloth = 3 units of wheat per unit of cloth. The answer 1/3 flips the fraction; that is A's opportunity cost of 1 unit of wheat, measured in cloth." },
+    { s: "Using the table from the previous question (A: 30 wheat or 10 cloth; B: 20 wheat or 20 cloth), which statement is correct?", o: ["Country A has a comparative advantage in both goods", "Country B has an absolute advantage in wheat", "Country A should specialize in wheat and Country B in cloth", "Country B should specialize in wheat because its opportunity cost of wheat is lower"], c: 2, w: "A's opportunity cost of 1 wheat is 10/30 = 1/3 cloth; B's is 20/20 = 1 cloth. A has the lower cost of wheat, so A specializes in wheat. B's cost of 1 cloth is 1 wheat versus 3 wheat for A, so B specializes in cloth. A has the absolute advantage in wheat (30 > 20), and no country can have a comparative advantage in both goods." },
+    { s: "A worker in Country X needs 4 hours to make a bicycle and 2 hours to make a radio. A worker in Country Y needs 6 hours to make a bicycle and 2 hours to make a radio. Which statement is correct?", o: ["Country X has a comparative advantage in bicycles, and Country Y has a comparative advantage in radios", "Country Y has a comparative advantage in bicycles because 6 is greater than 4", "Country X has a comparative advantage in both goods", "Neither country has a comparative advantage because both need 2 hours per radio"], c: 0, w: "This is an input problem, so the good in question goes on top. X's cost of 1 bicycle = 4 ÷ 2 = 2 radios; Y's = 6 ÷ 2 = 3 radios. X has the lower cost of bicycles. Y's cost of 1 radio = 2 ÷ 6 = 1/3 bicycle versus 2 ÷ 4 = 1/2 for X, so Y has the comparative advantage in radios. Equal hours for radios means neither has an absolute advantage in radios, but comparative advantage still exists." },
+    { s: "Using the hours from the previous question (X: 4 hours per bicycle, 2 per radio; Y: 6 hours per bicycle, 2 per radio), which terms of trade would benefit both countries?", o: ["1 bicycle for 1.5 radios", "1 bicycle for 4 radios", "1 radio for 1 bicycle", "1 bicycle for 2.5 radios"], c: 3, w: "The opportunity cost of 1 bicycle is 2 radios in X and 3 radios in Y. Terms must fall strictly between them, so 2.5 radios per bicycle works. At 1.5 radios, X would rather keep its bicycles; at 4 radios, Y would rather make bicycles itself." },
+    { s: "Why does comparative advantage, rather than absolute advantage, determine whether two countries gain from trade?", o: ["Countries with an absolute advantage in both goods never trade", "Trade lets each country get a good for less than its own opportunity cost of making it", "Absolute advantage measures prices, while comparative advantage measures quantities", "Comparative advantage guarantees that each country produces more of both goods"], c: 1, w: "A country gains from importing a good when it pays less, in terms of the other good, than it would give up to produce the good itself. That depends on opportunity costs, which comparative advantage compares. A country with an absolute advantage in both goods still gains by specializing in the good where its opportunity cost is lower." },
+    { s: "Country A has an absolute advantage in producing both cars and computers. Which of the following must be true?", o: ["Both countries can still gain from trade if their opportunity costs differ", "Country A should produce both goods and not trade", "Country A has a comparative advantage in both goods", "Country B cannot gain from trading with Country A"], c: 0, w: "Absolute advantage in both goods does not rule out gains from trade. As long as the two countries have different opportunity costs, each has a comparative advantage in one good, and specializing and trading at terms between those costs helps both." },
+    { s: "Country A's straight-line PPC runs from 40 units of food (horizontal axis) to 20 units of tools (vertical axis). A specializes in food and trades 10 units of food for 10 units of tools. Which consumption point does A reach, and where is it relative to A's PPC?", o: ["30 food and 5 tools, on its PPC", "40 food and 10 tools, outside its PPC", "30 food and 10 tools, outside its PPC", "30 food and 10 tools, inside its PPC"], c: 2, w: "A makes 40 food, keeps 30, and gets 10 tools. On its own, A's opportunity cost of 1 food is 20 ÷ 40 = 0.5 tool, so producing 30 food would leave only (40 − 30) × 0.5 = 5 tools. Consuming 10 tools with 30 food is beyond the PPC. That is the gain from trade." },
+    { s: "Country M's straight-line PPC runs from 60 units of corn on the horizontal axis to 20 units of steel on the vertical axis. What is Country M's opportunity cost of producing 1 unit of steel?", o: ["1/3 unit of corn", "20 units of corn", "60 units of corn", "3 units of corn"], c: 3, w: "The intercepts are M's maximum outputs, so treat them like an output problem: other over. Opportunity cost of 1 steel = 60 corn ÷ 20 steel = 3 units of corn. The answer 1/3 is the cost of 1 corn, in units of steel." }
+  ];
+  Lab.quiz(Q, $("quiz"), $("score"), $("quiz-reset"));
+  Lab.nav("1.3");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [1], topic: "1.3", compact: true, storageKey: "topic-1.3" });</script>
+</body>
+</html>

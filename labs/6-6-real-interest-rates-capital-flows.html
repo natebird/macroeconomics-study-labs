@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real Interest Rates and International Capital Flows Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { display: inline-flex; width: fit-content; max-width: 100%; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.chain { font-family: var(--mono); font-size: .84rem; color: var(--ink); line-height: 1.6; }
+.chain b { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 6 · Topic 6.6</span>
+  <h1>Real Interest Rates and International Capital Flows Study Lab</h1>
+  <p class="lede">Financial capital flows toward the country that pays the higher real interest rate. Those flows shift the supply of loanable funds in both countries, move the demand for or supply of the currency, and change the exchange rate and net exports. Pick a scenario, then switch between step 1 and step 2 to watch the whole chain unfold.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Linked graphs: the U.S. and Europe</h2>
+    <p>Dashed grey lines show where each market started (5% real interest rate in both countries, 0.90 euros per dollar). Solid lines show where it is now. Step 1 shows the first shock. Step 2 lets financial capital move between the countries.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>U.S. loanable funds market <small>real interest rate vs. quantity</small></h3>
+      <svg class="chart" id="g-us" role="img" aria-label="U.S. loanable funds market graph"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Market for U.S. dollars <small>euros per dollar vs. quantity of dollars</small></h3>
+      <svg class="chart" id="g-fx" role="img" aria-label="Foreign exchange market for U.S. dollars"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Europe's loanable funds market <small>the foreign country</small></h3>
+      <svg class="chart" id="g-eu" role="img" aria-label="Europe loanable funds market graph"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Capital flow <small>real interest rates and where money moves</small></h3>
+      <svg class="chart" id="g-flow" role="img" aria-label="Bar chart of real interest rates in the U.S. and Europe with the direction of capital flow"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Demand</span><span class="l-srpc">Supply</span><span class="l-c4">U.S. supply after the shock, before capital flows</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div style="display:grid; gap:6px;">
+      <span style="font-size:.86rem; font-weight:500;">Show</span>
+      <div class="seg" role="group" aria-label="Which step of the chain to show">
+        <button type="button" id="step-1" aria-pressed="false">Step 1: the shock</button>
+        <button type="button" id="step-2" aria-pressed="true">Step 2: capital flows respond</button>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <label for="s-def">U.S. government borrowing <output id="o-def"></output></label>
+        <input type="range" id="s-def" min="0" max="3" step="0.5">
+        <span class="hint">Deficit spending raises demand for loanable funds</span>
+      </div>
+      <div class="ctl">
+        <label for="s-ps">U.S. private saving <output id="o-ps"></output></label>
+        <input type="range" id="s-ps" min="-2" max="2" step="0.5">
+        <span class="hint">Households and firms saving more or less</span>
+      </div>
+      <div class="ctl">
+        <label for="s-mp">U.S. monetary policy <output id="o-mp"></output></label>
+        <input type="range" id="s-mp" min="-2" max="2" step="0.5">
+        <span class="hint">Right = expansionary (short run)</span>
+      </div>
+      <div class="ctl">
+        <label for="s-eu">Europe's real interest rate <output id="o-eu"></output></label>
+        <input type="range" id="s-eu" min="-2" max="2" step="0.5">
+        <span class="hint">Shifts demand for loanable funds in Europe</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">U.S. real interest rate</div><div class="v" id="r-r">5.0%</div></div>
+    <div class="stat"><div class="k">Capital flow (U.S.)</div><div class="v" id="r-f">none</div></div>
+    <div class="stat"><div class="k">Dollar value (€ per $)</div><div class="v" id="r-e">0.90</div></div>
+    <div class="stat"><div class="k">Change in U.S. net exports</div><div class="v" id="r-nx">0</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">The rule</span><h3>Capital chases the higher real rate</h3><p>Savers want the best return. When one country's real interest rate rises relative to another's, financial capital flows into the country with the higher rate. The gap between the two rates is the real interest rate differential.</p></div>
+    <div class="card"><span class="tag">Loanable funds</span><h3>Inflows add to supply</h3><p>A capital inflow increases the supply of loanable funds in the country receiving it, which pulls its real interest rate back down. The country the money leaves sees its supply of loanable funds decrease, so its real interest rate rises.</p></div>
+    <div class="card"><span class="tag">Foreign exchange</span><h3>To buy U.S. assets, buy dollars</h3><p>Foreigners need dollars to buy U.S. bonds. A capital inflow increases the demand for dollars, so the dollar appreciates. A capital outflow increases the supply of dollars (or decreases demand), so the dollar depreciates.</p></div>
+    <div class="card"><span class="tag">Net exports</span><h3>A stronger dollar hurts exports</h3><p>When the dollar appreciates, U.S. goods cost more for foreigners and foreign goods cost less for Americans. Exports fall, imports rise, and net exports decrease. A weaker dollar does the reverse.</p></div>
+    <div class="card"><span class="tag">Balance of payments</span><h3>Twin deficits</h3><p>The current account and the capital and financial account sum to zero. A larger capital inflow (financial account surplus) is matched by a larger current account deficit. That is why a budget deficit can lead to a trade deficit.</p></div>
+    <div class="card"><span class="tag">Policy</span><h3>Monetary policy moves capital too</h3><p>Expansionary monetary policy lowers interest rates in the short run. Lower U.S. rates send financial capital abroad, the dollar depreciates, and net exports rise. Contractionary policy does the opposite.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Capital flow cheat sheet</h2>
+    <p>Each row is a chain you can write out on an FRQ. All effects are for the U.S. and the dollar, with Europe as the other country.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>U.S. real interest rate</th><th>Capital flow</th><th>Market for dollars</th><th>Dollar</th><th>U.S. net exports</th></tr></thead>
+    <tbody>
+      <tr><td>U.S. government deficit spending increases</td><td>↑ (demand for LF right)</td><td>Into the U.S.</td><td><b>Demand right</b></td><td>Appreciates</td><td>↓</td></tr>
+      <tr><td>U.S. private saving increases</td><td>↓ (supply of LF right)</td><td>Out of the U.S.</td><td><span class="shift">Supply right</span></td><td>Depreciates</td><td>↑</td></tr>
+      <tr><td>Expansionary U.S. monetary policy</td><td>↓ (short run)</td><td>Out of the U.S.</td><td><span class="shift">Supply right</span></td><td>Depreciates</td><td>↑</td></tr>
+      <tr><td>Contractionary U.S. monetary policy</td><td>↑ (short run)</td><td>Into the U.S.</td><td><b>Demand right</b></td><td>Appreciates</td><td>↓</td></tr>
+      <tr><td>Europe's real interest rate rises</td><td>↑ (outflow cuts U.S. supply of LF)</td><td>Out of the U.S.</td><td><span class="shift">Supply right</span></td><td>Depreciates</td><td>↑</td></tr>
+      <tr><td>Europe's real interest rate falls</td><td>↓ (inflow adds to U.S. supply of LF)</td><td>Into the U.S.</td><td><b>Demand right</b></td><td>Appreciates</td><td>↓</td></tr>
+      <tr><td>Capital inflow arrives in the U.S.</td><td>↓ (supply of LF right)</td><td>Into the U.S.</td><td><b>Demand right</b></td><td>Appreciates</td><td>↓</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Loanable funds: vertical axis <b>Real interest rate</b>, horizontal axis <b>Quantity of loanable funds</b>. Label S<sub>LF</sub> and D<sub>LF</sub>, then r₁ and r₂ on the vertical axis.</li>
+        <li>Foreign exchange: horizontal axis <b>Quantity of dollars</b>, vertical axis the price of the dollar, such as <b>Euros per dollar</b>. Label S<sub>$</sub> and D<sub>$</sub>.</li>
+        <li>Write the chain in order: the real interest rate changes, capital flows in or out, demand for (or supply of) the currency shifts, the currency appreciates or depreciates, net exports change.</li>
+        <li>Name the direction of the flow with the country: "financial capital flows <b>into</b> the United States." Say "relative to" the other country's rate.</li>
+        <li>If the question asks about loanable funds after the flow, an inflow shifts the U.S. supply of loanable funds <b>right</b> and the other country's supply <b>left</b>.</li>
+        <li>For the market for euros, flip everything: the axis is "Dollars per euro", and a U.S. inflow means the supply of euros increases and the euro depreciates.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Sending capital toward the lower rate. Money flows to the country with the <b>higher</b> real interest rate.</li>
+        <li>Shifting the supply of dollars right for an inflow. Foreigners buying U.S. assets <b>demand</b> dollars, so D$ shifts right. (A leftward shift of S$, as Americans keep saving at home, is also accepted.) Americans buying foreign assets <b>supply</b> dollars.</li>
+        <li>Saying net exports rise when the dollar appreciates. A stronger dollar makes U.S. exports more expensive, so net exports fall.</li>
+        <li>Ignoring the real rate. Capital flows respond to the <b>real</b> interest rate. If a question starts in the money market, note that with sticky prices the nominal rate change is also a real rate change in the short run, then carry it to the foreign exchange market.</li>
+        <li>Forgetting the second country. An inflow to the U.S. is an outflow from Europe, which reduces Europe's supply of loanable funds and raises its real interest rate.</li>
+        <li>Mixing up the accounts. A capital inflow is a surplus in the capital and financial account, matched by a deficit in the current account.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 6.6. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-6.html">Unit 6 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { dU: 0, ps: 0, m: 0, dF: 0, step: 2 };
+  var S = Object.assign({}, BASE, { dU: 2.5 });
+  var K = 0.8;              // slope used by Lab.market
+  var FXK = 2.5;            // how far one unit of capital flow shifts the market for dollars
+  var BIL = 40;             // billions of dollars per unit of capital flow
+
+  // ---------- Model ----------
+  // U.S. loanable funds: demand shift dU (government borrowing), supply shift ps + m + F (F = net capital inflow).
+  // Europe loanable funds: demand shift dF, supply shift -F.
+  // Step 2: capital moves halfway toward closing the real interest rate gap, so F = 0.25 * (pre-flow shift gap).
+  function model(s) {
+    var gap = s.dU - s.ps - s.m - s.dF;
+    var F = s.step === 2 ? 0.25 * gap : 0;
+    var usD = s.dU, usSpre = s.ps + s.m, usS = usSpre + F;
+    var euD = s.dF, euS = -F;
+    var rUSpre = 5 + K * (usD - usSpre) / 2, rEUpre = 5 + K * s.dF / 2;
+    var rUS = 5 + K * (usD - usS) / 2, rEU = 5 + K * (euD - euS) / 2;
+    var fxD = F > 0 ? Math.min(3.2, FXK * F) : 0, fxS = F < 0 ? Math.min(3.2, -FXK * F) : 0;
+    var y = 5 + K * (fxD - fxS) / 2;
+    var e = 0.90 + 0.1 * (y - 5);
+    var flow = BIL * F;
+    return { F: F, flow: flow, usD: usD, usS: usS, usSpre: usSpre, euD: euD, euS: euS,
+      rUS: rUS, rEU: rEU, rUSpre: rUSpre, rEUpre: rEUpre, fxD: fxD, fxS: fxS, e: e, nx: -flow };
+  }
+
+  // ---------- Graphs ----------
+  var gUS = document.getElementById("g-us"), gEU = document.getElementById("g-eu"),
+      gFX = document.getElementById("g-fx"), gFL = document.getElementById("g-flow");
+
+  // Drawing scale: Europe's shifts are small, so they are stretched on screen. Readouts use the model values.
+  function g(v, k) { return Math.max(-3.2, Math.min(3.2, v * k)); }
+  function preFlowCurve(shift, label) {
+    return function (F, eq, H) {
+      Lab.fn(F, H.S(shift), "var(--c4)", 2, "2 5", 2);
+      var x = 5 + shift - 3.2 / K;
+      Lab.tag(F, x + 0.2, H.S(shift)(x) - 0.2, label, "var(--c4)");
+    };
+  }
+
+  function drawUS(m) {
+    var flowMoved = Math.abs(m.F) > 0.01;
+    Lab.market(gUS, {
+      xLabel: "Quantity of loanable funds", yLabel: "Real interest rate",
+      demand: { shift: g(m.usD, 1.2), label: "DLF" }, supply: { shift: g(m.usS, 1.2), label: "SLF" },
+      start: { demand: 0, supply: 0 }, eqLabels: ["Q₂", "r₂"], startLabels: ["Q₁", "r₁"],
+      extra: flowMoved && Math.abs(m.usSpre) > 0.01 ? preFlowCurve(g(m.usSpre, 1.2), "before flow") : null
+    });
+  }
+  function drawEU(m) {
+    Lab.market(gEU, {
+      xLabel: "Quantity of loanable funds", yLabel: "Real interest rate",
+      demand: { shift: g(m.euD, 1.6), label: "DLF" }, supply: { shift: g(m.euS, 2), label: "SLF" },
+      start: { demand: 0, supply: 0 }, eqLabels: ["Q₂", "r₂"], startLabels: ["Q₁", "r₁"]
+    });
+  }
+  function drawFX(m) {
+    Lab.market(gFX, {
+      xLabel: "Quantity of dollars", yLabel: "Euros per dollar",
+      demand: { shift: g(m.fxD, 1), label: "D$" }, supply: { shift: g(m.fxS, 1), label: "S$" },
+      start: { demand: 0, supply: 0 }, eqLabels: ["Q₂", "e₂"], startLabels: ["Q₁", "e₁"]
+    });
+  }
+  function drawFlow(m) {
+    var F = Lab.frame(gFL, { x: [0, 10], y: [0, 9], xLabel: "Country", yLabel: "Real interest rate (%)",
+      xTicks: [2.75, 7.25], yTicks: [0, 2, 4, 6, 8],
+      fmtX: function (v) { return v < 5 ? "United States" : "Europe"; }, fmtY: function (v) { return v + "%"; } });
+    Lab.rect(F, 1.5, 0, 4, m.rUS, "var(--accent)", 0.75);
+    Lab.rect(F, 6, 0, 8.5, m.rEU, "var(--c3)", 0.75);
+    Lab.line(F, [[1.2, 5], [4.3, 5]], "var(--ghost)", 2, "6 5");
+    Lab.line(F, [[5.7, 5], [8.8, 5]], "var(--ghost)", 2, "6 5");
+    Lab.tag(F, 2.75, m.rUS + 0.35, Lab.fmt(m.rUS) + "%", "var(--accent)", "middle");
+    Lab.tag(F, 7.25, m.rEU + 0.35, Lab.fmt(m.rEU) + "%", "var(--c3)", "middle");
+    if (Math.abs(m.F) > 0.01) {
+      var y = 8.0;
+      if (m.F > 0) Lab.arrow(F, 6.4, y, 3.6, y, "var(--good)");
+      else Lab.arrow(F, 3.6, y, 6.4, y, "var(--bad)");
+      Lab.tag(F, 5, y + 0.45, "Financial capital $" + Lab.fmt(Math.abs(m.flow), 0) + "B", m.F > 0 ? "var(--good)" : "var(--bad)", "middle");
+    } else {
+      Lab.tag(F, 5, 8.3, S.step === 1 && Math.abs(m.rUS - m.rEU) > 0.01 ? "Step 2 lets capital move" : "No capital flow", "var(--muted)", "middle");
+    }
+  }
+
+  // ---------- Story ----------
+  var f = Lab.fmt;
+  function dir(v, up, down, same) { return v > 0.005 ? up : v < -0.005 ? down : same; }
+  function story(m, s) {
+    var causes = [];
+    if (s.dU > 0) causes.push("The U.S. government borrows to pay for deficit spending, so the U.S. demand for loanable funds shifts right.");
+    if (s.ps > 0) causes.push("U.S. households and firms save more, so the U.S. supply of loanable funds shifts right.");
+    if (s.ps < 0) causes.push("U.S. households and firms save less, so the U.S. supply of loanable funds shifts left.");
+    if (s.m > 0) causes.push("The Fed uses expansionary monetary policy (for example, lowering the policy rate or buying bonds). Banks have more to lend, so the supply of loanable funds shifts right and the U.S. real interest rate falls in the short run, while expected inflation has not caught up.");
+    if (s.m < 0) causes.push("The Fed uses contractionary monetary policy (for example, raising the policy rate or selling bonds). Less is available to lend, so the supply of loanable funds shifts left and the U.S. real interest rate rises in the short run.");
+    if (s.dF > 0) causes.push("Demand for loanable funds rises in Europe (for example, more borrowing by European firms or governments), so Europe's real interest rate rises.");
+    if (s.dF < 0) causes.push("Demand for loanable funds falls in Europe, so Europe's real interest rate falls.");
+
+    var html = "";
+    if (!causes.length) {
+      return "<p><b>Both countries start at a 5.0% real interest rate.</b> With no gap between the rates, savers have no extra reason to move money across the Atlantic. The dollar trades at 0.90 euros. Pick a scenario or move a slider to create a real interest rate differential.</p>";
+    }
+    html += "<p><b>Step 1: the shock.</b></p><ul>" + causes.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    var gapPre = m.rUSpre - m.rEUpre;
+    html += "<p>Before any money moves, the U.S. real interest rate is " + f(m.rUSpre) + "% and Europe's is " + f(m.rEUpre) + "%. ";
+    if (Math.abs(gapPre) < 0.005) {
+      html += "The shocks cancel out: there is no gap between the rates, so capital has no reason to move.</p>";
+      return html;
+    }
+    html += gapPre > 0 ? "The U.S. now pays the higher real rate.</p>" : "Europe now pays the higher real rate.</p>";
+
+    if (s.step === 1) {
+      html += "<p>Switch to <b>Step 2</b> to see financial capital flow toward " + (gapPre > 0 ? "the U.S." : "Europe") + ".</p>";
+      return html;
+    }
+
+    var inflow = m.F > 0, amt = f(Math.abs(m.flow), 0);
+    html += "<p><b>Step 2: capital flows respond.</b></p><ul>";
+    if (inflow) {
+      html += "<li>European savers buy U.S. bonds to earn the higher real return. That is a capital inflow of $" + amt + " billion into the U.S.</li>";
+      html += "<li>The inflow increases the U.S. supply of loanable funds, which pulls the U.S. real rate down to " + f(m.rUS) + "%. In Europe the supply of loanable funds decreases and its real rate rises to " + f(m.rEU) + "%.</li>";
+      html += "<li>To buy U.S. bonds, Europeans need dollars. The demand for dollars shifts right and the dollar <b>appreciates</b> to " + f(m.e, 3) + " euros per dollar (the euro depreciates).</li>";
+      html += "<li>U.S. goods now cost more in euros and European goods cost less in dollars. U.S. exports fall, imports rise, and <b>net exports decrease</b> by $" + amt + " billion. The financial account surplus is matched by a current account deficit.</li>";
+    } else {
+      html += "<li>U.S. savers buy European bonds to earn the higher real return. That is a capital outflow of $" + amt + " billion from the U.S.</li>";
+      html += "<li>The outflow decreases the U.S. supply of loanable funds, which pushes the U.S. real rate to " + f(m.rUS) + "%. In Europe the supply of loanable funds increases and its real rate moves to " + f(m.rEU) + "%.</li>";
+      html += "<li>To buy European bonds, Americans sell dollars for euros. The supply of dollars shifts right and the dollar <b>depreciates</b> to " + f(m.e, 3) + " euros per dollar (the euro appreciates). Graders also accept a decrease in demand for dollars, since Europeans buy fewer U.S. assets.</li>";
+      html += "<li>U.S. goods now cost less in euros and European goods cost more in dollars. U.S. exports rise, imports fall, and <b>net exports increase</b> by $" + amt + " billion. The financial account deficit is matched by a current account surplus.</li>";
+    }
+    html += "</ul>";
+
+    var net = m.rUS - 5;
+    html += "<p>Overall, the U.S. real interest rate is <b>" + f(m.rUS) + "%</b>" + dir(net, ", up from 5.0%.", ", down from 5.0%.", ", the same as at the start.") +
+      " The flow narrows the gap between the two countries but does not close it in this short-run picture.</p>";
+    var chain = inflow
+      ? "U.S. real rate <b>↑</b> relative to Europe → capital <b>inflow</b> → D$ <b>right</b> → dollar <b>appreciates</b> → U.S. net exports <b>↓</b>"
+      : "U.S. real rate <b>↓</b> relative to Europe → capital <b>outflow</b> → S$ <b>right</b> → dollar <b>depreciates</b> → U.S. net exports <b>↑</b>";
+    html += '<p class="chain">AP chain: ' + chain + "</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elDef = document.getElementById("s-def"), elPS = document.getElementById("s-ps"),
+      elMP = document.getElementById("s-mp"), elEU = document.getElementById("s-eu");
+  var b1 = document.getElementById("step-1"), b2 = document.getElementById("step-2");
+  function signed(v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v); }
+  function render() {
+    var m = model(S);
+    elDef.value = S.dU; elPS.value = S.ps; elMP.value = S.m; elEU.value = S.dF;
+    b1.setAttribute("aria-pressed", S.step === 1); b2.setAttribute("aria-pressed", S.step === 2);
+    document.getElementById("o-def").textContent = S.dU > 0 ? "+$" + (S.dU * 20) + "B" : "none";
+    document.getElementById("o-ps").textContent = S.ps === 0 ? "start" : signed(S.ps);
+    document.getElementById("o-mp").textContent = S.m > 0 ? "expansionary" : S.m < 0 ? "contractionary" : "neutral";
+    document.getElementById("o-eu").textContent = S.dF > 0 ? "higher" : S.dF < 0 ? "lower" : "start";
+    drawUS(m); drawEU(m); drawFX(m); drawFlow(m);
+    document.getElementById("r-r").textContent = f(m.rUS) + "%";
+    var fl = document.getElementById("r-f");
+    fl.innerHTML = m.F > 0.005 ? '<span class="pill lr">Inflow $' + f(m.flow, 0) + "B</span>" : m.F < -0.005 ? '<span class="pill infl">Outflow $' + f(-m.flow, 0) + "B</span>" : "none";
+    var ev = document.getElementById("r-e");
+    ev.innerHTML = f(m.e, 3) + (m.e > 0.9005 ? ' <span class="pill lr">appreciates</span>' : m.e < 0.8995 ? ' <span class="pill infl">depreciates</span>' : "");
+    var nx = document.getElementById("r-nx");
+    nx.innerHTML = Math.abs(m.nx) < 0.5 ? "0" : (m.nx > 0 ? '<span class="pill lr">+$' + f(m.nx, 0) + "B</span>" : '<span class="pill infl">−$' + f(-m.nx, 0) + "B</span>");
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  elDef.addEventListener("input", function () { S.dU = parseFloat(elDef.value); render(); });
+  elPS.addEventListener("input", function () { S.ps = parseFloat(elPS.value); render(); });
+  elMP.addEventListener("input", function () { S.m = parseFloat(elMP.value); render(); });
+  elEU.addEventListener("input", function () { S.dF = parseFloat(elEU.value); render(); });
+  b1.addEventListener("click", function () { S.step = 1; render(); });
+  b2.addEventListener("click", function () { S.step = 2; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["U.S. deficit spending", { dU: 2.5 }],
+    ["Europe's real interest rate rises", { dF: 2 }],
+    ["U.S. private saving rises", { ps: 2 }],
+    ["Expansionary U.S. monetary policy", { m: 2 }],
+    ["Contractionary U.S. monetary policy", { m: -2 }],
+    ["Europe's real interest rate falls", { dF: -2 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, { step: S.step }, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The U.S. government increases deficit spending and borrows to finance it. Which of the following describes the effect on the U.S. real interest rate and the international value of the dollar?", o: ["Real interest rate falls; dollar depreciates", "Real interest rate rises; dollar appreciates", "Real interest rate rises; dollar depreciates", "Real interest rate falls; dollar appreciates"], c: 1, w: "Government borrowing shifts the demand for loanable funds right, so the U.S. real interest rate rises. Higher U.S. returns attract foreign financial capital, which increases the demand for dollars, so the dollar appreciates." },
+    { s: "Europe's real interest rate rises while the U.S. real interest rate is unchanged at first. Which of the following is most likely to happen?", o: ["Financial capital flows into the U.S., and the dollar appreciates", "Financial capital flows into the U.S., and the dollar depreciates", "Financial capital flows out of Europe, and the euro depreciates", "Financial capital flows out of the U.S., and the dollar depreciates"], c: 3, w: "Capital moves toward the higher real rate, which is now in Europe. Americans sell dollars to buy euro assets, so the supply of dollars increases and the dollar depreciates. Option C reverses the direction: capital flows into Europe, which makes the euro appreciate." },
+    { s: "In the U.S., the nominal interest rate is 6% and expected inflation is 2%. In Japan, the nominal interest rate is 3% and expected inflation is 0%. Based on real interest rates, which way will financial capital tend to flow?", o: ["From Japan to the U.S., because the U.S. real rate is 4% and Japan's is 3%", "From the U.S. to Japan, because Japan has lower inflation", "From Japan to the U.S., because the U.S. nominal rate is 3 points higher", "No flow, because the real rates are equal"], c: 0, w: "Real rate = nominal rate − expected inflation. U.S.: 6% − 2% = 4%. Japan: 3% − 0% = 3%. Capital flows to the higher real rate, the U.S. Option C reaches the right direction for the wrong reason: the gap in real rates is 1 point, not 3." },
+    { s: "Financial capital flows from Canada into the United States. In the U.S. loanable funds market, which of the following happens?", o: ["Demand for loanable funds increases and the real interest rate rises", "Supply of loanable funds decreases and the real interest rate rises", "Supply of loanable funds increases and the real interest rate falls", "Demand for loanable funds decreases and the real interest rate falls"], c: 2, w: "Foreign savers lending in the U.S. add to the supply of loanable funds. Supply shifts right and the U.S. real interest rate falls. In Canada, the supply of loanable funds decreases." },
+    { s: "The Federal Reserve conducts expansionary monetary policy. In the short run, what happens to the U.S. interest rate, the value of the dollar, and U.S. net exports?", o: ["Interest rate rises; dollar appreciates; net exports fall", "Interest rate falls; dollar appreciates; net exports fall", "Interest rate rises; dollar depreciates; net exports rise", "Interest rate falls; dollar depreciates; net exports rise"], c: 3, w: "Lower U.S. interest rates make U.S. assets less attractive. Financial capital flows out, the dollar depreciates, U.S. goods become cheaper for foreigners, and net exports rise." },
+    { s: "A country receives a net capital inflow of $50 billion this year. Its net investment income and net transfers are both zero. What is its current account balance?", o: ["A deficit of $50 billion", "A surplus of $50 billion", "Zero, because capital flows do not affect trade", "A deficit of $100 billion"], c: 0, w: "The current account and the capital and financial account sum to zero. A $50 billion financial account surplus means a $50 billion current account deficit. With no income or transfers, that is a $50 billion trade deficit." },
+    { s: "On a graph of the foreign exchange market for U.S. dollars with \"Euros per dollar\" on the vertical axis, how is an increase in U.S. real interest rates relative to Europe shown?", o: ["Supply of dollars shifts right and the euros per dollar falls", "Demand for dollars shifts right and the euros per dollar rises", "Demand for dollars shifts left and the euros per dollar falls", "Supply of dollars shifts left and the euros per dollar falls"], c: 1, w: "Higher U.S. real rates draw European savers into U.S. assets, and they must buy dollars first. Demand for dollars shifts right, so each dollar buys more euros: the dollar appreciates." },
+    { s: "U.S. households increase their saving. Assuming capital moves freely, which of the following is the correct sequence?", o: ["U.S. real rate rises, capital flows in, dollar appreciates, net exports fall", "U.S. real rate falls, capital flows in, dollar appreciates, net exports rise", "U.S. real rate falls, capital flows out, dollar depreciates, net exports rise", "U.S. real rate rises, capital flows out, dollar depreciates, net exports fall"], c: 2, w: "More saving shifts the U.S. supply of loanable funds right, so the real rate falls. U.S. assets now pay less than foreign assets, so capital flows out. The supply of dollars increases, the dollar depreciates, and net exports rise." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("6.6");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [6], topic: "6.6", compact: true, storageKey: "topic-6.6" });</script>
+</body>
+</html>

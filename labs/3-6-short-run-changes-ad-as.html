@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changes in the AD–AS Model in the Short Run Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.side { display: grid; gap: 14px; align-content: start; }
+.group { display: grid; gap: 8px; }
+.scenarios button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.side .controls { grid-template-columns: 1fr 1fr; }
+.stat .sub { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+@media (max-width: 520px) { .side .controls { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.6</span>
+  <h1>Changes in the AD–AS Model in the Short Run Study Lab</h1>
+  <p class="lede">A shock to aggregate demand or short-run aggregate supply moves the economy away from full employment. The direction of the shift tells you what happens to real GDP, the price level, and unemployment in the short run. Pick a shock below, or move the sliders, and read what an AP answer would say.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Shock the economy</h2>
+    <p>The economy starts in long-run equilibrium: real GDP of 1,000 billion (full employment), a price level of 100, and unemployment at the natural rate of 5%. Dashed grey lines show the starting curves once something moves.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small>price level vs. real GDP</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD-AS graph showing aggregate demand, short-run aggregate supply, and long-run aggregate supply"></svg>
+    </div>
+    <div class="card side">
+      <div class="group">
+        <div class="tag">Demand shocks (AD shifts)</div>
+        <div class="scenarios" id="sc-d"></div>
+      </div>
+      <div class="group">
+        <div class="tag">Supply shocks (SRAS shifts)</div>
+        <div class="scenarios" id="sc-s"></div>
+      </div>
+      <div class="group">
+        <div class="tag">Both curves shift</div>
+        <div class="scenarios" id="sc-b"></div>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label for="s-ad">Aggregate demand <output id="o-ad"></output></label>
+          <input type="range" id="s-ad" min="-2.5" max="2.5" step="0.25">
+          <span class="hint">Right = AD increases</span>
+        </div>
+        <div class="ctl">
+          <label for="s-sras">SRAS <output id="o-sras"></output></label>
+          <input type="range" id="s-sras" min="-2.5" max="2.5" step="0.25">
+          <span class="hint">Right = SRAS increases</span>
+        </div>
+      </div>
+      <div><button id="btn-reset" type="button">Reset to long-run equilibrium</button></div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">AD</span><span class="l-srpc">SRAS</span><span class="l-lrpc">LRAS</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real GDP (billions)</div><div class="v" id="r-y">1,000</div><div class="sub" id="r-y2">no change</div></div>
+    <div class="stat"><div class="k">Price level</div><div class="v" id="r-p">100</div><div class="sub" id="r-p2">no change</div></div>
+    <div class="stat"><div class="k">Unemployment</div><div class="v" id="r-u">5.0%</div><div class="sub" id="r-u2">at the natural rate</div></div>
+    <div class="stat"><div class="k">Output gap</div><div class="v" id="r-gap"><span class="pill lr">None</span></div><div class="sub" id="r-gap2">at full employment</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">AD shifts</span><h3>Demand shocks</h3><p>A change in consumption, investment, government spending, or net exports shifts AD. When AD increases, real GDP and the price level both rise. When AD decreases, both fall. Unemployment moves opposite to real GDP.</p></div>
+    <div class="card"><span class="tag">SRAS shifts</span><h3>Supply shocks</h3><p>A change in input prices, nominal wages, or productivity shifts SRAS. When SRAS decreases (shifts left), the price level rises and real GDP falls. When SRAS increases (shifts right), the price level falls and real GDP rises.</p></div>
+    <div class="card"><span class="tag">AD right</span><h3>Demand-pull inflation</h3><p>Inflation caused by an increase in aggregate demand. Buyers want more output than the economy produces at the old price level, so prices are pulled up. Real GDP rises at the same time.</p></div>
+    <div class="card"><span class="tag">SRAS left</span><h3>Cost-push inflation</h3><p>Inflation caused by higher production costs, such as an oil price spike or higher nominal wages. Firms produce less at each price level, so the price level rises while real GDP falls.</p></div>
+    <div class="card"><span class="tag">Worst of both</span><h3>Stagflation</h3><p>A rising price level together with falling real GDP and rising unemployment. Only a leftward shift of SRAS produces both on its own. A demand shock always moves the price level and real GDP in the same direction.</p></div>
+    <div class="card"><span class="tag">Two shifts</span><h3>One result is indeterminate</h3><p>When AD and SRAS shift at the same time, you know the direction of only one of real GDP or price level. The other depends on which shift is bigger. On the AP exam, call it indeterminate.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Shock cheat sheet</h2>
+    <p>Each row starts from long-run equilibrium and shows only the short run. Memorize the pattern: AD moves price level and real GDP the same way; SRAS moves them in opposite ways.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Shift</th><th>Price level</th><th>Real GDP</th><th>Unemployment</th><th>Short-run gap</th></tr></thead>
+    <tbody>
+      <tr><td>Consumer optimism, rise in household wealth</td><td><b>AD right</b></td><td>↑</td><td>↑</td><td>↓</td><td>Inflationary</td></tr>
+      <tr><td>Rise in net exports (foreign incomes rise)</td><td><b>AD right</b></td><td>↑</td><td>↑</td><td>↓</td><td>Inflationary</td></tr>
+      <tr><td>Fall in investment (business pessimism, higher real interest rates)</td><td><b>AD left</b></td><td>↓</td><td>↓</td><td>↑</td><td>Recessionary</td></tr>
+      <tr><td>Oil or other input price spike</td><td><span class="shift">SRAS left</span></td><td>↑</td><td>↓</td><td>↑</td><td>Recessionary (stagflation)</td></tr>
+      <tr><td>Rise in nominal wages</td><td><span class="shift">SRAS left</span></td><td>↑</td><td>↓</td><td>↑</td><td>Recessionary (stagflation)</td></tr>
+      <tr><td>Productivity gain, fall in input prices</td><td><span class="shift">SRAS right</span></td><td>↓</td><td>↑</td><td>↓</td><td>Inflationary if LRAS is held fixed. A lasting productivity gain also shifts LRAS right.</td></tr>
+      <tr><td>AD right and SRAS left</td><td>Both</td><td>↑</td><td><b>Indeterminate</b></td><td>Indeterminate</td><td>Depends on sizes</td></tr>
+      <tr><td>AD right and SRAS right</td><td>Both</td><td><b>Indeterminate</b></td><td>↑</td><td>↓</td><td>Inflationary</td></tr>
+      <tr><td>AD left and SRAS left</td><td>Both</td><td><b>Indeterminate</b></td><td>↓</td><td>↑</td><td>Recessionary</td></tr>
+      <tr><td>AD left and SRAS right</td><td>Both</td><td>↓</td><td><b>Indeterminate</b></td><td>Indeterminate</td><td>Depends on sizes</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price level</b>. Horizontal axis: <b>Real GDP</b> (or real output). Do not write "Price" and "Quantity".</li>
+        <li>Draw a vertical <b>LRAS</b> at full-employment output and label Y<sub>f</sub> on the horizontal axis. Draw AD and SRAS crossing on LRAS when the question says the economy starts in long-run equilibrium.</li>
+        <li>Label the new curve (AD₂ or SRAS₂) and draw an arrow showing the direction of the shift.</li>
+        <li>Mark the new equilibrium and label both axes: Y₂ and PL₂. Graders check that Y₂ and PL₂ sit on the correct side of Y<sub>f</sub> and PL₁.</li>
+        <li>When asked about unemployment, compare it with the natural rate: output below Y<sub>f</sub> means unemployment is above the natural rate.</li>
+        <li>When both curves shift, state the one that is certain and write "indeterminate" for the other.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting AD for an oil price spike or a wage increase. Production costs shift <b>SRAS</b>.</li>
+        <li>Shifting a curve because the price level changed. A change in the price level is a movement <b>along</b> AD and SRAS.</li>
+        <li>Mixing up the words. A <b>decrease</b> in SRAS is a shift <b>left</b> (up). An increase is a shift right (down).</li>
+        <li>Saying "stays the same" when two shifts make a variable indeterminate. Without sizes, you cannot know.</li>
+        <li>Shifting LRAS for a short-run shock. An oil price spike or a burst of consumer optimism leaves LRAS where it is.</li>
+        <li>Jumping to the long run. Topic 3.6 questions ask about the short run. Show self-adjustment only when the question asks for it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.6. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var K = 0.8;                     // slope used by Lab.market
+  var BASE = { a: 0, s: 0, key: null };
+  var S = Object.assign({}, BASE);
+
+  // ---------- Model ----------
+  // Lab.market space: equilibrium x = 5 + (a + s)/2, y = 5 + K(a - s)/2, LRAS at x = 5.
+  // Teaching numbers: real GDP = 1000 + 20(x - 5) billion, price level = 100 + 5(y - 5),
+  // unemployment = 5% - (x - 5) points (each 2% of output gap is 1 point of unemployment).
+  var EPS = 0.01;
+  function sgn(v) { return v > EPS ? 1 : v < -EPS ? -1 : 0; }
+  function model(s) {
+    var x = 5 + (s.a + s.s) / 2, y = 5 + K * (s.a - s.s) / 2;
+    var sa = sgn(s.a), ss = sgn(s.s);
+    var both = sa !== 0 && ss !== 0;
+    return {
+      x: x, y: y,
+      Y: 1000 + 20 * (x - 5), P: 100 + 5 * (y - 5), u: 5 - (x - 5),
+      sa: sa, ss: ss, both: both,
+      yInd: both && sa !== ss,     // opposite shifts: real GDP indeterminate
+      pInd: both && sa === ss      // same-direction shifts: price level indeterminate
+    };
+  }
+
+  // ---------- Scenarios ----------
+  var SC = {
+    optimism: { g: "d", name: "Consumer optimism", a: 2, s: 0,
+      why: "Households feel confident about future income and spend more. Consumption rises, so <b>AD shifts right</b>." },
+    invfall: { g: "d", name: "Fall in investment", a: -2, s: 0,
+      why: "Firms grow pessimistic about future sales and cut spending on new equipment and buildings. Investment falls, so <b>AD shifts left</b>." },
+    nx: { g: "d", name: "Rise in net exports", a: 1.5, s: 0,
+      why: "Incomes rise in other countries, so foreigners buy more of this country's goods. Net exports rise, so <b>AD shifts right</b>." },
+    oil: { g: "s", name: "Oil price spike", a: 0, s: -2,
+      why: "Oil is an input to almost everything. When its price jumps, production costs rise at every price level, so <b>SRAS shifts left</b>." },
+    prod: { g: "s", name: "Productivity gain", a: 0, s: 2,
+      why: "Workers produce more per hour, so the cost of each unit of output falls and <b>SRAS shifts right</b>. A lasting gain would shift LRAS right too; this lab holds LRAS fixed to isolate the short-run effect." },
+    wages: { g: "s", name: "Rise in wages", a: 0, s: -1.5,
+      why: "Nominal wages rise (for example, new labor contracts). Labor costs more at every price level, so <b>SRAS shifts left</b>." },
+    optoil: { g: "b", name: "Consumer optimism + oil spike", a: 2.5, s: -1.5,
+      why: "Consumer optimism shifts <b>AD right</b> while an oil price spike shifts <b>SRAS left</b>. Both shifts push the price level up. They push real GDP in opposite directions." },
+    invprod: { g: "b", name: "Investment boom + productivity gain", a: 1, s: 2.5,
+      why: "Business optimism raises investment, so <b>AD shifts right</b>, and a productivity gain shifts <b>SRAS right</b>. Both shifts raise real GDP. They push the price level in opposite directions." },
+    nxwage: { g: "b", name: "Fall in net exports + rise in wages", a: -2.5, s: -1,
+      why: "Foreign buyers purchase fewer of this country's goods, so <b>AD shifts left</b>, and higher nominal wages shift <b>SRAS left</b>. Both shifts lower real GDP. They push the price level in opposite directions." },
+    invprod2: { g: "b", name: "Fall in investment + productivity gain", a: -1.5, s: 2.5,
+      why: "Business pessimism cuts investment, so <b>AD shifts left</b>, while a productivity gain shifts <b>SRAS right</b>. Both shifts lower the price level. They push real GDP in opposite directions." }
+  };
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("adas");
+  function draw(s) {
+    var m = model(s);
+    var moved = Math.abs(s.a) > 1e-9 || Math.abs(s.s) > 1e-9;
+    var dx = m.x - 5, dy = m.y - 5;
+    Lab.market(svg, {
+      xLabel: "Real GDP", yLabel: "Price level", slope: K,
+      demand: { shift: s.a, label: Math.abs(s.a) > 0.2 ? "AD₂" : "AD₁" },
+      supply: { shift: s.s, label: Math.abs(s.s) > 0.2 ? "SRAS₂" : "SRAS₁" },
+      longRun: { shift: 0, label: "LRAS" },
+      start: { demand: 0, supply: 0, longRun: 0 },
+      eqLabels: moved ? [Math.abs(dx) >= 0.45 ? "Y₂" : null, Math.abs(dy) >= 0.45 ? "PL₂" : null] : ["Yf", "PL₁"],
+      startLabels: ["Yf", "PL₁"],
+      extra: function (F, eq, c) {
+        // ghost curve names
+        if (Math.abs(s.a) > 0.2) { var xd = 9.6; Lab.tag(F, xd, Math.max(0.4, c.D(0)(xd)) + 0.3, "AD₁", "var(--muted)", "end"); }
+        if (Math.abs(s.s) > 0.2) { var xe = 9.6; Lab.tag(F, xe, Math.min(9.6, c.S(0)(xe)) - 0.5, "SRAS₁", "var(--muted)", "end"); }
+        // output gap band along the horizontal axis
+        if (Math.abs(dx) > 0.05) {
+          var col = dx > 0 ? "var(--bad)" : "var(--accent)";
+          Lab.rect(F, 5, 0, eq.x, 0.3, col, 0.55);
+          Lab.tag(F, dx > 0 ? eq.x + 0.15 : eq.x - 0.15, 0.75, m.yInd ? "Gap depends on sizes" : dx > 0 ? "Inflationary gap" : "Recessionary gap", col, dx > 0 ? "start" : "end");
+        }
+      }
+    });
+    return m;
+  }
+
+  // ---------- Readouts and story ----------
+  var f = Lab.fmt;
+  function comma(v) { return Math.round(v).toLocaleString("en-US"); }
+  function chg(v, d) { var r = Math.round(v * Math.pow(10, d || 0)) / Math.pow(10, d || 0); return r > 0 ? "+" + r.toFixed(d || 0) : r < 0 ? "−" + Math.abs(r).toFixed(d || 0) : "0"; }
+  function ind() { return '<span class="pill rec">Indeterminate</span>'; }
+
+  function readouts(m) {
+    var dY = m.Y - 1000, dP = m.P - 100, du = m.u - 5;
+    var y = document.getElementById("r-y"), y2 = document.getElementById("r-y2");
+    var p = document.getElementById("r-p"), p2 = document.getElementById("r-p2");
+    var u = document.getElementById("r-u"), u2 = document.getElementById("r-u2");
+    var g = document.getElementById("r-gap"), g2 = document.getElementById("r-gap2");
+    var arrowY = dY > 0.05 ? "↑ " : dY < -0.05 ? "↓ " : "";
+    if (m.yInd) { y.innerHTML = ind(); y2.textContent = "this graph: " + comma(m.Y) + " (" + chg(dY) + ")"; }
+    else { y.textContent = arrowY + comma(m.Y); y2.textContent = Math.abs(dY) < 0.05 ? "no change from 1,000" : chg(dY) + " from 1,000"; }
+    var arrowP = dP > 0.05 ? "↑ " : dP < -0.05 ? "↓ " : "";
+    if (m.pInd) { p.innerHTML = ind(); p2.textContent = "this graph: " + f(m.P) + " (" + chg(dP, 1) + ")"; }
+    else { p.textContent = arrowP + f(m.P); p2.textContent = Math.abs(dP) < 0.05 ? "no change from 100" : chg(dP, 1) + " from 100"; }
+    if (m.yInd) { u.innerHTML = ind(); u2.textContent = "this graph: " + f(m.u) + "%"; }
+    else {
+      u.textContent = (du > 0.05 ? "↑ " : du < -0.05 ? "↓ " : "") + f(m.u) + "%";
+      u2.textContent = du > 0.05 ? "rises above the natural rate" : du < -0.05 ? "falls below the natural rate" : "at the natural rate";
+    }
+    var dx = m.x - 5;
+    var pill = dx > 0.05 ? '<span class="pill infl">Inflationary</span>' : dx < -0.05 ? '<span class="pill rec">Recessionary</span>' : '<span class="pill lr">None</span>';
+    if (m.yInd) { g.innerHTML = '<span class="pill rec">Depends</span>'; g2.textContent = "this graph: " + (dx > 0.05 ? "inflationary" : dx < -0.05 ? "recessionary" : "none"); }
+    else { g.innerHTML = pill; g2.textContent = dx > 0.05 ? "output above full employment" : dx < -0.05 ? "output below full employment" : "at full employment"; }
+  }
+
+  function shiftWords(v, curve) {
+    var size = Math.abs(v) >= 1.75 ? "a large" : Math.abs(v) >= 0.75 ? "a moderate" : "a small";
+    return curve + " has " + size + (v > 0 ? " increase (shift right)" : " decrease (shift left)");
+  }
+
+  function story(m, s) {
+    if (m.sa === 0 && m.ss === 0) {
+      return "<p><b>Long-run equilibrium.</b> AD, SRAS, and LRAS all cross at full-employment output (Y<sub>f</sub> = 1,000 billion) and a price level of 100. Unemployment equals the natural rate of 5%, so there is no output gap.</p>" +
+        "<p>Pick a demand shock, a supply shock, or a pair of shocks. Watch which way each curve moves, then check the readouts against the cheat sheet in section 3.</p>";
+    }
+    var sc = s.key ? SC[s.key] : null;
+    var html = "";
+    if (sc) html += "<p><b>" + sc.name + ".</b> " + sc.why + "</p>";
+    else {
+      var parts = [];
+      if (m.sa) parts.push(shiftWords(s.a, "AD"));
+      if (m.ss) parts.push(shiftWords(s.s, "SRAS"));
+      html += "<p><b>Your shifts.</b> " + parts.join(", and ") + ".</p>";
+    }
+    var li = [];
+    var dY = m.Y - 1000, dP = m.P - 100;
+    var ySame = Math.abs(dY) < 0.05, pSame = Math.abs(dP) < 0.05;
+    var yTxt = ySame ? "stays at 1,000 billion" : (dY > 0 ? "rises" : "falls") + " from 1,000 to " + comma(m.Y) + " billion";
+    var pTxt = pSame ? "stays at 100" : (dP > 0 ? "rises" : "falls") + " from 100 to " + f(m.P);
+
+    if (!m.both) {
+      li.push("Real GDP " + yTxt + " and the price level " + pTxt + ".");
+      if (m.sa > 0) li.push("This is <b>demand-pull inflation</b>: spending grows faster than output at the old price level, so prices are pulled up while output rises.");
+      if (m.sa < 0) li.push("A drop in AD lowers both the price level and real GDP. Firms sell less, cut production, and lay off workers.");
+      if (m.ss < 0) li.push("This is <b>cost-push inflation</b>, and because real GDP falls while the price level rises, it is <b>stagflation</b>. Only a leftward SRAS shift does this on its own.");
+      if (m.ss > 0) li.push("Lower costs per unit let firms produce more at a lower price level. The price level falls while real GDP rises.");
+    } else if (m.yInd) {
+      li.push("The price level " + (m.sa > 0 ? "<b>rises</b> for sure, because both shifts push it up" : "<b>falls</b> for sure, because both shifts push it down") + ". On this graph it " + pTxt + ".");
+      li.push("<b>Real GDP is indeterminate.</b> The AD shift pushes it " + (m.sa > 0 ? "up" : "down") + " and the SRAS shift pushes it " + (m.ss > 0 ? "up" : "down") + ". On this graph real GDP " + yTxt + " because the " + (Math.abs(s.a) > Math.abs(s.s) ? "AD shift is larger" : Math.abs(s.a) < Math.abs(s.s) ? "SRAS shift is larger" : "two shifts are the same size") + ". With different sizes it could rise, fall, or stay the same, so unemployment and the gap are indeterminate too.");
+      if (m.sa > 0 && m.ss < 0) li.push("Both kinds of inflation are at work: demand-pull from AD and cost-push from SRAS.");
+    } else {
+      li.push("Real GDP " + (m.sa > 0 ? "<b>rises</b> for sure, because both shifts push it up" : "<b>falls</b> for sure, because both shifts push it down") + ". On this graph it " + yTxt + ".");
+      li.push("<b>The price level is indeterminate.</b> The AD shift pushes it " + (m.sa > 0 ? "up" : "down") + " and the SRAS shift pushes it " + (m.ss > 0 ? "down" : "up") + ". On this graph the price level " + pTxt + " because the " + (Math.abs(s.a) > Math.abs(s.s) ? "AD shift is larger" : Math.abs(s.a) < Math.abs(s.s) ? "SRAS shift is larger" : "two shifts are the same size") + ". On the AP exam, without the sizes, write that the price level is indeterminate.");
+    }
+    html += "<ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+
+    var dx = m.x - 5, end;
+    if (m.yInd) end = "<b>AP answer:</b> state the certain change in the price level and say real GDP is indeterminate. Whether the economy ends up in a recessionary or an inflationary gap depends on which shift is larger.";
+    else if (dx > 0.05) end = "<b>AP answer:</b> output is above full employment, so there is an <b>inflationary gap</b>. Unemployment (" + f(m.u) + "%) is below the natural rate of 5%.";
+    else if (dx < -0.05) end = "<b>AP answer:</b> output is below full employment, so there is a <b>recessionary gap</b>. Unemployment (" + f(m.u) + "%) is above the natural rate of 5%.";
+    else end = "<b>AP answer:</b> on this graph output ends at full employment, so there is no gap and unemployment stays at the natural rate.";
+    html += "<p>" + end + " LRAS does not move for a short-run shock. Topic 3.7 shows how wages and input prices adjust in the long run.</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elA = document.getElementById("s-ad"), elS = document.getElementById("s-sras");
+  function label(v) { return Math.abs(v) < 1e-9 ? "start" : (v > 0 ? "right " : "left ") + Math.abs(v).toFixed(2).replace(/\.?0+$/, ""); }
+  var btns = {};
+  function render(full) {
+    var m = draw(S);
+    elA.value = S.a; elS.value = S.s;
+    document.getElementById("o-ad").textContent = label(S.a);
+    document.getElementById("o-sras").textContent = label(S.s);
+    Object.keys(btns).forEach(function (k) { btns[k].setAttribute("aria-pressed", S.key === k ? "true" : "false"); });
+    if (full !== false) { readouts(m); document.getElementById("story").innerHTML = story(m, S); }
+  }
+  var stop = function () {};
+  function go(target) {
+    stop();
+    var a0 = S.a, s0 = S.s;
+    S.key = target.key;
+    stop = Lab.animate(600, function (t) {
+      S.a = a0 + (target.a - a0) * t; S.s = s0 + (target.s - s0) * t;
+      render(false);
+    }, function () { S.a = target.a; S.s = target.s; render(); });
+  }
+  elA.addEventListener("input", function () { stop(); S.a = parseFloat(elA.value); S.key = null; render(); });
+  elS.addEventListener("input", function () { stop(); S.s = parseFloat(elS.value); S.key = null; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { go({ a: 0, s: 0, key: null }); });
+
+  Object.keys(SC).forEach(function (k) {
+    var x = SC[k];
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x.name;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { go({ a: x.a, s: x.s, key: k }); });
+    document.getElementById("sc-" + x.g).appendChild(b);
+    btns[k] = b;
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "An economy is in long-run equilibrium when the world price of oil rises sharply. In the short run, what happens to the price level and real GDP?",
+      o: ["Price level rises and real GDP rises", "Price level falls and real GDP falls", "Price level rises and real GDP falls", "Price level falls and real GDP rises"], c: 2,
+      w: "Oil is an input, so higher oil prices shift SRAS left. The price level rises and real GDP falls. Choice A describes an increase in AD, which is the tempting wrong answer if you shift the wrong curve." },
+    { s: "An economy starts in long-run equilibrium. Consumers become more optimistic about future income. In the short run, which of the following results?",
+      o: ["Higher price level, higher real GDP, and an inflationary gap", "Higher price level, lower real GDP, and a recessionary gap", "Lower price level, higher real GDP, and an inflationary gap", "No change in the price level, higher real GDP, and no gap"], c: 0,
+      w: "Optimism raises consumption, so AD shifts right along the upward-sloping SRAS. Both the price level and real GDP rise, and output above full employment is an inflationary gap." },
+    { s: "Which of the following would cause stagflation in the short run?",
+      o: ["An increase in government spending", "A decrease in the price of imported raw materials", "A decrease in consumer wealth", "An increase in nominal wages across the economy"], c: 3,
+      w: "Higher nominal wages raise production costs and shift SRAS left, which raises the price level and lowers real GDP at the same time. A decrease in consumer wealth shifts AD left, which lowers the price level, so it is a recession without inflation." },
+    { s: "In the same period, aggregate demand increases and short-run aggregate supply decreases. Which of the following must be true in the short run?",
+      o: ["Real GDP rises; the change in the price level is indeterminate", "The price level rises; the change in real GDP is indeterminate", "Both the price level and real GDP rise", "The price level rises and real GDP falls"], c: 1,
+      w: "Both shifts push the price level up, so it must rise. The AD shift raises real GDP and the SRAS shift lowers it, so without the sizes real GDP is indeterminate. Choices C and D each assume one shift is bigger." },
+    { s: "Full-employment real GDP is $800 billion and the economy is in long-run equilibrium at a price level of 120. Investment falls, and the new short-run equilibrium is real GDP of $760 billion and a price level of 116. Which describes the new short-run position?",
+      o: ["An inflationary gap of $40 billion with unemployment below the natural rate", "A recessionary gap of $4 billion with unemployment at the natural rate", "A recessionary gap of $40 billion with unemployment above the natural rate", "An inflationary gap of $4 billion with unemployment above the natural rate"], c: 2,
+      w: "The gap is measured in real GDP: 800 − 760 = $40 billion below full employment, a recessionary gap. With output below Y_f, unemployment is above the natural rate. The 4 is the change in the price level, not the gap." },
+    { s: "On an AD–AS graph, demand-pull inflation is shown by:",
+      o: ["A leftward shift of SRAS along a fixed AD curve", "A rightward shift of LRAS", "A movement down along the AD curve", "A rightward shift of AD along an upward-sloping SRAS curve"], c: 3,
+      w: "Demand-pull inflation comes from an increase in AD. As AD shifts right along SRAS, the price level and real GDP both rise. A leftward SRAS shift is cost-push inflation." },
+    { s: "A large productivity gain shifts SRAS to the right at the same time that rising foreign incomes increase this country's net exports. In the short run:",
+      o: ["Real GDP rises; the change in the price level is indeterminate", "The price level rises; the change in real GDP is indeterminate", "Real GDP falls; the price level falls", "Both real GDP and the price level are indeterminate"], c: 0,
+      w: "Higher net exports shift AD right and the productivity gain shifts SRAS right. Both raise real GDP. AD pushes the price level up and SRAS pushes it down, so the price level is indeterminate." },
+    { s: "An economy is in long-run equilibrium at a price level of 120. A sharp rise in energy prices shifts SRAS left, and the new short-run price level is 126. What is the inflation rate from this shock, and what type of inflation is it?",
+      o: ["6%, demand-pull inflation", "5%, cost-push inflation", "4.8%, cost-push inflation", "5%, demand-pull inflation"], c: 1,
+      w: "Inflation rate = (126 − 120) ÷ 120 × 100 = 5%. Higher energy costs shift SRAS left, so it is cost-push inflation. 6 is the change in the index, not the percentage, and 4.8% divides by the new price level instead of the old one." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.6");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.6", compact: true, storageKey: "topic-3.6" });</script>
+</body>
+</html>

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Circular Flow and GDP Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.sub-h { font-size: 1.2rem; }
+.lab.cf { grid-template-columns: 3fr 2fr; }
+.lab.cf .graph-card { align-content: start; }
+.flowinfo { display: grid; gap: 12px; align-content: start; }
+.flowinfo .fi { display: grid; gap: 8px; border-left: 4px solid var(--accent); padding: 4px 0 4px 12px; }
+.flowinfo .fi p { font-size: .94rem; }
+.fromto { font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+.pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.toggles { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.flowbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.flowbtns button { font-size: .82rem; padding: 4px 11px; }
+.flowbtns button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.note { font-size: .84rem; color: var(--muted); }
+#cf .hit { cursor: pointer; }
+#cf .box rect { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+#cf .box text { fill: var(--ink); font-size: 14px; font-weight: 600; }
+#cf .box.mkt rect { fill: var(--paper); }
+#cf .flab { font-size: 12px; font-weight: 600; }
+.calc-card { display: grid; gap: 14px; }
+.calc-top { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; }
+.tbl-wrap { position: relative; }
+.items td, .items th { vertical-align: middle; position: relative; }
+.items input, .items select, .addrow input, .addrow select { font: inherit; font-size: .9rem; padding: 5px 8px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.items input[type="number"] { width: 90px; font-family: var(--mono); }
+.items select { max-width: 240px; }
+.items .res { font-size: .86rem; }
+.items .ok { color: var(--good); font-weight: 600; }
+.items .no { color: var(--bad); font-weight: 600; }
+.items .wait { color: var(--muted); font-style: italic; }
+.items button { font-size: .8rem; padding: 3px 10px; }
+.addrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.addrow .f { display: grid; gap: 3px; font-size: .8rem; color: var(--muted); }
+.addrow input[type="text"] { width: 220px; }
+.addrow input[type="number"] { width: 100px; font-family: var(--mono); }
+.prompt { font-size: .95rem; }
+.calc .row span:last-child { font-family: var(--mono); text-align: right; }
+.calc .row.dim { color: var(--muted); }
+.va-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .8rem; color: var(--muted); }
+.va-legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: currentColor; }
+@media (max-width: 860px) { .lab.cf { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 2 · Topic 2.1</span>
+  <h1>The Circular Flow and GDP Study Lab</h1>
+  <p class="lede">The circular flow model shows how money, products, and resources move between households, firms, the government, and the rest of the world. Gross domestic product (GDP) measures the value of the final goods and services that flow through that system in a year. Click flows in the diagram, then use the calculator to measure GDP and see which transactions it leaves out.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Circular flow and GDP lab</h2>
+    <p>Part A is the circular flow diagram. Part B measures GDP two ways and flags items that do not belong. Part C shows why adding value added at each stage gives the same answer as counting only the final good.</p>
+  </div>
+
+  <h3 class="sub-h">A. The circular flow</h3>
+  <div class="lab cf">
+    <div class="card graph-card">
+      <h3>Circular flow diagram <small>click any flow</small></h3>
+      <svg class="chart" id="cf" role="img" aria-label="Circular flow diagram with households, firms, the product market, the factor market, the government, and the rest of the world"></svg>
+    </div>
+    <div class="card flowinfo">
+      <div class="fi" id="flow-info" aria-live="polite"></div>
+      <div class="toggles">
+        <label class="check" for="t-gov"><input type="checkbox" id="t-gov" checked> Show government</label>
+        <label class="check" for="t-row"><input type="checkbox" id="t-row" checked> Show rest of the world</label>
+        <button type="button" id="btn-anim" aria-pressed="false">Pause animation</button>
+      </div>
+      <div>
+        <div class="tag" style="margin-bottom:6px;">Pick a flow</div>
+        <div class="flowbtns" id="flowbtns"></div>
+      </div>
+      <p class="note" id="leak-note"></p>
+    </div>
+  </div>
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Money flows</span><span class="l-srpc">Real flows (goods, services, factors)</span><span class="l-c3">Government flows</span><span class="l-c4">Rest of the world flows</span></div>
+  </div>
+
+  <h3 class="sub-h">B. GDP calculator</h3>
+  <div class="card calc-card">
+    <div><span class="formula">GDP = C + I + G + Xn &nbsp; where Xn = X − M</span> &nbsp; <span class="formula">GDP = wages + rent + interest + profit</span></div>
+    <div>
+      <div class="tag" style="margin-bottom:8px;">AP-style problems</div>
+      <div class="scenarios" id="presets"></div>
+    </div>
+    <p class="prompt" id="prompt"></p>
+    <div class="calc-top">
+      <label class="check" for="c-sort"><input type="checkbox" id="c-sort"> Sort the items myself (hide the answer key)</label>
+      <button type="button" id="btn-reload">Reset this problem</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="items">
+        <thead><tr><th>Transaction</th><th>Amount ($B)</th><th>Category</th><th>What the calculator does</th><th><span class="sr">Remove</span></th></tr></thead>
+        <tbody id="items"></tbody>
+      </table>
+    </div>
+    <div class="addrow">
+      <div class="f"><label for="new-name">Add your own transaction</label><input type="text" id="new-name" placeholder="e.g. A city buys new buses"></div>
+      <div class="f"><label for="new-amt">Amount ($B)</label><input type="number" id="new-amt" value="25" step="1"></div>
+      <div class="f"><label for="new-cat">Category</label><select id="new-cat"></select></div>
+      <button type="button" id="btn-add">Add item</button>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="card">
+      <h3>Expenditure approach</h3>
+      <div class="calc" id="calc-exp" style="margin-top:10px;"></div>
+    </div>
+    <div class="card">
+      <h3>Income approach</h3>
+      <div class="calc" id="calc-inc" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">GDP, expenditure approach</div><div class="v" id="r-exp">0</div></div>
+    <div class="stat"><div class="k">GDP, income approach</div><div class="v" id="r-inc">0</div></div>
+    <div class="stat"><div class="k" id="r-cnt-k">Items counted</div><div class="v" id="r-cnt">0</div></div>
+    <div class="stat"><div class="k">Items excluded</div><div class="v" id="r-exc">0</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <h3 class="sub-h">C. Value added: count each stage once</h3>
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>A loaf of bread <small>value added vs. adding every sale</small></h3>
+      <svg class="chart" id="va" role="img" aria-label="Bar chart comparing the sum of value added with the sum of all sales"></svg>
+      <div class="va-legend" id="va-legend"></div>
+    </div>
+    <div class="card" style="display:grid; gap:14px; align-content:start;">
+      <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));" id="va-controls"></div>
+      <div class="calc" id="va-calc"></div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;"><button type="button" id="va-reset">Reset prices</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">The model</span><h3>Circular flow model</h3><p>Households sell land, labor, capital, and entrepreneurship to firms in the factor market and receive wages, rent, interest, and profit. They spend that income on goods and services in the product market. Money flows one way around the loop; goods, services, and factors flow the other way.</p></div>
+    <div class="card"><span class="tag">Definition</span><h3>Gross domestic product (GDP)</h3><p>The market value of all final goods and services produced within a country's borders in a given year. Ownership does not matter. A Japanese-owned car plant in Ohio adds to U.S. GDP.</p></div>
+    <div class="card"><span class="tag">C + I + G + Xn</span><h3>Expenditure approach</h3><p>Add consumption, investment, government purchases, and net exports. Imports are subtracted because spending on imports is already inside C, I, and G, and GDP counts only domestic production.</p></div>
+    <div class="card"><span class="tag">I in GDP</span><h3>What investment means</h3><p>Investment is spending on new capital goods (machines, tools, factories), new residential housing, and changes in business inventories. Buying stocks or bonds is a financial transaction and adds nothing to GDP.</p></div>
+    <div class="card"><span class="tag">Avoid double counting</span><h3>Final goods and value added</h3><p>Intermediate goods are inputs used up to make something else. Their value is already in the final price, so GDP leaves them out. Adding the value added at each stage of production gives the same total as the final sale price.</p></div>
+    <div class="card"><span class="tag">Spending = income</span><h3>Income approach</h3><p>Every dollar spent on final output becomes someone's income. Adding wages, rent, interest, and profit gives GDP too. Leakages (saving, taxes, imports) leave the spending stream; injections (investment, government purchases, exports) enter it.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Does it count in GDP?</h2>
+    <p>Memorize these. AP multiple-choice questions on this topic are mostly this table in disguise.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Transaction</th><th>In this year's U.S. GDP?</th><th>Where it goes, or why it is left out</th></tr></thead>
+    <tbody>
+      <tr><td>A family buys a new refrigerator or a haircut</td><td><b>Yes</b></td><td>Consumption (C)</td></tr>
+      <tr><td>A firm buys new machinery or builds a factory</td><td><b>Yes</b></td><td>Investment (I): new capital goods</td></tr>
+      <tr><td>A builder completes a new house</td><td><b>Yes</b></td><td>Investment (I): new residential construction</td></tr>
+      <tr><td>Goods produced this year that are still unsold</td><td><b>Yes</b></td><td>Investment (I): inventory investment. When sold next year, inventories fall, so they are not counted twice.</td></tr>
+      <tr><td>A state builds a bridge or pays public school teachers</td><td><b>Yes</b></td><td>Government purchases (G)</td></tr>
+      <tr><td>Foreigners buy U.S.-made airplanes</td><td><b>Yes</b></td><td>Exports (X), added</td></tr>
+      <tr><td>Americans buy cars made in Germany</td><td><span class="shift">Subtracted</span></td><td>Imports (M). The spending is in C, so M is subtracted to remove it.</td></tr>
+      <tr><td>Social Security or unemployment benefits</td><td>No</td><td>Transfer payment: nothing is produced in return</td></tr>
+      <tr><td>Buying shares of stock or a bond</td><td>No</td><td>Financial transaction. The broker's fee does count (a service, C).</td></tr>
+      <tr><td>Buying a used car or an existing house</td><td>No</td><td>Used good, counted when it was made. A dealer's or agent's commission does count.</td></tr>
+      <tr><td>Steel bought by an automaker</td><td>No</td><td>Intermediate good. Its value is inside the price of the car.</td></tr>
+      <tr><td>Shoes made in a U.S.-owned factory in Vietnam</td><td>No</td><td>Produced outside U.S. borders. Counts in Vietnam's GDP and U.S. GNP.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. On the free-response section</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Tips that earn points</h3>
+      <ul>
+        <li>Write the formula before the numbers: GDP = C + I + G + (X − M). Then substitute and show the total. Graders look for the setup.</li>
+        <li>When asked whether an item counts, name the component (C, I, G, or Xn) or name the reason it is excluded, such as "transfer payment, no good or service is produced."</li>
+        <li>For value added, show the subtraction at each stage (sale price minus cost of intermediate inputs), then add the stages. The sum equals the final price.</li>
+        <li>In a circular flow drawing, label the product market and the factor market, and show money moving opposite to goods, services, and factors.</li>
+        <li>For unsold output, say it counts as inventory investment in the year it is produced.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Calling stock or bond purchases "investment." In GDP, investment means new capital goods, new housing, and inventory changes.</li>
+        <li>Putting transfer payments into G. Social Security checks are excluded; only government purchases of goods and services are G.</li>
+        <li>Adding imports. Imports are subtracted. Buying an import does not itself lower GDP; the subtraction removes foreign output that was counted in C, I, or G.</li>
+        <li>Counting intermediate goods along with the final good. That is double counting.</li>
+        <li>Counting the sale price of a used item. Only the new service, such as a commission, counts.</li>
+        <li>Mixing up GDP and GNP. GDP is about where the output is made; GNP is about who owns the resources.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 2.1. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-2.html">Unit 2 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var f = Lab.fmt;
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  // =====================================================================
+  // A. Circular flow diagram
+  // =====================================================================
+  var svg = $("cf");
+  svg.setAttribute("viewBox", "0 0 600 462");
+  var COLORS = { money: "var(--accent)", real: "var(--srpc)", gov: "var(--c3)", row: "var(--c4)" };
+  var BOXES = [
+    { id: "hh", x: 20, y: 205, w: 120, h: 50, t: "Households" },
+    { id: "firms", x: 460, y: 205, w: 120, h: 50, t: "Firms" },
+    { id: "pm", x: 220, y: 20, w: 160, h: 50, t: "Product market", mkt: true },
+    { id: "fm", x: 220, y: 390, w: 160, h: 50, t: "Factor market", mkt: true },
+    { id: "gov", x: 240, y: 205, w: 120, h: 50, t: "Government", grp: "gov" },
+    { id: "row", x: 460, y: 20, w: 120, h: 50, t: "Rest of world", grp: "row" }
+  ];
+  // Each flow: segments with SVG path data and an optional label.
+  var FLOWS = [
+    { id: "spend", name: "Consumer spending (C)", kind: "money", grp: "core", col: "money",
+      segs: [{ d: "M45 205 Q45 33 220 33", l: ["Consumer spending (C)", 135, 22, "middle"] },
+             { d: "M360 70 C370 110 575 100 575 205", l: ["Revenue", 588, 104, "end"] }],
+      ft: "Households → product market → firms",
+      what: "Households pay for new goods and services in the product market. That spending arrives at firms as sales revenue.",
+      gdp: "This is C, the largest component of GDP. Total spending on domestic output (C + I + G + Xn) reaches firms as revenue, and that total is GDP.",
+      pills: [["Money flow", "rec"], ["In GDP as C", "lr"]] },
+    { id: "goods", name: "Goods and services", kind: "real", grp: "core", col: "real",
+      segs: [{ d: "M490 205 Q440 110 350 70", l: ["Goods and services", 440, 182, "end"] },
+             { d: "M220 57 Q120 65 105 205", l: ["Goods and services", 136, 125, "start"] }],
+      ft: "Firms → product market → households",
+      what: "The products themselves move from firms, through the product market, to buyers. They travel opposite to the money paid for them.",
+      gdp: "GDP measures the market value of these final goods and services.",
+      pills: [["Real flow", "rec"]] },
+    { id: "factors", name: "Factors of production", kind: "real", grp: "core", col: "real",
+      segs: [{ d: "M105 255 Q120 402 220 402", l: ["Land, labor, capital, entrepreneurship", 128, 352, "start"] },
+             { d: "M380 402 Q480 402 495 255", l: null }],
+      ft: "Households → factor market → firms",
+      what: "Households own the factors of production and sell their services to firms in the factor market: labor, land, capital, and entrepreneurship.",
+      gdp: "Firms use these resources to produce the output that GDP measures.",
+      pills: [["Real flow", "rec"]] },
+    { id: "income", name: "Wages, rent, interest, and profit", kind: "money", grp: "core", col: "money",
+      segs: [{ d: "M575 255 Q575 427 380 427", l: ["Wages, rent, interest, profit", 300, 456, "middle"] },
+             { d: "M220 427 Q30 427 30 255", l: ["Income", 36, 300, "start"] }],
+      ft: "Firms → factor market → households",
+      what: "Firms pay for the factors they hire: wages for labor, rent for land, interest for capital, and profit to entrepreneurs. These payments become household income.",
+      gdp: "Adding these four payments is the income approach to GDP. In the circular flow, total income equals total spending on final output.",
+      pills: [["Money flow", "rec"], ["Income approach", "lr"]] },
+    { id: "taxes", name: "Taxes", kind: "money", grp: "gov", col: "gov",
+      segs: [{ d: "M140 218 L240 218", l: ["Taxes", 190, 211, "middle"] },
+             { d: "M460 218 L360 218", l: ["Taxes", 410, 211, "middle"] }],
+      ft: "Households and firms → government",
+      what: "Households and firms pay taxes to the government. Taxes reduce the income households have left to spend.",
+      gdp: "Taxes are a leakage from the spending stream. They are not a component of GDP.",
+      pills: [["Money flow", "rec"], ["Leakage", "infl"]] },
+    { id: "transfers", name: "Transfer payments", kind: "money", grp: "gov", col: "gov",
+      segs: [{ d: "M240 244 L140 244", l: ["Transfers", 190, 266, "middle"] }],
+      ft: "Government → households",
+      what: "The government sends payments such as Social Security and unemployment benefits. No good or service is produced in return.",
+      gdp: "Transfer payments are excluded from GDP and are not part of G. They show up in GDP only if households spend them on new output, and then they count as C.",
+      pills: [["Money flow", "rec"], ["Not in GDP", "infl"]] },
+    { id: "gpurch", name: "Government purchases (G)", kind: "money", grp: "gov", col: "gov",
+      segs: [{ d: "M300 205 L300 70", l: ["Government purchases (G)", 294, 160, "end"] }],
+      ft: "Government → product market",
+      what: "The government buys final goods and services such as roads, schools, and military equipment. It also hires workers, and those salaries count in G too.",
+      gdp: "This is G, an injection into the spending stream.",
+      pills: [["Money flow", "rec"], ["Injection", "lr"], ["In GDP as G", "lr"]] },
+    { id: "exports", name: "Exports (X)", kind: "money", grp: "row", col: "row",
+      segs: [{ d: "M460 33 L380 33", l: ["Exports", 420, 26, "middle"] }],
+      ft: "Rest of the world → product market",
+      what: "Foreign buyers pay for goods and services produced in this country.",
+      gdp: "Exports are added in GDP. They are an injection: spending that comes from outside the domestic economy.",
+      pills: [["Money flow", "rec"], ["Injection", "lr"], ["Added to GDP", "lr"]] },
+    { id: "imports", name: "Imports (M)", kind: "money", grp: "row", col: "row",
+      segs: [{ d: "M380 57 L460 57", l: ["Imports", 420, 82, "middle"] }],
+      ft: "Product market → rest of the world",
+      what: "Domestic buyers pay for goods and services produced in other countries, so that money leaves the domestic economy.",
+      gdp: "Imports are subtracted (Xn = X − M). Spending on imports is already inside C, I, and G, so subtracting M leaves only domestic production. Imports are a leakage.",
+      pills: [["Money flow", "rec"], ["Leakage", "infl"], ["Subtracted", "infl"]] }
+  ];
+  var CF = { gov: true, row: true, sel: "spend", playing: !Lab.reduceMotion };
+  var dots = [];
+  var flowEls = {};
+
+  function visible(fl) { return fl.grp === "core" || (fl.grp === "gov" && CF.gov) || (fl.grp === "row" && CF.row); }
+
+  function buildDiagram() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    dots = []; flowEls = {};
+    var defs = Lab.el("defs", {}, svg);
+    Object.keys(COLORS).forEach(function (k) {
+      var m = Lab.el("marker", { id: "mk-" + k, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 9, markerHeight: 9, markerUnits: "userSpaceOnUse", orient: "auto-start-reverse" }, defs);
+      Lab.el("path", { d: "M0 0 L10 5 L0 10 Z", fill: COLORS[k] }, m);
+    });
+    var layerF = Lab.el("g", {}, svg);
+    var layerB = Lab.el("g", {}, svg);
+    var layerD = Lab.el("g", {}, svg);
+    var layerL = Lab.el("g", {}, svg);
+    BOXES.forEach(function (b) {
+      if (b.grp === "gov" && !CF.gov) return;
+      if (b.grp === "row" && !CF.row) return;
+      var g = Lab.el("g", { "class": "box" + (b.mkt ? " mkt" : "") }, layerB);
+      Lab.el("rect", { x: b.x, y: b.y, width: b.w, height: b.h, rx: b.mkt ? 24 : 8 }, g);
+      Lab.el("text", { x: b.x + b.w / 2, y: b.y + b.h / 2 + 5, "text-anchor": "middle" }, g, b.t);
+    });
+    FLOWS.forEach(function (fl) {
+      if (!visible(fl)) return;
+      var col = COLORS[fl.col];
+      var g = Lab.el("g", { "data-flow": fl.id }, layerF);
+      var lg = Lab.el("g", { "data-flow": fl.id }, layerL);
+      var paths = [];
+      fl.segs.forEach(function (s) {
+        var p = Lab.el("path", { d: s.d, fill: "none", stroke: col, "stroke-width": 3, "stroke-dasharray": fl.kind === "real" ? "7 5" : null, "marker-end": "url(#mk-" + fl.col + ")" }, g);
+        paths.push(p);
+        var hit = Lab.el("path", { d: s.d, fill: "none", stroke: "transparent", "stroke-width": 18, "class": "hit" }, g);
+        hit.addEventListener("click", function () { select(fl.id); });
+        if (s.l) {
+          var t = Lab.el("text", { x: s.l[1], y: s.l[2], "text-anchor": s.l[3], "class": "flab hit", style: "fill:" + col }, lg, s.l[0]);
+          t.addEventListener("click", function () { select(fl.id); });
+        }
+      });
+      flowEls[fl.id] = { g: g, lg: lg, paths: paths };
+      paths.forEach(function (p) {
+        var len = p.getTotalLength(), n = Math.max(2, Math.round(len / 75));
+        for (var i = 0; i < n; i++) {
+          var c = Lab.el("circle", { r: 3.5, fill: col }, layerD);
+          dots.push({ c: c, p: p, len: len, off: len * i / n, flow: fl.id });
+        }
+      });
+    });
+    placeDots(0);
+    paint();
+  }
+
+  function placeDots(now) {
+    var speed = 0.045; // px per ms
+    dots.forEach(function (d) {
+      var s = (d.off + now * speed) % d.len;
+      var pt = d.p.getPointAtLength(Math.max(0, Math.min(d.len - 6, s)));
+      d.c.setAttribute("cx", pt.x.toFixed(1)); d.c.setAttribute("cy", pt.y.toFixed(1));
+    });
+  }
+
+  var stopAnim = null;
+  function loop() {
+    if (!CF.playing || Lab.reduceMotion) return;
+    stopAnim = Lab.animate(6000, function () { placeDots(performance.now()); }, function () { if (CF.playing) loop(); });
+  }
+
+  function paint() {
+    FLOWS.forEach(function (fl) {
+      var e = flowEls[fl.id]; if (!e) return;
+      var on = fl.id === CF.sel;
+      e.g.style.opacity = on ? 1 : 0.32;
+      e.lg.style.opacity = on ? 1 : 0.55;
+      e.paths.forEach(function (p) { p.setAttribute("stroke-width", on ? 5 : 3); });
+    });
+    dots.forEach(function (d) { var on = d.flow === CF.sel; d.c.setAttribute("r", on ? 5 : 3); d.c.style.opacity = on ? 1 : 0.35; });
+    var fl = FLOWS.filter(function (x) { return x.id === CF.sel; })[0];
+    var info = $("flow-info");
+    info.style.borderLeftColor = COLORS[fl.col];
+    info.innerHTML = "<h3>" + fl.name + "</h3><div class='fromto'>" + fl.ft + "</div><div class='pills'>" +
+      fl.pills.map(function (p) { return "<span class='pill " + p[1] + "'>" + p[0] + "</span>"; }).join("") +
+      "</div><p>" + fl.what + "</p><p><b>GDP link:</b> " + fl.gdp + "</p>";
+    var bs = $("flowbtns").querySelectorAll("button");
+    bs.forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.flow === CF.sel); b.hidden = !visible(FLOWS.filter(function (x) { return x.id === b.dataset.flow; })[0]); });
+    var leak = ["saving (not drawn)"], inj = ["investment (not drawn)"];
+    if (CF.gov) { leak.push("taxes"); inj.push("government purchases"); }
+    if (CF.row) { leak.push("imports"); inj.push("exports"); }
+    $("leak-note").innerHTML = "<b>Leakages:</b> " + leak.join(", ") + ". <b>Injections:</b> " + inj.join(", ") + ". This simple diagram leaves out the financial markets, where household saving is lent to firms that buy capital goods." +
+      (!CF.gov && !CF.row ? " With government and the rest of the world off, you are looking at the simple two-sector model." : "");
+  }
+
+  function select(id) { CF.sel = id; paint(); }
+
+  FLOWS.forEach(function (fl) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = fl.name; b.dataset.flow = fl.id;
+    b.addEventListener("click", function () { select(fl.id); });
+    $("flowbtns").appendChild(b);
+  });
+  function toggled() {
+    CF.gov = $("t-gov").checked; CF.row = $("t-row").checked;
+    var cur = FLOWS.filter(function (x) { return x.id === CF.sel; })[0];
+    if (!visible(cur)) CF.sel = "spend";
+    buildDiagram();
+  }
+  $("t-gov").addEventListener("change", toggled);
+  $("t-row").addEventListener("change", toggled);
+  var animBtn = $("btn-anim");
+  if (Lab.reduceMotion) { animBtn.hidden = true; }
+  animBtn.addEventListener("click", function () {
+    CF.playing = !CF.playing;
+    animBtn.textContent = CF.playing ? "Pause animation" : "Play animation";
+    animBtn.setAttribute("aria-pressed", String(!CF.playing));
+    if (CF.playing) loop(); else if (stopAnim) stopAnim();
+  });
+  buildDiagram();
+  loop();
+
+  // =====================================================================
+  // B. GDP calculator
+  // =====================================================================
+  var CATS = {
+    C: { n: "Consumption (C)", side: "exp", why: "Household spending on new goods and services produced this year." },
+    I: { n: "Investment (I)", side: "exp", why: "Spending on new capital goods, new housing, or a change in inventories." },
+    G: { n: "Government purchases (G)", side: "exp", why: "Government spending on final goods and services, including paying public employees." },
+    X: { n: "Exports (X)", side: "exp", why: "Domestic output sold to foreign buyers. Added." },
+    M: { n: "Imports (M)", side: "exp", why: "Foreign output bought here. Subtracted, because that spending sits inside C, I, or G." },
+    W: { n: "Wages", side: "inc", why: "Income paid for labor." },
+    R: { n: "Rent", side: "inc", why: "Income paid for land." },
+    N: { n: "Interest", side: "inc", why: "Income paid for capital." },
+    P: { n: "Profit", side: "inc", why: "Income earned by entrepreneurs." },
+    tr: { n: "Transfer payment", side: "out", why: "The government gives money and nothing is produced in return." },
+    used: { n: "Used good", side: "out", why: "It was counted in GDP the year it was made. Only a new fee or commission on the sale counts." },
+    fin: { n: "Financial transaction", side: "out", why: "Buying stocks, bonds, or saving swaps one asset for another. Nothing new is produced." },
+    int: { n: "Intermediate good", side: "out", why: "Its value is already inside the price of the final good. Counting it again is double counting." },
+    abr: { n: "Produced abroad", side: "out", why: "GDP counts output made inside the country's borders, whoever owns the factory." }
+  };
+  var GROUPS = [["Expenditure approach", ["C", "I", "G", "X", "M"]], ["Income approach", ["W", "R", "N", "P"]], ["Not counted in GDP", ["tr", "used", "fin", "int", "abr"]]];
+
+  var PRESETS = [
+    { n: "Expenditure basics", p: "Find GDP using the expenditure approach. Three of the items do not belong.", items: [
+      ["Households buy new clothes, food, and haircuts", 500, "C"],
+      ["Firms buy new factory equipment", 120, "I"],
+      ["Builders complete new houses", 60, "I"],
+      ["Unsold goods added to firms' inventories", 20, "I"],
+      ["The government builds a highway", 150, "G"],
+      ["Foreign buyers purchase U.S. wheat", 80, "X"],
+      ["Americans buy imported phones", 100, "M"],
+      ["Social Security checks", 90, "tr"],
+      ["A family buys shares of stock", 40, "fin"],
+      ["A used car sold between neighbors", 15, "used"]] },
+    { n: "Spending equals income", p: "Measure GDP both ways. The two approaches should give the same answer.", items: [
+      ["Consumer spending", 450, "C"],
+      ["Business spending on new equipment and buildings", 100, "I"],
+      ["Government purchases of goods and services", 120, "G"],
+      ["Exports", 50, "X"],
+      ["Imports", 90, "M"],
+      ["Wages and salaries", 400, "W"],
+      ["Rent paid to landowners", 40, "R"],
+      ["Interest paid to lenders", 60, "N"],
+      ["Profits", 130, "P"],
+      ["Unemployment benefits", 25, "tr"],
+      ["A household buys government bonds", 50, "fin"]] },
+    { n: "Spot the double counting", p: "Some of these goods are used up to make other goods. Find GDP without double counting.", items: [
+      ["Steel sold to an automaker", 30, "int"],
+      ["Tires sold to an automaker", 10, "int"],
+      ["New cars sold to households", 90, "C"],
+      ["A household buys new tires for its own car", 4, "C"],
+      ["Flour bought by a bakery", 6, "int"],
+      ["Bread bought by households", 15, "C"],
+      ["The bakery buys a new delivery truck", 25, "I"],
+      ["The bakery's unsold inventory of bread rises", 2, "I"]] },
+    { n: "AP trick items", p: "Classic exam traps. Decide what counts in this year's U.S. GDP.", items: [
+      ["Sale of a house built ten years ago", 200, "used"],
+      ["Real estate agent's commission on that sale", 12, "C"],
+      ["A household buys corporate bonds", 50, "fin"],
+      ["Broker's fee for the bond purchase", 3, "C"],
+      ["A student buys a used textbook online", 20, "used"],
+      ["Unemployment benefits", 35, "tr"],
+      ["Shoes made in a U.S.-owned factory in Vietnam", 40, "abr"],
+      ["Cars built in Ohio by a Japanese-owned firm, sold to Americans", 60, "C"],
+      ["Salaries of public school teachers", 80, "G"],
+      ["Business inventories fall", -15, "I"]] },
+    { n: "What counts as investment", p: "In GDP, investment means new capital, new housing, and inventory changes. Sort out the financial transactions.", items: [
+      ["A firm sells new shares of stock to raise money", 100, "fin"],
+      ["The firm uses that money to build a new factory", 100, "I"],
+      ["A family buys a newly built house", 250, "I"],
+      ["A family buys a new car", 30, "C"],
+      ["Households buy this year's output of goods", 260, "C"],
+      ["Output produced this year but not yet sold", 40, "I"],
+      ["The government buys new computers for schools", 20, "G"],
+      ["A household deposits savings in a bank", 15, "fin"],
+      ["Exports", 20, "X"],
+      ["Imports", 30, "M"]] }
+  ];
+
+  var C = { preset: 0, sort: false, items: [], nextId: 1 };
+  function load(i) {
+    C.preset = i;
+    C.items = PRESETS[i].items.map(function (x) { return { id: C.nextId++, t: x[0], a: x[1], key: x[2], cat: C.sort ? "" : x[2] }; });
+    buildRows(); compute();
+  }
+
+  function catOptions(sel, withBlank, current) {
+    sel.innerHTML = "";
+    if (withBlank) { var o0 = document.createElement("option"); o0.value = ""; o0.textContent = "Choose a category"; sel.appendChild(o0); }
+    GROUPS.forEach(function (g) {
+      var og = document.createElement("optgroup"); og.label = g[0];
+      g[1].forEach(function (k) { var o = document.createElement("option"); o.value = k; o.textContent = CATS[k].n; og.appendChild(o); });
+      sel.appendChild(og);
+    });
+    sel.value = current || "";
+  }
+
+  var tbody = $("items");
+  function buildRows() {
+    tbody.innerHTML = "";
+    C.items.forEach(function (it) {
+      var tr = document.createElement("tr"); tr.dataset.id = it.id;
+      var td1 = document.createElement("td"); td1.textContent = it.t;
+      var td2 = document.createElement("td");
+      var lab = document.createElement("label"); lab.className = "sr"; lab.htmlFor = "amt-" + it.id; lab.textContent = "Amount for " + it.t;
+      var inp = document.createElement("input"); inp.type = "number"; inp.step = "1"; inp.id = "amt-" + it.id; inp.value = it.a;
+      inp.addEventListener("input", function () { var v = parseFloat(inp.value); it.a = isNaN(v) ? 0 : v; compute(); });
+      td2.appendChild(lab); td2.appendChild(inp);
+      var td3 = document.createElement("td");
+      var lab2 = document.createElement("label"); lab2.className = "sr"; lab2.htmlFor = "cat-" + it.id; lab2.textContent = "Category for " + it.t;
+      var sel = document.createElement("select"); sel.id = "cat-" + it.id;
+      catOptions(sel, C.sort || !it.cat, it.cat);
+      sel.addEventListener("change", function () { it.cat = sel.value; compute(); });
+      td3.appendChild(lab2); td3.appendChild(sel);
+      var td4 = document.createElement("td"); td4.className = "res"; td4.id = "res-" + it.id;
+      var td5 = document.createElement("td");
+      var rm = document.createElement("button"); rm.type = "button"; rm.textContent = "Remove"; rm.setAttribute("aria-label", "Remove " + it.t);
+      rm.addEventListener("click", function () { C.items = C.items.filter(function (x) { return x.id !== it.id; }); buildRows(); compute(); });
+      td5.appendChild(rm);
+      [td1, td2, td3, td4, td5].forEach(function (x) { tr.appendChild(x); });
+      tbody.appendChild(tr);
+    });
+    if (!C.items.length) tbody.innerHTML = "<tr><td colspan='5' class='wait'>No items. Pick a problem above or add your own transaction.</td></tr>";
+  }
+
+  function money(v) { return (v < 0 ? "−" : "") + "$" + f(Math.abs(v), 0); }
+  function sgn(v) { return v < 0 ? "(−" + f(-v, 0) + ")" : f(v, 0); }
+
+  function compute() {
+    var S = { C: 0, I: 0, G: 0, X: 0, M: 0, W: 0, R: 0, N: 0, P: 0 }, has = { exp: false, inc: false };
+    var counted = 0, out = [], sorted = 0, right = 0, withKey = 0;
+    C.items.forEach(function (it) {
+      var res = $("res-" + it.id), k = it.cat;
+      if (it.key) withKey++;
+      if (!k) { res.innerHTML = "<span class='wait'>Pick a category</span>"; return; }
+      sorted++;
+      var cat = CATS[k], html = "";
+      var wrong = C.sort && it.key && it.key !== k;
+      if (C.sort && it.key) {
+        if (wrong) html += "<span class='no'>✗ Not quite.</span> Answer: " + CATS[it.key].n + ". " + CATS[it.key].why + " ";
+        else { right++; html += "<span class='ok'>✓ Correct.</span> "; }
+      }
+      if (cat.side === "out") { out.push(it); html += wrong ? "<br>As sorted, the calculator excludes it." : "<span class='no'>Excluded.</span> " + cat.why; }
+      else {
+        S[k] += it.a; has[cat.side] = true; counted++;
+        var verb = k === "M" ? "Subtracted as M." : "Counted in " + (cat.side === "exp" ? k : cat.n.toLowerCase()) + ".";
+        html += wrong ? "<br>As sorted, the calculator uses it as " + cat.n + "." : "<span class='ok'>" + verb + "</span> " + cat.why;
+      }
+      res.innerHTML = html;
+    });
+    var Xn = S.X - S.M, exp = S.C + S.I + S.G + Xn, inc = S.W + S.R + S.N + S.P;
+
+    $("calc-exp").innerHTML = has.exp ?
+      row("Consumption (C)", f(S.C, 0)) + row("Investment (I)", (S.I < 0 ? "−" : "") + f(Math.abs(S.I), 0)) + row("Government purchases (G)", f(S.G, 0)) +
+      row("Net exports Xn = X − M = " + f(S.X, 0) + " − " + f(S.M, 0), (Xn < 0 ? "−" : "") + f(Math.abs(Xn), 0)) +
+      row("GDP = " + f(S.C, 0) + " + " + f(S.I, 0) + " + " + f(S.G, 0) + " + " + sgn(Xn), money(exp) + "B")
+      : "<div class='row dim'><span>No spending items in this problem.</span><span>–</span></div>";
+    $("calc-inc").innerHTML = has.inc ?
+      row("Wages", f(S.W, 0)) + row("Rent", f(S.R, 0)) + row("Interest", f(S.N, 0)) + row("Profit", f(S.P, 0)) +
+      row("GDP = " + f(S.W, 0) + " + " + f(S.R, 0) + " + " + f(S.N, 0) + " + " + f(S.P, 0), money(inc) + "B")
+      : "<div class='row dim'><span>No income items in this problem. Try “Spending equals income.”</span><span>–</span></div>";
+
+    $("r-exp").textContent = has.exp ? money(exp) + "B" : "–";
+    $("r-inc").textContent = has.inc ? money(inc) + "B" : "–";
+    if (C.sort && withKey) { $("r-cnt-k").textContent = "Sorted correctly"; $("r-cnt").textContent = right + " / " + withKey; }
+    else { $("r-cnt-k").textContent = "Items counted"; $("r-cnt").textContent = counted; }
+    $("r-exc").innerHTML = out.length ? "<span class='pill infl'>" + out.length + " left out</span>" : "0";
+
+    // story
+    var pr = PRESETS[C.preset], h = [];
+    h.push("<p><b>" + esc(pr.n) + ".</b> " + esc(pr.p) + "</p>");
+    var li = [];
+    if (C.sort) {
+      var un = C.items.length - sorted;
+      li.push("You have sorted " + sorted + " of " + C.items.length + " items" + (withKey ? ", and " + right + " match the answer key." : "."));
+      if (un) li.push("The totals below use only the items you have sorted, with your categories.");
+    }
+    if (has.exp) {
+      var t = "Expenditure approach: GDP = C + I + G + Xn = " + f(S.C, 0) + " + " + f(S.I, 0) + " + " + f(S.G, 0) + " + " + sgn(Xn) + " = <b>" + money(exp) + " billion</b>.";
+      if (Xn < 0) t += " Net exports are negative because imports exceed exports, so they subtract from GDP.";
+      li.push(t);
+      if (S.I < 0) li.push("Investment is negative here. Firms sold goods out of inventory that were made and counted in an earlier year, so falling inventories subtract from this year's GDP.");
+    }
+    if (has.inc) li.push("Income approach: GDP = wages + rent + interest + profit = " + f(S.W, 0) + " + " + f(S.R, 0) + " + " + f(S.N, 0) + " + " + f(S.P, 0) + " = <b>" + money(inc) + " billion</b>.");
+    if (has.exp && has.inc) {
+      if (Math.abs(exp - inc) < 0.5) li.push("Both approaches give the same total. Every dollar spent on final output becomes wages, rent, interest, or profit for someone.");
+      else li.push("The two approaches differ by " + money(Math.abs(exp - inc)) + " billion. In a complete set of accounts they match, so an item is missing or in the wrong category.");
+    }
+    if (out.length) li.push("Left out: " + out.map(function (it) { return esc(it.t) + " (" + CATS[it.cat].n.toLowerCase() + ")"; }).join("; ") + ".");
+    if (!has.exp && !has.inc && !C.sort) li.push("Nothing is counted yet. Add an item or pick a problem.");
+    h.push("<ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>");
+    var ap = "<b>What an AP answer says:</b> ";
+    if (has.exp) ap += "GDP = " + money(exp) + " billion. ";
+    var reasons = {};
+    out.forEach(function (it) { reasons[it.cat] = true; });
+    var rs = [];
+    if (reasons.tr) rs.push("transfer payments pay for no new production");
+    if (reasons.fin) rs.push("stocks, bonds, and deposits are financial transactions");
+    if (reasons.used) rs.push("used goods were counted when they were made");
+    if (reasons["int"]) rs.push("intermediate goods are already in the price of final goods");
+    if (reasons.abr) rs.push("goods made abroad are not produced within the borders");
+    if (rs.length) ap += "Excluded items: " + rs.join("; ") + ".";
+    else ap += "Only spending on final goods and services produced within the country this year counts.";
+    h.push("<p>" + ap + "</p>");
+    $("story").innerHTML = h.join("");
+  }
+  function row(a, b) { return "<div class='row'><span>" + a + "</span><span>" + b + "</span></div>"; }
+
+  PRESETS.forEach(function (p, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p.n;
+    b.addEventListener("click", function () { load(i); });
+    $("presets").appendChild(b);
+  });
+  $("c-sort").addEventListener("change", function () { C.sort = $("c-sort").checked; load(C.preset); });
+  $("btn-reload").addEventListener("click", function () { load(C.preset); });
+  catOptions($("new-cat"), false, "G");
+  $("btn-add").addEventListener("click", function () {
+    var name = $("new-name").value.trim() || "Your transaction";
+    var a = parseFloat($("new-amt").value); if (isNaN(a)) a = 0;
+    C.items.push({ id: C.nextId++, t: name, a: a, key: null, cat: $("new-cat").value });
+    $("new-name").value = "";
+    buildRows(); compute();
+  });
+  load(0);
+
+  // =====================================================================
+  // C. Value added
+  // =====================================================================
+  var STAGES = [
+    { n: "Farmer sells wheat to a miller", s: "Farmer", c: "var(--accent)" },
+    { n: "Miller sells flour to a baker", s: "Miller", c: "var(--srpc)" },
+    { n: "Baker sells bread to a grocery store", s: "Baker", c: "var(--lrpc)" },
+    { n: "Grocery store sells bread to a shopper", s: "Grocery", c: "var(--c3)" }
+  ];
+  var VA0 = [1.0, 1.5, 3.0, 4.0], VA = VA0.slice();
+  var vaC = $("va-controls");
+  STAGES.forEach(function (st, i) {
+    var d = document.createElement("div"); d.className = "ctl";
+    d.innerHTML = "<label for='va-" + i + "'>" + st.n + " <output id='va-o" + i + "'></output></label><input type='range' id='va-" + i + "' min='0.25' max='8' step='0.25'><span class='hint'>Sale price at this stage</span>";
+    vaC.appendChild(d);
+  });
+  STAGES.forEach(function (st, i) {
+    $("va-" + i).addEventListener("input", function () {
+      VA[i] = parseFloat(this.value);
+      for (var j = i + 1; j < VA.length; j++) VA[j] = Math.max(VA[j], VA[j - 1]);
+      for (var k = i - 1; k >= 0; k--) VA[k] = Math.min(VA[k], VA[k + 1]);
+      drawVA();
+    });
+  });
+  $("va-legend").innerHTML = STAGES.map(function (s) { return "<span style='color:" + s.c + "'>" + s.s + "</span>"; }).join("");
+  $("va-reset").addEventListener("click", function () { VA = VA0.slice(); drawVA(); });
+
+  function drawVA() {
+    var added = VA.map(function (p, i) { return p - (i ? VA[i - 1] : 0); });
+    var sales = VA.reduce(function (a, b) { return a + b; }, 0), fin = VA[VA.length - 1];
+    var top = Math.max(4, Math.ceil(sales + 1.5));
+    var step = top > 16 ? 4 : 2, ticks = [];
+    for (var t = 0; t <= top; t += step) ticks.push(t);
+    var F = Lab.frame($("va"), { x: [0, 2], y: [0, top], xLabel: "", yLabel: "Dollars", xTicks: [], yTicks: ticks, fmtY: function (v) { return "$" + v; } });
+    var base = 0;
+    added.forEach(function (a, i) { if (a > 0) Lab.rect(F, 0.22, base, 0.78, base + a, STAGES[i].c, 0.9); base += a; });
+    base = 0;
+    VA.forEach(function (p, i) { Lab.rect(F, 1.22, base, 1.78, base + p, STAGES[i].c, 0.35); base += p; });
+    Lab.hline(F, fin, "var(--ink)", 1.5, "5 4");
+    Lab.tag(F, 0.5, fin + top * 0.04, "$" + f(fin, 2) + " = GDP", "var(--ink)", "middle");
+    Lab.tag(F, 1.5, sales + top * 0.04, "$" + f(sales, 2), "var(--bad)", "middle");
+    Lab.el("text", { x: F.sx(0.5), y: F.H - F.M.b + 16, "text-anchor": "middle" }, F.svg, "Sum of value added");
+    Lab.el("text", { x: F.sx(1.5), y: F.H - F.M.b + 16, "text-anchor": "middle" }, F.svg, "Sum of every sale");
+    STAGES.forEach(function (st, i) { $("va-" + i).value = VA[i]; $("va-o" + i).textContent = "$" + f(VA[i], 2); });
+    var rows = STAGES.map(function (st, i) {
+      return row(st.s + ": " + (i ? "$" + f(VA[i], 2) + " − $" + f(VA[i - 1], 2) : "$" + f(VA[i], 2) + " (no purchased inputs)"), "$" + f(added[i], 2));
+    }).join("");
+    rows += row("Sum of every sale (double counts " + "$" + f(sales - fin, 2) + ")", "$" + f(sales, 2));
+    rows += row("Value added = final price = contribution to GDP", "$" + f(fin, 2));
+    $("va-calc").innerHTML = rows;
+  }
+  drawVA();
+
+  // =====================================================================
+  // Quiz
+  // =====================================================================
+  var Q = [
+    { s: "Which of the following is counted as investment (I) in GDP?", o: ["A household buys shares of a technology company", "A firm buys new robots for its assembly line", "A retiree buys a newly issued government bond", "A family buys a house that was built 20 years ago"], c: 1, w: "Investment in GDP means spending on new capital goods, new housing, and inventory changes. The robots are new capital goods. Stocks and bonds are financial transactions, and the old house was counted in GDP the year it was built." },
+    { s: "An economy has consumption of $600 billion, investment of $150 billion, government purchases of $200 billion, transfer payments of $80 billion, exports of $70 billion, and imports of $90 billion. What is GDP?", o: ["$1,010 billion", "$1,110 billion", "$1,020 billion", "$930 billion"], c: 3, w: "GDP = C + I + G + (X − M) = 600 + 150 + 200 + (70 − 90) = $930 billion. Transfer payments are left out. Choice A adds the transfers, and choice B adds imports instead of subtracting them." },
+    { s: "In the circular flow model, households receive wages, rent, interest, and profit in exchange for", o: ["supplying factors of production in the factor market", "buying goods and services in the product market", "paying taxes to the government", "selling goods and services in the product market"], c: 0, w: "Households own land, labor, capital, and entrepreneurship and sell their services to firms in the factor market. The payments for those factors are household income. Firms, not households, sell in the product market." },
+    { s: "A farmer sells cotton to a mill for $2. The mill sells cloth to a shirt maker for $5. The shirt maker sells a shirt to a store for $12, and the store sells it to a consumer for $20. How much does this production add to GDP?", o: ["$39", "$12", "$20", "$18"], c: 2, w: "Value added at each stage is $2 + ($5 − $2) + ($12 − $5) + ($20 − $12) = $2 + $3 + $7 + $8 = $20, the price of the final good. Adding every sale ($39) double counts the cotton, cloth, and the shirt sold to the store." },
+    { s: "Which of the following is excluded from GDP?", o: ["Salaries paid to public school teachers", "New homes built this year", "Unemployment compensation payments", "Goods produced this year but not yet sold"], c: 2, w: "Unemployment compensation is a transfer payment, so nothing is produced in return. Teacher salaries are government purchases, new homes are investment, and unsold output counts as inventory investment." },
+    { s: "This year a firm produces $50 million of goods and sells $40 million of them by December 31. How does this affect this year's GDP?", o: ["GDP rises by $50 million: $40 million in sales plus $10 million of inventory investment", "GDP rises by $40 million; the unsold goods count next year when they are sold", "GDP does not change until all the goods are sold", "GDP rises by $10 million of inventory investment only"], c: 0, w: "GDP measures production in the year it happens. The $10 million of unsold goods counts as inventory investment this year. Next year, when they sell, inventories fall by the same amount, so they are not counted twice." },
+    { s: "Which of the following is an injection into the circular flow?", o: ["Saving", "Taxes", "Imports", "Exports"], c: 3, w: "Exports bring spending into the domestic economy from foreign buyers. Saving, taxes, and imports are leakages because they take money out of the spending stream." },
+    { s: "An economy reports wages of $500 billion, rent of $40 billion, interest of $60 billion, profits of $150 billion, transfer payments of $70 billion, and purchases of corporate stock of $90 billion. What is GDP by the income approach?", o: ["$820 billion", "$750 billion", "$910 billion", "$840 billion"], c: 1, w: "The income approach adds factor payments: 500 + 40 + 60 + 150 = $750 billion. Transfer payments are not earned by producing anything, and stock purchases are financial transactions, so both are left out." }
+  ];
+  Lab.quiz(Q, $("quiz"), $("score"), $("quiz-reset"));
+  Lab.nav("2.1");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [2], topic: "2.1", compact: true, storageKey: "topic-2.1" });</script>
+</body>
+</html>

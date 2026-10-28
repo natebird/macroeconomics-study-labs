@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banking and the Expansion of the Money Supply Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.part { font-size: 1.25rem; margin-top: 6px; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.tacct { display: grid; grid-template-columns: 1fr 1fr; border-top: 2px solid var(--ink); }
+.tacct > div { display: flex; flex-direction: column; min-width: 0; }
+.tacct > div:first-child { border-right: 2px solid var(--ink); }
+.tacct h4 { margin: 0; padding: 6px 10px; text-align: center; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--rule); }
+.trow { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 10px; border-bottom: 1px dashed var(--rule); font-size: .92rem; font-variant-numeric: tabular-nums; }
+.trow .amt { font-family: var(--mono); white-space: nowrap; }
+.trow.sub { padding-left: 24px; font-size: .86rem; color: var(--muted); }
+.trow.total { margin-top: auto; font-weight: 600; border-bottom: 0; border-top: 1px solid var(--ink); }
+.trow .nm::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--sw, var(--ink)); vertical-align: baseline; }
+.trow.nosw .nm::before { display: none; }
+.dl { font-family: var(--mono); font-size: .76rem; margin-left: 6px; }
+.dl.up { color: var(--good); } .dl.dn { color: var(--bad); }
+.k-req { --sw: var(--srpc); } .k-exc { --sw: var(--good); } .k-loan { --sw: var(--accent); } .k-sec { --sw: var(--c3); } .k-dd { --sw: var(--lrpc); } .k-eq { --sw: var(--c4); } .k-short { --sw: var(--bad); }
+.legend .l-good { color: var(--good); } .legend .l-bad { color: var(--bad); }
+.prompt { font-size: .95rem; background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+.calc .row span:last-child { font-family: var(--mono); font-size: .88rem; text-align: right; }
+.calc .row span:first-child { min-width: 0; }
+@media (max-width: 520px) { .controls { grid-template-columns: 1fr !important; } .tacct .trow { padding-left: 6px; padding-right: 6px; } .calc .row { flex-direction: column; gap: 2px; } .calc .row span:last-child { text-align: left; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 4 · Topic 4.4</span>
+  <h1>Banking and the Expansion of the Money Supply Study Lab</h1>
+  <p class="lede">Banks keep only a fraction of their deposits as reserves and lend out the rest, and those loans create new money. Use Part A to run one bank's balance sheet move by move, then use Part B to follow a deposit through many banks and see why the total levels off at excess reserves times the money multiplier.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Balance sheets and deposit expansion</h2>
+    <p>Every number on this page is a hypothetical teaching number. These problems use the limited-reserves model, where the required reserve ratio limits how much banks can lend.</p>
+  </div>
+
+  <h3 class="part" id="pa-h">Part A: One bank's balance sheet (T-account)</h3>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>First Bank T-account <small>changes from the last move in color</small></h3>
+      <div class="tacct" id="tacct" aria-describedby="pa-h"></div>
+    </div>
+    <div class="card graph-card">
+      <h3>Both sides must balance <small>assets = liabilities + equity</small></h3>
+      <svg class="chart" id="bs" role="img" aria-label="Stacked bars of the bank's assets and its liabilities plus owner's equity"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-srpc">Required reserves</span><span class="l-good">Excess reserves</span><span class="l-ad">Loans</span><span class="l-c3">Securities</span><span class="l-lrpc">Demand deposits</span><span class="l-c4">Owner's equity</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Make a move</div>
+      <div class="scenarios" id="a-moves"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="a-rr">Required reserve ratio <output id="o-a-rr"></output></label>
+        <input type="range" id="a-rr" min="5" max="50" step="5">
+        <span class="hint">Set by the central bank</span>
+      </div>
+      <div class="ctl">
+        <label for="a-amt">Amount for deposits, withdrawals, bond purchases <output id="o-a-amt"></output></label>
+        <input type="range" id="a-amt" min="50" max="500" step="50">
+        <span class="hint">The size of the next move</span>
+      </div>
+    </div>
+    <div class="btnrow"><button id="a-reset" type="button">Reset the bank</button></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Required reserves</div><div class="v" id="a-r1"></div></div>
+    <div class="stat"><div class="k">Excess reserves</div><div class="v" id="a-r2"></div></div>
+    <div class="stat"><div class="k">Max new loans by this bank</div><div class="v" id="a-r3"></div></div>
+    <div class="stat"><div class="k">Money supply change so far</div><div class="v" id="a-r4"></div></div>
+  </div>
+
+  <div class="story" id="a-story" aria-live="polite"></div>
+
+  <h3 class="part" id="pb-h">Part B: Deposit expansion through the banking system</h3>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Round by round <small>each round is the next bank</small></h3>
+      <svg class="chart" id="rounds" role="img" aria-label="Bar chart of new deposits, required reserves, and loans in each round"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>Running total of new money <small>approaches the maximum</small></h3>
+      <svg class="chart" id="total" role="img" aria-label="Line chart of the running total of new money compared with the maximum change in the money supply"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-lrpc">New deposit</span><span class="l-srpc">Required reserves</span><span class="l-c3">Extra reserves banks choose to keep</span><span class="l-ad">Loans (new money)</span><span class="l-ghost">AP maximum</span><span class="l-bad">Level-off with leakages</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">AP-style presets</div>
+      <div class="scenarios" id="b-presets"></div>
+    </div>
+    <div style="display:grid; gap:6px;">
+      <span style="font-size:.86rem; font-weight:500;">Where do the new reserves come from?</span>
+      <div class="seg" role="group" aria-label="Source of the new reserves">
+        <button type="button" id="src-cash" aria-pressed="true">Cash deposit of existing currency</button>
+        <button type="button" id="src-public" aria-pressed="false">Fed buys bonds from the public</button>
+        <button type="button" id="src-bank" aria-pressed="false">Fed buys bonds from a bank</button>
+      </div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="b-rr">Required reserve ratio <output id="o-b-rr"></output></label>
+        <input type="range" id="b-rr" min="5" max="50" step="5">
+        <span class="hint">Money multiplier = 1 / ratio</span>
+      </div>
+      <div class="ctl">
+        <label for="b-amt">Initial amount <output id="o-b-amt"></output></label>
+        <input type="range" id="b-amt" min="100" max="5000" step="100">
+        <span class="hint">Size of the deposit or bond purchase</span>
+      </div>
+    </div>
+    <label class="check" for="b-leak"><input type="checkbox" id="b-leak"> Add real-world leakages: banks keep an extra 5% of deposits as excess reserves, and borrowers hold 10% of each loan as cash</label>
+    <div class="btnrow">
+      <button id="b-next" type="button" class="primary">Next round</button>
+      <button id="b-all" type="button">Run to the limit</button>
+      <button id="b-restart" type="button">Back to round 1</button>
+      <span id="b-round" style="font-family:var(--mono); font-size:.86rem; color:var(--muted);"></span>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Money multiplier</div><div class="v" id="b-r1"></div></div>
+    <div class="stat"><div class="k">Excess reserves, first bank</div><div class="v" id="b-r2"></div></div>
+    <div class="stat"><div class="k" id="b-r3k">New money so far</div><div class="v" id="b-r3"></div></div>
+    <div class="stat"><div class="k">Max change in money supply</div><div class="v" id="b-r4"></div></div>
+  </div>
+
+  <div class="two">
+    <div class="card" style="display:grid; gap:10px; align-content:start;">
+      <h3>Show your work</h3>
+      <p class="prompt" id="b-prompt"></p>
+      <div class="calc" id="b-calc"></div>
+    </div>
+    <div class="story" id="b-story" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Fractional reserves</span><h3>Banks lend most deposits</h3><p>A bank keeps only part of its deposits as reserves (vault cash plus its deposit at the Fed) and lends the rest. When a loan is spent and redeposited at another bank, that bank can lend again. This chain is how the banking system creates money.</p></div>
+    <div class="card"><span class="tag">Assets = liabilities + equity</span><h3>The T-account</h3><p>Assets go on the left: reserves, loans, and securities. Liabilities and owner's equity go on the right: demand deposits and the owners' capital. Deposits are a liability because the bank owes them to customers. Every move changes the two sides by the same amount, or swaps one asset for another.</p></div>
+    <div class="card"><span class="tag">rr × deposits</span><h3>Required vs. excess reserves</h3><p>Required reserves = required reserve ratio × demand deposits. Excess reserves = total reserves − required reserves. A single bank can safely lend only its excess reserves.</p></div>
+    <div class="card"><span class="tag">1 / rr</span><h3>Money multiplier</h3><p>The money multiplier is 1 divided by the required reserve ratio. With a 10% ratio it is 10. The maximum change in the money supply = excess reserves × money multiplier (for a Fed purchase from the public, add the initial deposit, which is itself new money). Do not mix it up with the spending multiplier, 1/MPS.</p></div>
+    <div class="card"><span class="tag">Where the reserves come from</span><h3>Cash deposit vs. Fed purchase</h3><p>Depositing cash you already had does not change the money supply at first: currency just turns into a checkable deposit. Only the new loans add money. When the Fed buys bonds from the public, it pays with brand-new money, so the deposit itself is new money and counts too.</p></div>
+    <div class="card"><span class="tag">Leakages</span><h3>Why the real multiplier is smaller</h3><p>The simple multiplier assumes banks lend every dollar of excess reserves and every loan comes back as a deposit. When banks hold extra reserves or people hold some cash, less is relent each round, so the actual multiplier is smaller than 1/rr.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Worked examples</h2>
+    <p>These are the patterns AP questions use. Cover the right-hand columns and try each row yourself. "First bank" means the bank that receives the deposit or sells the bond.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Ratio</th><th>Required reserves (first bank)</th><th>Excess reserves (first bank)</th><th>Max new loans, one bank</th><th>Multiplier</th><th>Max change in money supply</th></tr></thead>
+    <tbody>
+      <tr><td>Customer deposits $1,000 of cash she already had</td><td>10%</td><td>$100</td><td>$900</td><td>$900</td><td>10</td><td><b>+$9,000</b> ($900 × 10)</td></tr>
+      <tr><td>Fed buys $1,000 of bonds from the public; seller deposits the payment</td><td>10%</td><td>$100</td><td>$900</td><td>$900</td><td>10</td><td><b>+$10,000</b> ($1,000 + $900 × 10)</td></tr>
+      <tr><td>Fed buys $1,000 of bonds from a bank</td><td>10%</td><td>$0 change (deposits did not change)</td><td>$1,000</td><td>$1,000</td><td>10</td><td><b>+$10,000</b> ($1,000 × 10)</td></tr>
+      <tr><td>Business deposits $500 of cash it already had</td><td>20%</td><td>$100</td><td>$400</td><td>$400</td><td>5</td><td><b>+$2,000</b> ($400 × 5)</td></tr>
+      <tr><td>Fed buys $2,000 of bonds from the public</td><td>25%</td><td>$500</td><td>$1,500</td><td>$1,500</td><td>4</td><td><b>+$8,000</b> ($2,000 + $1,500 × 4)</td></tr>
+      <tr><td>Customer withdraws $1,000 in cash (bank had no excess reserves)</td><td>10%</td><td>Falls by $100</td><td>Short by $900</td><td>Must cut loans by $900</td><td>10</td><td><span class="shift">Up to −$9,000</span> ($900 × 10)</td></tr>
+      <tr><td>Fed sells $1,000 of bonds to the public (banks had no excess reserves)</td><td>10%</td><td>Falls by $100</td><td>Short by $900</td><td>Must cut loans by $900</td><td>10</td><td><span class="shift">Up to −$10,000</span> ($1,000 × 10)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Answering the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>How to earn the points</h3>
+      <ul>
+        <li>Write the formula, then the numbers: "Required reserves = 0.10 × $1,000 = $100." Graders award calculation points only when the work is shown.</li>
+        <li>For one bank, the answer is its <b>excess reserves</b>. For the whole banking system, the answer is <b>excess reserves × 1/rr</b>.</li>
+        <li>Read who sold the bond. Fed buys from the <b>public</b>: max change in money supply = purchase × multiplier. Fed buys from a <b>bank</b>: the purchase adds that much to excess reserves, so the max change is also purchase × multiplier, but the money supply does not change until loans are made.</li>
+        <li>For a cash deposit, say the money supply does not change at the moment of the deposit because currency and demand deposits are both in M1. Then compute the loans: (1 − rr) × deposit × 1/rr.</li>
+        <li>In a T-account, put reserves, loans, and securities under <b>Assets</b>; put demand deposits and owner's equity under <b>Liabilities</b>. Show each entry as a + or − change.</li>
+        <li>Use the word "maximum" or "potential." The multiplier gives an upper limit because banks may hold excess reserves and people may hold cash.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Multiplying the whole cash deposit by the multiplier when asked for the change in the <b>money supply</b>. That gives the change in <b>demand deposits</b>; the money supply change is excess reserves × multiplier.</li>
+        <li>Saying one bank can lend excess reserves × the multiplier. One bank can lend only its own excess reserves.</li>
+        <li>Counting reserves as part of the money supply. Reserves held by banks are not money in the hands of the public.</li>
+        <li>Calculating required reserves on a Fed purchase from a bank. No deposit changed, so required reserves do not change and the whole amount is excess reserves.</li>
+        <li>Listing deposits as an asset of the bank. Deposits are money the bank owes, so they are a liability.</li>
+        <li>Using 1/MPS. That is the spending multiplier from Unit 3. The money multiplier is 1/rr.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 4.4. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-4.html">Unit 4 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Formatting ----------
+  function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
+  function signedMoney(v) { var r = Math.round(v); return r > 0 ? "+" + money(r) : r < 0 ? money(r) : "$0"; }
+  function short$(v) { return v >= 1000 ? "$" + (Math.round(v / 100) / 10) + "k" : "$" + Math.round(v); }
+  function dec(rr) { return (rr / 100).toFixed(2); }
+  function mult(rr) { var m = 100 / rr; return Math.abs(m - Math.round(m)) < 1e-9 ? String(Math.round(m)) : m.toFixed(2); }
+
+  // =====================================================================
+  // PART A: one bank's T-account
+  // =====================================================================
+  var A0 = { rr: 10, amt: 100, res: 100, loans: 800, sec: 300, dd: 1000, eq: 200, dms: 0 };
+  var A = Object.assign({}, A0), Aprev = null, Alast = { kind: "start" };
+
+  function snap(s) {
+    var req = s.rr / 100 * s.dd, exc = s.res - req;
+    return { req: req, exc: exc, res: s.res, loans: s.loans, sec: s.sec, dd: s.dd, eq: s.eq, assets: s.res + s.loans + s.sec, liab: s.dd + s.eq };
+  }
+
+  function act(kind) {
+    var before = snap(A), x = A.amt, info = { kind: kind, x: x };
+    if (kind === "deposit") { A.dd += x; A.res += x; }
+    else if (kind === "withdraw") {
+      x = Math.min(x, A.res); info.x = x; info.capped = x < A.amt;
+      A.dd -= x; A.res -= x;
+    } else if (kind === "lend") {
+      x = Math.max(0, before.exc); info.x = x;
+      A.loans += x; A.res -= x; A.dms += x;
+    } else if (kind === "fedbank") {
+      x = Math.min(x, A.sec); info.x = x; info.capped = x < A.amt;
+      A.sec -= x; A.res += x;
+    } else if (kind === "fedpublic") { A.dd += x; A.res += x; A.dms += x; }
+    Aprev = before; Alast = info; renderA();
+  }
+
+  function dl(now, prev) {
+    if (!Aprev) return "";
+    var d = Math.round(now - prev);
+    if (!d) return "";
+    return '<span class="dl ' + (d > 0 ? "up" : "dn") + '">' + (d > 0 ? "+" : "−") + Math.abs(d).toLocaleString("en-US") + "</span>";
+  }
+  function trow(cls, name, v, pv, extra) {
+    return '<div class="trow ' + (extra || "") + '"><span class="nm ' + cls + '">' + name + "</span><span class=\"amt\">" + money(v) + (pv != null ? dl(v, pv) : "") + "</span></div>";
+  }
+
+  function drawT(s) {
+    var p = Aprev || s;
+    var short = s.exc < -0.5;
+    var html = '<div><h4>Assets</h4>' +
+      trow("", "Reserves", s.res, p.res, "nosw") +
+      trow("k-req", "Required reserves", short ? s.req : s.req, p.req, "sub") +
+      trow(short ? "k-short" : "k-exc", short ? "Excess reserves (short)" : "Excess reserves", s.exc, p.exc, "sub") +
+      trow("k-loan", "Loans", s.loans, p.loans) +
+      trow("k-sec", "Securities (bonds)", s.sec, p.sec) +
+      trow("", "Total assets", s.assets, p.assets, "total nosw") + "</div>";
+    html += '<div><h4>Liabilities + owner\'s equity</h4>' +
+      trow("k-dd", "Demand deposits", s.dd, p.dd) +
+      trow("k-eq", "Owner's equity", s.eq, p.eq) +
+      trow("", "Total", s.liab, p.liab, "total nosw") + "</div>";
+    document.getElementById("tacct").innerHTML = html;
+  }
+
+  function drawBS(s) {
+    var svg = document.getElementById("bs");
+    var top = Math.max(1500, Math.ceil(s.assets * 1.18 / 500) * 500);
+    var ticks = []; for (var t = 0; t <= top; t += 500) ticks.push(t);
+    var F = Lab.frame(svg, { x: [0, 10], y: [0, top], xLabel: "", yLabel: "Dollars", yTicks: ticks, fmtY: short$ });
+    function seg(x0, x1, y0, y1, color, label) {
+      if (y1 - y0 <= 0) return;
+      Lab.rect(F, x0, y0, x1, y1, color, 0.9);
+      Lab.line(F, [[x0, y1], [x1, y1]], "var(--surface)", 1.5);
+      if (F.sy(y0) - F.sy(y1) >= 17) Lab.tag(F, (x0 + x1) / 2, (y0 + y1) / 2 - top * 0.014, label, "var(--surface)", "middle");
+    }
+    var y = 0, short = s.exc < -0.5;
+    if (short) { seg(0.6, 4.6, 0, s.res, "var(--bad)", "Reserves " + money(s.res)); y = s.res; }
+    else {
+      seg(0.6, 4.6, 0, s.req, "var(--srpc)", "Required " + money(s.req)); y = s.req;
+      seg(0.6, 4.6, y, y + s.exc, "var(--good)", "Excess " + money(s.exc)); y += s.exc;
+    }
+    seg(0.6, 4.6, y, y + s.loans, "var(--accent)", "Loans " + money(s.loans)); y += s.loans;
+    seg(0.6, 4.6, y, y + s.sec, "var(--c3)", "Securities " + money(s.sec));
+    seg(5.4, 9.4, 0, s.dd, "var(--lrpc)", "Demand deposits " + money(s.dd));
+    seg(5.4, 9.4, s.dd, s.dd + s.eq, "var(--c4)", "Equity " + money(s.eq));
+    Lab.tag(F, 2.6, s.assets + top * 0.035, "Assets " + money(s.assets), "var(--ink)", "middle");
+    Lab.tag(F, 7.4, s.liab + top * 0.035, "Liabilities + equity " + money(s.liab), "var(--ink)", "middle");
+  }
+
+  function storyA(s) {
+    var L = Alast, x = L.x, rr = A.rr, r = rr / 100, lead, why = "";
+    var m = mult(rr);
+    if (L.kind === "start") {
+      lead = "<b>First Bank starts with " + money(s.dd) + " in demand deposits and " + money(s.res) + " in reserves.</b> ";
+      lead += s.exc > 0.5 ? "It has " + money(s.exc) + " in excess reserves it could lend." : s.exc < -0.5 ? "With a " + rr + "% requirement it is short of reserves." : "With a " + rr + "% requirement its reserves exactly meet the requirement. Pick a move above.";
+    } else if (L.kind === "deposit") {
+      lead = "<b>A customer deposits " + money(x) + " of cash she already had.</b> Demand deposits (a liability) rise by " + money(x) + " and reserves (an asset) rise by " + money(x) + ".";
+      why = "Required reserves rise by " + dec(rr) + " × " + money(x) + " = " + money(r * x) + ", so excess reserves rise by " + money((1 - r) * x) + ". The money supply does not change yet: " + money(x) + " of currency became " + money(x) + " of checkable deposits, and both count in M1. New money appears only when the bank lends.";
+    } else if (L.kind === "withdraw") {
+      if (x <= 0) { lead = "<b>The bank has no reserves left to pay out.</b> A withdrawal is not possible until it gets more reserves."; }
+      else {
+        lead = "<b>A customer withdraws " + money(x) + " in cash.</b> Demand deposits and reserves both fall by " + money(x) + "." + (L.capped ? " (That is all the reserves the bank had.)" : "");
+        why = "The money supply does not change: deposits turned into currency, and both are money. Required reserves fall by only " + money(r * x) + ", so excess reserves fall by " + money((1 - r) * x) + ".";
+      }
+    } else if (L.kind === "lend") {
+      if (x <= 0) lead = "<b>The bank has no excess reserves, so it cannot make a new loan.</b> Try a deposit or a Fed bond purchase first.";
+      else {
+        lead = "<b>The bank lends all " + money(x) + " of its excess reserves.</b> Loans (an asset) rise by " + money(x) + " and reserves fall by " + money(x) + " as the borrower spends the money and it moves to other banks.";
+        why = "The borrower's spending money did not exist before, so the money supply rises by " + money(x) + ". This is the most one bank can safely lend. Only the banking system as a whole can expand deposits by the multiplier.";
+      }
+    } else if (L.kind === "fedbank") {
+      if (x <= 0) lead = "<b>The bank has no securities left to sell to the Fed.</b>";
+      else {
+        lead = "<b>The Fed buys " + money(x) + " of government securities from First Bank.</b> Securities fall by " + money(x) + " and reserves rise by " + money(x) + ". One asset was swapped for another, so total assets do not change." + (L.capped ? " (That is all the securities the bank held.)" : "");
+        why = "No deposit changed, so required reserves do not change and all " + money(x) + " becomes excess reserves. The money supply does not change until the bank lends. If the whole banking system lends it out, the money supply can rise by up to " + money(x) + " × " + m + " = " + money(x * 100 / rr) + ".";
+      }
+    } else if (L.kind === "fedpublic") {
+      lead = "<b>The Fed buys " + money(x) + " of bonds from a household, which deposits the Fed's payment here.</b> Demand deposits and reserves both rise by " + money(x) + ".";
+      why = "This deposit is new money. The Fed paid with money that was not in the economy before, so the money supply rises by " + money(x) + " right away. Required reserves rise by " + money(r * x) + " and excess reserves by " + money((1 - r) * x) + ".";
+    } else if (L.kind === "rr") {
+      lead = "<b>The required reserve ratio is now " + rr + "%.</b> Required reserves = " + dec(rr) + " × " + money(s.dd) + " = " + money(s.req) + ". Total reserves did not change, so excess reserves " + (s.exc >= (Aprev ? Aprev.exc : 0) ? "rise" : "fall") + " by the same amount required reserves " + (s.exc >= (Aprev ? Aprev.exc : 0) ? "fall" : "rise") + ".";
+    }
+    var now;
+    if (s.exc < -0.5) {
+      now = "<b>Now:</b> required reserves are " + money(s.req) + " but the bank holds only " + money(s.res) + ", so it is short " + money(-s.exc) + ". It must borrow reserves, sell securities, or let loans shrink. Across the banking system that can reduce the money supply by up to " + money(-s.exc) + " × " + m + " = " + money(-s.exc * 100 / rr) + ".";
+    } else if (s.exc < 0.5) {
+      now = "<b>Now:</b> required reserves = " + dec(rr) + " × " + money(s.dd) + " = " + money(s.req) + ", which equals total reserves. Excess reserves are $0, so the bank is fully loaned up and cannot make new loans.";
+    } else {
+      now = "<b>Now:</b> required reserves = " + dec(rr) + " × " + money(s.dd) + " = " + money(s.req) + ". Excess reserves = " + money(s.res) + " − " + money(s.req) + " = " + money(s.exc) + ". This bank can lend up to " + money(s.exc) + ". If every bank lends and every loan is redeposited, the money supply can grow by up to " + money(s.exc) + " × " + m + " = " + money(s.exc * 100 / rr) + ".";
+    }
+    return "<p>" + lead + "</p>" + (why ? "<p>" + why + "</p>" : "") + "<p>" + now + "</p>";
+  }
+
+  var aRR = document.getElementById("a-rr"), aAmt = document.getElementById("a-amt");
+  function renderA() {
+    var s = snap(A);
+    aRR.value = A.rr; aAmt.value = A.amt;
+    document.getElementById("o-a-rr").textContent = A.rr + "%";
+    document.getElementById("o-a-amt").textContent = money(A.amt);
+    drawT(s); drawBS(s);
+    document.getElementById("a-r1").textContent = money(s.req);
+    document.getElementById("a-r2").innerHTML = s.exc < -0.5 ? '<span class="pill infl">short ' + money(-s.exc) + "</span>" : money(s.exc);
+    document.getElementById("a-r3").textContent = money(Math.max(0, s.exc));
+    document.getElementById("a-r4").textContent = signedMoney(A.dms);
+    document.getElementById("a-story").innerHTML = storyA(s);
+  }
+  aRR.addEventListener("input", function () { Aprev = snap(A); A.rr = parseFloat(aRR.value); Alast = { kind: "rr" }; renderA(); });
+  aAmt.addEventListener("input", function () { A.amt = parseFloat(aAmt.value); renderA(); });
+  document.getElementById("a-reset").addEventListener("click", function () { A = Object.assign({}, A0); Aprev = null; Alast = { kind: "start" }; renderA(); });
+  [["Deposit cash", "deposit"], ["Lend all excess reserves", "lend"], ["Fed buys bonds from this bank", "fedbank"], ["Fed buys bonds from a household (deposited here)", "fedpublic"], ["Customer withdraws cash", "withdraw"]].forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { act(x[1]); });
+    document.getElementById("a-moves").appendChild(b);
+  });
+  renderA();
+
+  // =====================================================================
+  // PART B: multi-round deposit expansion
+  // =====================================================================
+  var LIMIT = 80;                              // "run to the limit" step
+  var B0 = { src: "cash", D: 1000, rr: 10, leak: false, step: 3 };
+  var B = Object.assign({}, B0);
+  var stopAnim = null;
+
+  function leaks(s) { return s.leak ? { e: 0.05, c: 0.10 } : { e: 0, c: 0 }; }
+  function rounds(s, n) {
+    var r = s.rr / 100, k = leaks(s), out = [], prevLoan = 0;
+    for (var i = 1; i <= n; i++) {
+      var dep = i === 1 ? (s.src === "bank" ? 0 : s.D) : (1 - k.c) * prevLoan;
+      var req = r * dep, extra = k.e * dep;
+      var loan = i === 1 && s.src === "bank" ? s.D : dep - req - extra;
+      out.push({ dep: dep, req: req, extra: extra, loan: loan });
+      prevLoan = loan;
+    }
+    return out;
+  }
+  function base(s) { return s.src === "public" ? s.D : 0; }
+  function runTotal(s, n) { var t = base(s); rounds(s, n).forEach(function (x) { t += x.loan; }); return t; }
+  function firstER(s) { return s.src === "bank" ? s.D : s.D * (1 - s.rr / 100); }
+  function apMax(s) { return s.src === "cash" ? firstER(s) * 100 / s.rr : s.D * 100 / s.rr; }
+  function leakMax(s) { return runTotal(s, 400); }
+
+  function drawRounds(s, frac) {
+    var svg = document.getElementById("rounds");
+    var R = rounds(s, 10), shown = Math.min(s.step, 10);
+    var top = s.D * 1.12;
+    var step = top > 2000 ? 1000 : top > 1000 ? 500 : top > 400 ? 200 : 100;
+    var yt = []; for (var t = 0; t <= top; t += step) yt.push(t);
+    var F = Lab.frame(svg, { x: [0.4, 10.6], y: [0, top], xLabel: "Round (bank 1, bank 2, ...)", yLabel: "Dollars",
+      xTicks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], yTicks: yt, fmtX: String, fmtY: short$ });
+    if (s.step <= 10) Lab.rect(F, s.step - 0.47, 0, s.step + 0.47, top, "var(--accent-soft)", 0.8);
+    for (var i = 0; i < shown; i++) {
+      var g = R[i], k = i + 1, f = (k === s.step && frac != null) ? frac : 1;
+      if (g.dep > 0) Lab.rect(F, k - 0.42, 0, k - 0.15, g.dep * f, "var(--lrpc)", 0.9);
+      Lab.rect(F, k - 0.13, 0, k + 0.13, g.req * f, "var(--srpc)", 0.9);
+      if (g.extra > 0) Lab.rect(F, k - 0.13, g.req * f, k + 0.13, (g.req + g.extra) * f, "var(--c3)", 0.9);
+      Lab.rect(F, k + 0.15, 0, k + 0.42, g.loan * f, "var(--accent)", 0.9);
+    }
+    if (s.step > 10) Lab.tag(F, 10.5, top * 0.9, "Rounds after 10 are too small to see", "var(--muted)", "end");
+    else {
+      var cur = R[s.step - 1];
+      Lab.tag(F, s.step <= 5 ? s.step + 0.55 : s.step - 0.55, top * 0.93, "Round " + s.step + ": loan " + money(cur.loan), "var(--accent)", s.step <= 5 ? "start" : "end");
+    }
+  }
+
+  function drawTotal(s, frac) {
+    var svg = document.getElementById("total");
+    var max = apMax(s), top = max * 1.15;
+    var exp = Math.pow(10, Math.floor(Math.log10(top))), st = top / exp > 5 ? exp : top / exp > 2 ? exp / 2 : exp / 5;
+    var yt = []; for (var t = 0; t <= top; t += st) yt.push(t);
+    var F = Lab.frame(svg, { x: [0, 20], y: [0, top], xLabel: "Round", yLabel: "New money created",
+      xTicks: [0, 5, 10, 15, 20], yTicks: yt, fmtX: String, fmtY: short$ });
+    Lab.hline(F, max, "var(--ghost)", 2, "6 5");
+    Lab.tag(F, 0.4, max + top * 0.035, "AP maximum " + money(max), "var(--muted)");
+    if (s.leak) {
+      var lm = leakMax(s);
+      Lab.hline(F, lm, "var(--bad)", 2, "4 4");
+      Lab.tag(F, 19.6, lm - top * 0.06, "With leakages " + money(lm), "var(--bad)", "end");
+    }
+    var n = Math.min(s.step, 20), pts = [[0, base(s)]], t2 = base(s), R = rounds(s, n);
+    for (var i = 0; i < n; i++) {
+      var f = (i + 1 === s.step && frac != null) ? frac : 1;
+      pts.push([i + 1, t2 + R[i].loan * f]); t2 += R[i].loan;
+    }
+    Lab.line(F, pts, "var(--accent)", 3);
+    var last = pts[pts.length - 1];
+    Lab.dot(F, last[0], last[1], "var(--accent)", false);
+    if (s.src === "public") Lab.tag(F, 0.4, base(s) + top * 0.04, "Deposit itself: " + money(base(s)), "var(--lrpc)");
+  }
+
+  function prompt(s) {
+    if (s.src === "cash") return "A customer deposits " + money(s.D) + " of cash she had been holding into her checking account. The required reserve ratio is " + s.rr + "%. Assume banks lend all excess reserves and all loans are redeposited.";
+    if (s.src === "public") return "The Fed buys " + money(s.D) + " of government bonds from a household, which deposits the payment in its checking account. The required reserve ratio is " + s.rr + "%. Assume banks lend all excess reserves and all loans are redeposited.";
+    return "The Fed buys " + money(s.D) + " of government securities from First Bank. The required reserve ratio is " + s.rr + "%. Assume banks lend all excess reserves and all loans are redeposited.";
+  }
+
+  function calc(s) {
+    var r = dec(s.rr), m = mult(s.rr), D = s.D, rows = [];
+    rows.push(["Money multiplier", "1 ÷ " + r + " = " + m]);
+    if (s.src === "bank") {
+      rows.push(["Change in required reserves (first bank)", r + " × $0 new deposits = $0"]);
+      rows.push(["Change in excess reserves (first bank)", "new reserves − required = " + money(D) + " − $0 = " + money(D)]);
+      rows.push(["Max new loans by this one bank", "= excess reserves = " + money(D)]);
+      rows.push(["Immediate change in money supply", "$0 (a bond was swapped for reserves)"]);
+      rows.push(["Max change in money supply", money(D) + " × " + m + " = " + money(apMax(s))]);
+    } else {
+      var req = D * s.rr / 100, er = D - req;
+      rows.push(["Required reserves (first bank)", r + " × " + money(D) + " = " + money(req)]);
+      rows.push(["Excess reserves (first bank)", money(D) + " − " + money(req) + " = " + money(er)]);
+      rows.push(["Max new loans by this one bank", "= excess reserves = " + money(er)]);
+      rows.push(["Max change in demand deposits", money(D) + " × " + m + " = " + money(D * 100 / s.rr)]);
+      if (s.src === "cash") rows.push(["Max change in money supply", money(er) + " × " + m + " = " + money(apMax(s))]);
+      else rows.push(["Max change in money supply", money(D) + " + " + money(er) + " × " + m + " = " + money(apMax(s))]);
+    }
+    return rows.map(function (x) { return '<div class="row"><span>' + x[0] + "</span><span>" + x[1] + "</span></div>"; }).join("");
+  }
+
+  function storyB(s) {
+    var D = s.D, er = firstER(s), max = apMax(s), m = mult(s.rr), lead, rd;
+    if (s.src === "cash") lead = "<b>A customer deposits " + money(D) + " of cash that already existed.</b> At the moment of the deposit the money supply does not change: currency held by the public falls by " + money(D) + " and checkable deposits rise by " + money(D) + ". New money comes only from loans. The first bank keeps " + money(D - er) + " as required reserves and can lend its " + money(er) + " of excess reserves.";
+    else if (s.src === "public") lead = "<b>The Fed buys " + money(D) + " of bonds from the public.</b> The seller deposits the Fed's payment. That deposit is new money because the Fed paid with money that was not in the economy before, so the money supply rises by " + money(D) + " right away. The bank keeps " + money(D - er) + " as required reserves and can lend its " + money(er) + " of excess reserves.";
+    else lead = "<b>The Fed buys " + money(D) + " of securities from a bank.</b> The bank swaps a bond for " + money(D) + " of reserves. No deposit changed, so the money supply does not change at first and required reserves do not change. All " + money(D) + " is excess reserves, and the bank can lend all of it.";
+
+    if (s.step > 10) rd = "After many rounds each new deposit is tiny, and the running total has leveled off.";
+    else {
+      var g = rounds(s, s.step)[s.step - 1];
+      if (s.step === 1 && s.src === "bank") rd = "<b>Round 1:</b> First Bank lends its " + money(g.loan) + " of new excess reserves. The borrower spends it, and the seller deposits it in the next bank.";
+      else rd = "<b>Round " + s.step + ":</b> bank " + s.step + " receives a deposit of " + money(g.dep) + ", keeps " + money(g.req) + " as required reserves" + (g.extra > 0 ? " plus " + money(g.extra) + " of extra reserves" : "") + ", and lends " + money(g.loan) + ". The borrower spends the loan, and " + (s.leak ? "most of it is" : "it is") + " deposited in the next bank.";
+    }
+    var tot = runTotal(s, s.step >= LIMIT ? 400 : s.step);
+    var formula = s.src === "cash" ? money(er) + " excess reserves × " + m : s.src === "public" ? money(D) + " deposit + " + money(er) + " × " + m : money(D) + " excess reserves × " + m;
+    var tt = "<b>New money so far: " + money(tot) + ".</b> " + (s.leak ? "Without leakages the total would approach" : "The total approaches") + " the maximum change in the money supply, " + formula + " = <b>" + money(max) + "</b>.";
+    var lk;
+    if (s.leak) {
+      var lm = leakMax(s);
+      lk = "With leakages the total levels off near " + money(lm) + ", only " + Math.round(lm / max * 100) + "% of the AP maximum. Each round, banks hold back extra reserves and borrowers keep some cash, so less is relent. The actual money multiplier is smaller than 1/rr.";
+    } else {
+      lk = "This maximum assumes banks lend every dollar of excess reserves and every loan is redeposited. In the real world, banks hold some excess reserves and people hold some cash, so the actual multiplier is smaller. Turn on leakages to see it.";
+    }
+    return "<p>" + lead + "</p><p>" + rd + "</p><p>" + tt + "</p><p>" + lk + "</p>";
+  }
+
+  var bRR = document.getElementById("b-rr"), bAmt = document.getElementById("b-amt"), bLeak = document.getElementById("b-leak");
+  var srcBtns = { cash: document.getElementById("src-cash"), "public": document.getElementById("src-public"), bank: document.getElementById("src-bank") };
+  function renderB(frac) {
+    var s = B;
+    bRR.value = s.rr; bAmt.value = s.D; bLeak.checked = s.leak;
+    Object.keys(srcBtns).forEach(function (k) { srcBtns[k].setAttribute("aria-pressed", String(k === s.src)); });
+    document.getElementById("o-b-rr").textContent = s.rr + "%";
+    document.getElementById("o-b-amt").textContent = money(s.D);
+    drawRounds(s, frac); drawTotal(s, frac);
+    document.getElementById("b-round").textContent = s.step >= LIMIT ? "After many rounds" : "Round " + s.step;
+    document.getElementById("b-next").disabled = s.step >= LIMIT;
+    document.getElementById("b-r1").textContent = mult(s.rr);
+    document.getElementById("b-r2").textContent = money(firstER(s));
+    document.getElementById("b-r3k").textContent = s.step >= LIMIT ? "New money, all rounds" : "New money after round " + s.step;
+    document.getElementById("b-r3").textContent = money(runTotal(s, s.step >= LIMIT ? 400 : s.step));
+    document.getElementById("b-r4").textContent = money(apMax(s));
+    document.getElementById("b-prompt").textContent = prompt(s);
+    document.getElementById("b-calc").innerHTML = calc(s);
+    document.getElementById("b-story").innerHTML = storyB(s);
+  }
+  function setB(patch) { if (stopAnim) stopAnim(); B = Object.assign({}, B, patch); renderB(); }
+
+  bRR.addEventListener("input", function () { setB({ rr: parseFloat(bRR.value) }); });
+  bAmt.addEventListener("input", function () { setB({ D: parseFloat(bAmt.value) }); });
+  bLeak.addEventListener("change", function () { setB({ leak: bLeak.checked }); });
+  Object.keys(srcBtns).forEach(function (k) { srcBtns[k].addEventListener("click", function () { setB({ src: k }); }); });
+  document.getElementById("b-next").addEventListener("click", function () {
+    if (stopAnim) stopAnim();
+    B.step = Math.min(LIMIT, B.step + 1);
+    renderB(0);
+    stopAnim = Lab.animate(450, function (t) { renderB(t); }, function () { stopAnim = null; });
+  });
+  document.getElementById("b-all").addEventListener("click", function () { setB({ step: LIMIT }); });
+  document.getElementById("b-restart").addEventListener("click", function () { setB({ step: 1 }); });
+
+  var presets = [
+    ["Cash deposit $1,000 at 10%", { src: "cash", D: 1000, rr: 10, leak: false, step: 3 }],
+    ["Fed buys $1,000 from the public at 20%", { src: "public", D: 1000, rr: 20, leak: false, step: 3 }],
+    ["Fed buys $500 from a bank at 25%", { src: "bank", D: 500, rr: 25, leak: false, step: 3 }],
+    ["Cash deposit $2,000 at 20%", { src: "cash", D: 2000, rr: 20, leak: false, step: 3 }],
+    ["Cash deposit $1,000 at 10%, with leakages", { src: "cash", D: 1000, rr: 10, leak: true, step: LIMIT }]
+  ];
+  presets.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { setB(x[1]); });
+    document.getElementById("b-presets").appendChild(b);
+  });
+  renderB();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The required reserve ratio is 20%. A customer deposits $5,000 in cash into her checking account at Bank A, which had no excess reserves before. What is the maximum amount Bank A can lend as a result?", o: ["$1,000", "$4,000", "$5,000", "$25,000"], c: 1, w: "Required reserves rise by 0.20 × $5,000 = $1,000, so excess reserves rise by $5,000 − $1,000 = $4,000. A single bank can lend only its excess reserves. $25,000 is the change in demand deposits for the whole banking system, which one bank cannot create." },
+    { s: "The required reserve ratio is 10%. A person deposits $2,000 of cash she had kept at home. Assuming banks lend all excess reserves and all loans are redeposited, what is the maximum change in the money supply?", o: ["$20,000", "$2,000", "$0", "$18,000"], c: 3, w: "The deposit itself does not change the money supply because currency simply became a checkable deposit. Excess reserves are $2,000 − $200 = $1,800, and $1,800 × 10 = $18,000. $20,000 is the maximum change in demand deposits, which includes the original $2,000 that was already money." },
+    { s: "The Federal Reserve buys $1,000 of government bonds from the public, and the seller deposits the payment in a bank. The required reserve ratio is 25%. What is the maximum change in the money supply?", o: ["$750", "$3,000", "$4,000", "$1,000"], c: 2, w: "The $1,000 deposit is new money, because the Fed paid with money that did not exist before. Excess reserves are $750, which supports up to $750 × 4 = $3,000 in loans. Total: $1,000 + $3,000 = $4,000, the same as $1,000 × 4. $3,000 leaves out the new deposit." },
+    { s: "Which of the following is a liability on a commercial bank's balance sheet?", o: ["Loans to businesses", "Required reserves", "Government securities", "Demand deposits"], c: 3, w: "Demand deposits are money the bank owes its customers, so they are a liability. Loans, reserves, and securities are all things the bank owns, so they are assets." },
+    { s: "A bank has demand deposits of $10,000 and total reserves of $3,000. The required reserve ratio is 20%. What are the bank's excess reserves?", o: ["$1,000", "$2,000", "$3,000", "$8,000"], c: 0, w: "Required reserves = 0.20 × $10,000 = $2,000. Excess reserves = $3,000 − $2,000 = $1,000. $2,000 is the required amount, and $3,000 is total reserves." },
+    { s: "The required reserve ratio rises from 10% to 20%. What happens to the money multiplier?", o: ["It rises from 5 to 10", "It falls from 10 to 5", "It falls from 10 to 8", "It does not change, because reserves are not money"], c: 1, w: "The money multiplier is 1/rr. At 10% it is 1/0.10 = 10. At 20% it is 1/0.20 = 5. A higher ratio means banks must hold more of each deposit, so less is lent in each round." },
+    { s: "In practice, the actual money multiplier is smaller than 1 divided by the required reserve ratio. Which of the following best explains why?", o: ["Banks lend all of their excess reserves", "Borrowers redeposit every dollar they borrow", "Banks hold some excess reserves and people hold some loan proceeds as cash", "The required reserve ratio is always less than 1"], c: 2, w: "The simple multiplier assumes no leakages. When banks keep excess reserves or the public holds cash, less money is redeposited and relent each round, so the total expansion is smaller. Choices A and B describe the assumptions behind the simple multiplier." },
+    { s: "The Federal Reserve buys $500 of government securities directly from a commercial bank. The required reserve ratio is 10%. What are the immediate effects on the money supply and on the bank's excess reserves?", o: ["The money supply does not change, and excess reserves rise by $500", "The money supply rises by $500, and excess reserves rise by $450", "The money supply rises by $5,000, and excess reserves do not change", "The money supply does not change, and excess reserves rise by $450"], c: 0, w: "The bank swaps a $500 security for $500 of reserves. No deposit changes, so the money supply does not change yet and required reserves do not change. All $500 is excess reserves. Once banks lend it out, the money supply can rise by up to $500 × 10 = $5,000. Choice D wrongly takes 10% for required reserves when no deposit was made." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("4.4");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [4], topic: "4.4", compact: true, storageKey: "topic-4.4" });</script>
+</body>
+</html>

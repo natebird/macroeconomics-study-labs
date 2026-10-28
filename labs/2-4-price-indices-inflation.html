@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Price Indices and Inflation Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub { display: grid; gap: 6px; margin-top: 8px; }
+.sub h3 { font-size: 1.2rem; }
+.sub p { color: var(--muted); max-width: 70ch; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 12px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.basket-card { display: grid; gap: 12px; align-content: start; }
+.basket { min-width: 0; border: 0; }
+.basket th, .basket td { padding: 6px 6px; vertical-align: middle; }
+.basket th { font-size: .7rem; }
+.basket th.base { color: var(--accent); }
+.basket tfoot td { font-family: var(--mono); font-size: .86rem; background: var(--paper); }
+.basket tfoot td.base { color: var(--accent); font-weight: 600; }
+.basket input[type="number"] { font: inherit; font-family: var(--mono); font-size: .86rem; width: 100%; min-width: 52px; padding: 5px 6px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.basket td.good { font-size: .88rem; font-weight: 500; }
+.ctl input[type="number"] { font: inherit; font-family: var(--mono); font-size: .95rem; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); color: var(--ink); width: 100%; }
+.calc-card { display: grid; gap: 10px; align-content: start; }
+.calc .row span:last-child { font-family: var(--mono); white-space: nowrap; text-align: right; }
+.calc .row.h { font-weight: 600; color: var(--accent); border-bottom: 0; padding-top: 6px; }
+.note { font-size: .86rem; color: var(--muted); }
+.controls.two-in { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 520px) { .basket input[type="number"] { min-width: 0; padding: 4px 3px; font-size: .78rem; } .basket th, .basket td { padding: 5px 3px; } .calc .row { flex-wrap: wrap; } .calc .row span:last-child { white-space: normal; } .controls.two-in { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 2 · Topic 2.4</span>
+  <h1>Price Indices and Inflation Study Lab</h1>
+  <p class="lede">A price index like the consumer price index (CPI) tracks what a fixed market basket of goods costs over time, compared with a base year set to 100. The inflation rate is the percent change in that index. Edit the basket, pick a base year, and follow every step of the work, then convert nominal dollars into real dollars.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Build a CPI</h2>
+    <p>Three formulas do all the work.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:8px;"><span class="formula">Cost = Σ (quantity × price)</span> <span class="formula">CPI = cost this year ÷ cost in base year × 100</span> <span class="formula">Inflation = (CPI new − CPI old) ÷ CPI old × 100</span></div>
+  </div>
+
+  <div class="lab">
+    <div class="card basket-card">
+      <h3>Market basket <small style="font-family:var(--body); font-weight:400; font-size:.82rem; color:var(--muted);">quantities stay fixed every year</small></h3>
+      <div class="tbl-wrap">
+        <table class="basket" id="basket"></table>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <span class="tag">Base year</span>
+        <div class="seg" id="baseSeg" role="group" aria-label="Choose the base year"></div>
+      </div>
+      <p class="note">Type any quantity or price. The base-year column is highlighted; its CPI is always 100.</p>
+    </div>
+    <div class="card graph-card">
+      <h3>CPI over three years <small>base year = 100</small></h3>
+      <svg class="chart" id="cpichart" role="img" aria-label="Line chart of the CPI in years 1, 2, and 3"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">CPI</span><span class="l-ghost">Base-year level (100)</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:8px;">
+    <div class="tag">Try a preset problem</div>
+    <div class="scenarios" id="scen"></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">CPI, Year 2</div><div class="v" id="r-c2"></div></div>
+    <div class="stat"><div class="k">CPI, Year 3</div><div class="v" id="r-c3"></div></div>
+    <div class="stat"><div class="k">Inflation, Year 1 → 2</div><div class="v" id="r-i12"></div></div>
+    <div class="stat"><div class="k">Inflation, Year 2 → 3</div><div class="v" id="r-i23"></div></div>
+  </div>
+
+  <div class="lab">
+    <div class="card calc-card">
+      <h3>Steps 1–2: cost of the basket</h3>
+      <div class="calc" id="calcCost"></div>
+    </div>
+    <div class="card calc-card">
+      <h3>Steps 3–4: CPI and inflation rate</h3>
+      <div class="calc" id="calcCpi"></div>
+    </div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="sub">
+    <h3>Nominal to real</h3>
+    <p>A nominal value is in current dollars. Divide by the price index and multiply by 100 to get a real value in base-year dollars: <span class="formula">Real = Nominal ÷ price index × 100</span></p>
+  </div>
+  <div class="lab">
+    <div class="card" style="display:grid; gap:14px; align-content:start;">
+      <div class="scenarios" id="scenReal"></div>
+      <div class="controls two-in">
+        <div class="ctl">
+          <label for="n-val">Nominal value ($)</label>
+          <input type="number" id="n-val" min="0" step="100">
+          <span class="hint">A wage, income, price, or GDP in current dollars</span>
+        </div>
+        <div class="ctl">
+          <label for="n-idx">Price index that year</label>
+          <input type="number" id="n-idx" min="1" step="0.1">
+          <span class="hint">CPI or GDP deflator; base year = 100</span>
+        </div>
+      </div>
+    </div>
+    <div class="card calc-card">
+      <h3>Show your work</h3>
+      <div class="calc" id="calcReal"></div>
+      <div class="story" id="storyReal" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Price index</span><h3>Base year = 100</h3><p>A price index compares the cost of the same market basket in each year with its cost in the base year. In the base year the index is always 100. An index of 125 means the basket costs 25% more than in the base year.</p></div>
+    <div class="card"><span class="tag">CPI vs. deflator</span><h3>Two ways to measure the price level</h3><p>The CPI prices a fixed basket bought by a typical urban household, including imports. The GDP deflator covers all final goods and services produced in the country: nominal GDP ÷ real GDP × 100. It leaves out imports and has no fixed basket.</p></div>
+    <div class="card"><span class="tag">Inflation rate</span><h3>Inflation, deflation, disinflation</h3><p>Inflation is a rising price level (positive inflation rate). Deflation is a falling price level (negative rate). Disinflation is a falling inflation rate while prices still rise, such as 6% down to 2%.</p></div>
+    <div class="card"><span class="tag">Biases</span><h3>Why the CPI overstates inflation</h3><p><b>Substitution bias:</b> people switch away from goods that get pricier, but the basket stays fixed. <b>New goods:</b> new products enter the basket late. <b>Quality changes:</b> some price increases pay for better products, not just higher prices.</p></div>
+    <div class="card"><span class="tag">Nominal vs. real</span><h3>Dollars vs. purchasing power</h3><p>Nominal values are in current dollars. Real values remove price changes so you can compare what money buys across years. If your nominal wage rises 3% and prices rise 5%, your real wage falls about 2%.</p></div>
+    <div class="card"><span class="tag">Causes</span><h3>Demand-pull and cost-push</h3><p>Demand-pull inflation comes from aggregate demand rising faster than output can keep up. Cost-push inflation comes from higher production costs, such as wages or oil, that shift short-run aggregate supply left.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Worked examples</h2>
+    <p>These are the calculations AP asks most often. Memorize the formula column and always write it before you plug in numbers.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Question</th><th>Formula</th><th>Work</th><th>Answer</th></tr></thead>
+    <tbody>
+      <tr><td>A basket costs $200 in the base year and $240 this year. Find the CPI.</td><td>Cost this year ÷ cost in base year × 100</td><td>240 ÷ 200 × 100</td><td><b>120</b></td></tr>
+      <tr><td>The CPI rises from 120 to 126. Find the inflation rate.</td><td>(New − old) ÷ old × 100</td><td>(126 − 120) ÷ 120 × 100</td><td><b>5%</b></td></tr>
+      <tr><td>The CPI falls from 125 to 120. Find the inflation rate.</td><td>(New − old) ÷ old × 100</td><td>(120 − 125) ÷ 125 × 100</td><td><b>−4% (deflation)</b></td></tr>
+      <tr><td>Inflation was 6% last year and 2% this year. What happened?</td><td>Compare the two rates</td><td>The rate fell but stayed positive</td><td><b>Disinflation</b>; prices still rose</td></tr>
+      <tr><td>A worker earns $45,000 when the CPI is 150. Find the real wage.</td><td>Nominal ÷ price index × 100</td><td>45,000 ÷ 150 × 100</td><td><b>$30,000</b> in base-year dollars</td></tr>
+      <tr><td>Nominal GDP is $1,100 billion and real GDP is $1,000 billion. Find the GDP deflator.</td><td>Nominal GDP ÷ real GDP × 100</td><td>1,100 ÷ 1,000 × 100</td><td><b>110</b></td></tr>
+      <tr><td>The CPI is 80 in a year before the base year. What does that mean?</td><td>Index ÷ 100</td><td>80 ÷ 100 = 0.8</td><td>The basket cost <b>20% less</b> than in the base year</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. On the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>How to show your work</h3>
+      <ul>
+        <li>Write the formula first, then plug in: "CPI = (cost in Year 2 ÷ cost in base year) × 100 = (220 ÷ 200) × 100 = 110." Graders award the point for the setup and the answer.</li>
+        <li>Find the cost of the basket by multiplying each base-year quantity by that year's price, then add. Use the same quantities every year.</li>
+        <li>For the inflation rate, divide by the <i>old</i> (earlier) index, not the new one or 100.</li>
+        <li>State the sign and name it: a positive rate is inflation, a negative rate is deflation, and a smaller positive rate than last year is disinflation.</li>
+        <li>For real values, label the answer "in base-year dollars." If asked whether purchasing power rose, compare the real values, or compare nominal growth with the inflation rate.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Calling disinflation "deflation." If prices still rise, only more slowly, it is disinflation.</li>
+        <li>Reading the CPI as the inflation rate. A CPI of 110 means prices are 10% above the <i>base year</i>, not that inflation this year was 10%.</li>
+        <li>Subtracting CPIs and stopping: 126 − 120 = 6 points, but the inflation rate is 6 ÷ 120 = 5%.</li>
+        <li>Changing the quantities each year. The CPI holds the basket fixed; that is exactly why substitution bias happens.</li>
+        <li>Saying the CPI understates inflation. The standard biases (substitution, new goods, quality) make it <i>overstate</i> the rise in the cost of living.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 2.4. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-2.html">Unit 2 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+
+  // Trim trailing zeros: 110.00 -> "110", 115.50 -> "115.5"
+  function num(v, d) { var k = Math.pow(10, d == null ? 2 : d); var r = Math.round(v * k) / k; return r.toLocaleString("en-US", { maximumFractionDigits: d == null ? 2 : d }); }
+  function money(v) { var r = Math.round(v * 100) / 100; return "$" + (Math.abs(r - Math.round(r)) < 1e-9 ? Math.round(r).toLocaleString("en-US") : r.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })); }
+  function pct(v) { var r = Math.round(v * 10) / 10; if (Object.is(r, -0) || Math.abs(r) < 1e-9) r = 0; return (r < 0 ? "−" : "") + Math.abs(r).toFixed(1) + "%"; }
+  function minus(s) { return String(s).replace(/^-/, "−"); }
+
+  // ================= Presets =================
+  // Each good: [name, quantity, price Y1, price Y2, price Y3]
+  var PRESETS = [
+    { name: "Inflation slows (disinflation)", base: 0, goods: [["Pizzas", 10, 10, 11, 11.5], ["Movie tickets", 5, 8, 8, 8.4], ["Gallons of gas", 20, 3, 3.5, 3.7]] },
+    { name: "Steady 5% inflation", base: 0, goods: [["Loaves of bread", 50, 2, 2.1, 2.205], ["Haircuts", 4, 15, 15.75, 16.5375], ["Gallons of gas", 20, 2, 2.1, 2.205]] },
+    { name: "Inflation speeds up", base: 0, goods: [["Burgers", 20, 5, 5.25, 5.75], ["Jeans", 2, 25, 26, 29], ["Bus passes", 1, 50, 53, 58]] },
+    { name: "Deflation in Year 3", base: 0, goods: [["Laptops", 1, 600, 620, 570], ["T-shirts", 10, 10, 11, 10], ["Coffees", 50, 2, 2.2, 2]] },
+    { name: "Four goods, base = Year 2", base: 1, goods: [["Apples (lb)", 20, 1.5, 2, 2.2], ["Textbooks", 2, 60, 65, 68], ["Phone plans", 12, 40, 40, 42], ["Gallons of gas", 50, 3, 3.2, 3.4]] },
+    { name: "One price spikes (substitution bias)", base: 0, goods: [["Beef (lb)", 10, 5, 9, 11], ["Chicken (lb)", 10, 4, 4, 4.2], ["Rice (lb)", 20, 1, 1, 1.05]] }
+  ];
+  var S;
+  function load(p) { S = { base: p.base, goods: p.goods.map(function (g) { return g.slice(); }) }; buildTable(); buildSeg(); compute(); }
+
+  // ================= Basket table (built once per preset so inputs keep focus) =================
+  function buildTable() {
+    var t = $("basket");
+    var h = '<thead><tr><th scope="col">Good</th><th scope="col">Qty</th>';
+    for (var y = 0; y < 3; y++) h += '<th scope="col" class="' + (y === S.base ? "base" : "") + '" id="th-y' + y + '">Price Y' + (y + 1) + (y === S.base ? " (base)" : "") + "</th>";
+    h += "</tr></thead><tbody>";
+    S.goods.forEach(function (g, i) {
+      h += '<tr><td class="good">' + g[0] + "</td>";
+      h += '<td><label class="sr" for="q' + i + '" style="position:absolute;left:-9999px;">Quantity of ' + g[0] + '</label><input type="number" id="q' + i + '" min="0" step="1" value="' + g[1] + '"></td>';
+      for (var y = 0; y < 3; y++) h += '<td><label for="p' + i + "-" + y + '" style="position:absolute;left:-9999px;">Price of ' + g[0] + " in Year " + (y + 1) + '</label><input type="number" id="p' + i + "-" + y + '" min="0" step="0.01" value="' + g[2 + y] + '"></td>';
+      h += "</tr>";
+    });
+    h += '</tbody><tfoot><tr><td colspan="2">Basket cost</td>';
+    for (var y = 0; y < 3; y++) h += '<td id="tc' + y + '"></td>';
+    h += "</tr></tfoot>";
+    t.innerHTML = h;
+    S.goods.forEach(function (g, i) {
+      $("q" + i).addEventListener("input", function (e) { g[1] = Math.max(0, parseFloat(e.target.value) || 0); compute(); });
+      for (var y = 0; y < 3; y++) (function (y) {
+        $("p" + i + "-" + y).addEventListener("input", function (e) { g[2 + y] = Math.max(0, parseFloat(e.target.value) || 0); compute(); });
+      })(y);
+    });
+  }
+  function buildSeg() {
+    var seg = $("baseSeg"); seg.innerHTML = "";
+    [0, 1, 2].forEach(function (y) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = "Year " + (y + 1);
+      b.setAttribute("aria-pressed", String(y === S.base));
+      b.addEventListener("click", function () { S.base = y; buildTable(); buildSeg(); compute(); });
+      seg.appendChild(b);
+    });
+  }
+
+  // ================= Compute + render =================
+  function compute() {
+    var cost = [0, 1, 2].map(function (y) { return S.goods.reduce(function (s, g) { return s + g[1] * g[2 + y]; }, 0); });
+    var bc = cost[S.base];
+    var ok = bc > 0;
+    var cpi = cost.map(function (c) { return ok ? c / bc * 100 : NaN; });
+    var inf = [ok && cpi[0] > 0 ? (cpi[1] - cpi[0]) / cpi[0] * 100 : NaN, ok && cpi[1] > 0 ? (cpi[2] - cpi[1]) / cpi[1] * 100 : NaN];
+
+    for (var y = 0; y < 3; y++) { var c = $("tc" + y); c.textContent = money(cost[y]); c.className = y === S.base ? "base" : ""; }
+
+    // Steps 1-2
+    var r = "";
+    for (y = 0; y < 3; y++) {
+      r += '<div class="row h"><span>Year ' + (y + 1) + (y === S.base ? " (base year)" : "") + "</span><span></span></div>";
+      r += '<div class="row"><span>' + S.goods.map(function (g) { return num(g[1]) + " × " + money(g[2 + y]); }).join(" + ") + "</span><span>= " + money(cost[y]) + "</span></div>";
+    }
+    $("calcCost").innerHTML = r;
+
+    // Steps 3-4
+    r = "";
+    if (!ok) r = '<div class="row"><span>The base-year basket costs $0, so the CPI cannot be computed. Enter some prices and quantities.</span><span></span></div>';
+    else {
+      for (y = 0; y < 3; y++) r += '<div class="row"><span>CPI Y' + (y + 1) + " = " + money(cost[y]) + " ÷ " + money(bc) + " × 100</span><span>= " + num(cpi[y]) + "</span></div>";
+      r += '<div class="row"><span>Inflation Y1→2 = (' + num(cpi[1]) + " − " + num(cpi[0]) + ") ÷ " + num(cpi[0]) + " × 100</span><span>= " + (isNaN(inf[0]) ? "n/a" : pct(inf[0])) + "</span></div>";
+      r += '<div class="row"><span>Inflation Y2→3 = (' + num(cpi[2]) + " − " + num(cpi[1]) + ") ÷ " + num(cpi[1]) + " × 100</span><span>= " + (isNaN(inf[1]) ? "n/a" : pct(inf[1])) + "</span></div>";
+    }
+    $("calcCpi").innerHTML = r;
+
+    $("r-c2").textContent = ok ? num(cpi[1], 1) : "n/a";
+    $("r-c3").textContent = ok ? num(cpi[2], 1) : "n/a";
+    $("r-i12").textContent = isNaN(inf[0]) ? "n/a" : pct(inf[0]);
+    $("r-i23").textContent = isNaN(inf[1]) ? "n/a" : pct(inf[1]);
+
+    drawChart(cpi, inf, ok);
+    story(cost, cpi, inf, ok);
+  }
+
+  function niceStep(span) { var raw = span / 5, mag = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / mag; return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag; }
+  function drawChart(cpi, inf, ok) {
+    var vals = ok ? cpi.concat([100]) : [100];
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    var step = niceStep(Math.max(10, hi - lo) * 1.3);
+    var y0 = Math.max(0, Math.floor((lo - step * 0.6) / step) * step), y1 = Math.ceil((hi + step * 0.8) / step) * step;
+    var yt = []; for (var v = y0; v <= y1 + 1e-9; v += step) yt.push(v);
+    var F = Lab.frame($("cpichart"), {
+      x: [0.6, 3.4], y: [y0, y1], xLabel: "Year", yLabel: "Consumer price index (CPI)",
+      xTicks: [1, 2, 3], yTicks: yt, fmtX: function (x) { return "Year " + x + (x - 1 === S.base ? " (base)" : ""); }, fmtY: function (x) { return num(x, 1); }
+    });
+    Lab.hline(F, 100, "var(--ghost)", 2, "6 5");
+    Lab.tag(F, 0.64, 100 - (y1 - y0) * 0.06, "100", "var(--muted)");
+    if (!ok) return;
+    Lab.line(F, [[1, cpi[0]], [2, cpi[1]], [3, cpi[2]]], "var(--accent)", 3);
+    for (var i = 0; i < 3; i++) {
+      Lab.dot(F, i + 1, cpi[i], i === S.base ? "var(--lrpc)" : "var(--accent)", false);
+      Lab.tag(F, i + 1, cpi[i] + (y1 - y0) * 0.055, num(cpi[i], 1), "var(--ink)", "middle");
+    }
+    for (i = 0; i < 2; i++) {
+      if (isNaN(inf[i])) continue;
+      var my = (cpi[i] + cpi[i + 1]) / 2, col = inf[i] < -0.05 ? "var(--bad)" : "var(--muted)";
+      var up = cpi[i + 1] > cpi[i] + 1e-9, dn = cpi[i + 1] < cpi[i] - 1e-9;
+      Lab.tag(F, i + 1.5 + (up || dn ? 0.1 : 0), my + (dn ? 0.05 : -0.06) * (y1 - y0), (inf[i] > 0.05 ? "+" : "") + pct(inf[i]), col, up || dn ? "start" : "middle");
+    }
+  }
+
+  function story(cost, cpi, inf, ok) {
+    var el = $("story");
+    if (!ok) { el.innerHTML = "<p><b>No base to compare to.</b> The basket costs $0 in the base year. A price index needs a positive base-year cost.</p>"; return; }
+    var a = inf[0], b = inf[1], head, t = [];
+    if (b < -0.05 && a < -0.05) head = "<b>Deflation both years.</b> The CPI falls " + pct(-a) + " and then " + pct(-b) + ", so the price level is dropping.";
+    else if (b < -0.05) head = "<b>Deflation in Year 3.</b> The CPI falls from " + num(cpi[1], 1) + " to " + num(cpi[2], 1) + ", an inflation rate of " + pct(b) + ". A negative inflation rate means the price level fell.";
+    else if (a < -0.05 && b > 0.05) head = "<b>Deflation, then inflation.</b> Prices fell " + pct(-a) + " from Year 1 to Year 2, then rose " + pct(b) + ".";
+    else if (Math.abs(a) <= 0.05 && Math.abs(b) <= 0.05) head = "<b>Stable prices.</b> The basket costs the same every year, so the CPI never moves and inflation is 0%.";
+    else if (a > 0.05 && b > 0.05 && b < a - 0.05) head = "<b>Disinflation.</b> Inflation falls from " + pct(a) + " to " + pct(b) + ". Prices are still rising, just more slowly. This is disinflation, not deflation.";
+    else if (a > 0.05 && b > a + 0.05) head = "<b>Inflation is speeding up.</b> The inflation rate rises from " + pct(a) + " to " + pct(b) + ".";
+    else if (a > 0.05 && Math.abs(b - a) <= 0.05) head = "<b>Steady inflation of about " + pct(b) + " a year.</b> The CPI rises by the same percentage each year, so the number of index points it gains grows a little each year.";
+    else head = "<b>Inflation rates: " + (isNaN(a) ? "n/a" : pct(a)) + " then " + (isNaN(b) ? "n/a" : pct(b)) + ".</b>";
+
+    t.push("The basket's cost goes from " + money(cost[0]) + " to " + money(cost[1]) + " to " + money(cost[2]) + ". Year " + (S.base + 1) + " is the base year, so its CPI is exactly 100.");
+    if (S.base > 0) t.push("Because the base year is not Year 1, the CPI is below 100 in any earlier year with a lower basket cost. A CPI below 100 means prices were lower than in the base year; it does not by itself mean deflation. Try switching the base year: every CPI changes, but the inflation rates stay the same.");
+    else t.push("Switch the base year with the buttons above. Every CPI changes, but the inflation rates stay the same, because inflation compares two years with each other.");
+
+    // Substitution-bias check: compare each good's price change Y1 -> Y3
+    var ch = S.goods.map(function (g) { return g[2] > 0 ? (g[4] - g[2]) / g[2] * 100 : NaN; }).filter(function (x) { return !isNaN(x); });
+    if (ch.length > 1) {
+      var mx = Math.max.apply(null, ch), mn = Math.min.apply(null, ch);
+      if (mx - mn > 25) {
+        var hiG = S.goods.filter(function (g) { return g[2] > 0 && Math.abs((g[4] - g[2]) / g[2] * 100 - mx) < 1e-9; })[0][0];
+        t.push("<b>Substitution bias:</b> " + hiG.toLowerCase() + " got much more expensive than the other goods. Real shoppers would buy less of it and more of the cheaper goods, but the CPI keeps the quantities fixed. So the CPI overstates how much the cost of living rose.");
+      }
+    }
+    t.push("AP answer: \"CPI = cost of basket in the current year ÷ cost in the base year × 100. Inflation rate = (CPI this year − CPI last year) ÷ CPI last year × 100.\"");
+    el.innerHTML = "<p>" + head + "</p><ul>" + t.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+
+  PRESETS.forEach(function (p) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = p.name;
+    b.addEventListener("click", function () { load(p); });
+    $("scen").appendChild(b);
+  });
+
+  // ================= Nominal to real =================
+  var R = { n: 45000, i: 150 };
+  function renderReal() {
+    $("n-val").value = R.n; $("n-idx").value = R.i;
+    computeReal();
+  }
+  function computeReal() {
+    var n = R.n, i = R.i, rows = "", st;
+    if (!(i > 0)) {
+      $("calcReal").innerHTML = '<div class="row"><span>Enter a price index above 0.</span><span></span></div>';
+      $("storyReal").innerHTML = "<p>The price index must be positive. The base year is 100.</p>";
+      return;
+    }
+    var real = n / i * 100, pl = i - 100;
+    rows += '<div class="row"><span>Formula</span><span>Real = Nominal ÷ index × 100</span></div>';
+    rows += '<div class="row"><span>Plug in</span><span>' + money(n) + " ÷ " + num(i) + " × 100</span></div>";
+    rows += '<div class="row"><span>Divide</span><span>' + money(n) + " ÷ " + num(i / 100, 4) + "</span></div>";
+    rows += '<div class="row"><span>Real value (base-year dollars)</span><span>' + money(real) + "</span></div>";
+    $("calcReal").innerHTML = rows;
+    if (Math.abs(pl) < 1e-9) st = "<p>The index is 100, so this is the base year. Nominal and real values are equal.</p>";
+    else if (pl > 0) st = "<p>Prices are " + num(pl, 1) + "% higher than in the base year, so " + money(n) + " today buys only what " + money(real) + " bought in the base year.</p>";
+    else st = "<p>Prices are " + num(-pl, 1) + "% lower than in the base year, so " + money(n) + " today buys what " + money(real) + " bought in the base year. The real value is larger than the nominal value.</p>";
+    $("storyReal").innerHTML = st;
+  }
+  $("n-val").addEventListener("input", function (e) { R.n = Math.max(0, parseFloat(e.target.value) || 0); computeReal(); });
+  $("n-idx").addEventListener("input", function (e) { R.i = parseFloat(e.target.value) || 0; computeReal(); });
+  [
+    ["Wage of $45,000, CPI = 150", function () { return { n: 45000, i: 150 }; }],
+    ["Nominal GDP $1,100B, deflator = 110", function () { return { n: 1100, i: 110 }; }],
+    ["Price of $30 when CPI = 80", function () { return { n: 30, i: 80 }; }],
+    ["$50,000 in Year 3 of my basket", function () { var c = [0, 1, 2].map(function (y) { return S.goods.reduce(function (s, g) { return s + g[1] * g[2 + y]; }, 0); }); return { n: 50000, i: c[S.base] > 0 ? Math.round(c[2] / c[S.base] * 1000) / 10 : 100 }; }]
+  ].forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { R = x[1](); renderReal(); });
+    $("scenReal").appendChild(b);
+  });
+
+  load(PRESETS[0]);
+  renderReal();
+
+  // ================= Quiz =================
+  var Q = [
+    { s: "In the base year of a price index, the value of the index is:", o: ["0", "1", "100", "Equal to the inflation rate that year"], c: 2, w: "The index compares each year with the base year: base cost ÷ base cost × 100 = 100. It is never 0 or 1 in the standard AP format, and it is a level, not a rate." },
+    { s: "A market basket costs $250 in the base year and $300 in Year 2. What is the CPI in Year 2?", o: ["50", "120", "83.3", "300"], c: 1, w: "CPI = 300 ÷ 250 × 100 = 120. Choice C flips the fraction (250 ÷ 300). Choice A is the dollar difference, not an index." },
+    { s: "The CPI rises from 120 in Year 1 to 126 in Year 2. The inflation rate is:", o: ["6%", "26%", "126%", "5%"], c: 3, w: "(126 − 120) ÷ 120 × 100 = 5%. The tempting 6% is the change in index points; you must divide by the old index of 120." },
+    { s: "The inflation rate falls from 6% to 2%. This is an example of:", o: ["Disinflation", "Deflation", "Hyperinflation", "A falling price level"], c: 0, w: "Prices are still rising, only more slowly, so it is disinflation. Deflation and a falling price level require a negative inflation rate." },
+    { s: "When the price of beef rises sharply, consumers buy more chicken instead. Because the CPI basket does not change, the CPI will:", o: ["Understate the increase in the cost of living", "Measure the cost of living exactly", "Overstate the increase in the cost of living", "Fall below 100"], c: 2, w: "This is substitution bias. The fixed basket keeps counting all the expensive beef, so measured inflation is higher than the rise in what households actually pay." },
+    { s: "A worker's nominal wage is $60,000 and the CPI is 150. What is the worker's real wage in base-year dollars?", o: ["$90,000", "$40,000", "$60,000", "$59,850"], c: 1, w: "Real = nominal ÷ index × 100 = 60,000 ÷ 150 × 100 = $40,000. Choice A multiplies by 1.5 instead of dividing." },
+    { s: "The CPI was 110 last year and 105 this year. Which statement is correct?", o: ["Inflation was 5%", "The economy experienced disinflation", "Prices are lower than in the base year", "The economy experienced deflation"], c: 3, w: "(105 − 110) ÷ 110 × 100 ≈ −4.5%, so the price level fell: deflation. Prices are still 5% above the base year (index 105 > 100), so C is wrong." },
+    { s: "Which of the following causes the CPI to overstate inflation?", o: ["Improvements in product quality that raise prices", "Including only domestically produced goods", "Setting the base-year index equal to 100", "Using current-year quantities each year"], c: 0, w: "When a price rises because the product got better, part of the higher price buys more quality, but the CPI counts it all as inflation. The CPI does include imports, and it uses a fixed basket, not current-year quantities." }
+  ];
+  Lab.quiz(Q, $("quiz"), $("score"), $("quiz-reset"));
+  Lab.nav("2.4");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [2], topic: "2.4", compact: true, storageKey: "topic-2.4" });</script>
+</body>
+</html>

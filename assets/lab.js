@@ -1,17 +1,56 @@
-/* Shared helpers for the Unit 5 study labs.
+/* Shared helpers for the AP Macroeconomics study labs.
    Exposes a global `Lab` object: SVG chart drawing, a quiz builder, page navigation. */
 (function () {
   "use strict";
 
+  /* Every topic in the course. A unit's labs go live when its number is in READY. */
+  var READY = [1, 2, 3, 4, 5, 6];
+  var UNIT_TITLES = { 1: "Basic Economic Concepts", 2: "Economic Indicators and the Business Cycle", 3: "National Income and Price Determination", 4: "Financial Sector", 5: "Long-Run Consequences of Stabilization Policies", 6: "Open Economy\u2014International Trade and Finance" };
   var TOPICS = [
+    { id: "1.1", file: "1-1-scarcity.html", title: "Scarcity" },
+    { id: "1.2", file: "1-2-opportunity-cost-ppc.html", title: "Opportunity Cost and the PPC" },
+    { id: "1.3", file: "1-3-comparative-advantage.html", title: "Comparative Advantage and Gains from Trade" },
+    { id: "1.4", file: "1-4-demand.html", title: "Demand" },
+    { id: "1.5", file: "1-5-supply.html", title: "Supply" },
+    { id: "1.6", file: "1-6-market-equilibrium.html", title: "Market Equilibrium and Changes in Equilibrium" },
+    { id: "2.1", file: "2-1-circular-flow-gdp.html", title: "The Circular Flow and GDP" },
+    { id: "2.2", file: "2-2-limitations-of-gdp.html", title: "Limitations of GDP" },
+    { id: "2.3", file: "2-3-unemployment.html", title: "Unemployment" },
+    { id: "2.4", file: "2-4-price-indices-inflation.html", title: "Price Indices and Inflation" },
+    { id: "2.5", file: "2-5-costs-of-inflation.html", title: "Costs of Inflation" },
+    { id: "2.6", file: "2-6-real-vs-nominal-gdp.html", title: "Real vs. Nominal GDP" },
+    { id: "2.7", file: "2-7-business-cycles.html", title: "Business Cycles" },
+    { id: "3.1", file: "3-1-aggregate-demand.html", title: "Aggregate Demand" },
+    { id: "3.2", file: "3-2-multipliers.html", title: "Multipliers" },
+    { id: "3.3", file: "3-3-short-run-aggregate-supply.html", title: "Short-Run Aggregate Supply" },
+    { id: "3.4", file: "3-4-long-run-aggregate-supply.html", title: "Long-Run Aggregate Supply" },
+    { id: "3.5", file: "3-5-ad-as-equilibrium.html", title: "Equilibrium in the AD\u2013AS Model" },
+    { id: "3.6", file: "3-6-short-run-changes-ad-as.html", title: "Changes in the AD\u2013AS Model in the Short Run" },
+    { id: "3.7", file: "3-7-long-run-self-adjustment.html", title: "Long-Run Self-Adjustment" },
+    { id: "3.8", file: "3-8-fiscal-policy.html", title: "Fiscal Policy" },
+    { id: "3.9", file: "3-9-automatic-stabilizers.html", title: "Automatic Stabilizers" },
+    { id: "4.1", file: "4-1-financial-assets.html", title: "Financial Assets" },
+    { id: "4.2", file: "4-2-nominal-vs-real-interest-rates.html", title: "Nominal vs. Real Interest Rates" },
+    { id: "4.3", file: "4-3-money.html", title: "Definition, Measurement, and Functions of Money" },
+    { id: "4.4", file: "4-4-banking-money-supply.html", title: "Banking and the Expansion of the Money Supply" },
+    { id: "4.5", file: "4-5-money-market.html", title: "The Money Market" },
+    { id: "4.6", file: "4-6-monetary-policy.html", title: "Monetary Policy" },
+    { id: "4.7", file: "4-7-loanable-funds-market.html", title: "The Loanable Funds Market" },
     { id: "5.1", file: "5-1-policy-actions-short-run.html", title: "Fiscal & Monetary Policy in the Short Run" },
     { id: "5.2", file: "5-2-phillips-curve.html", title: "The Phillips Curve" },
     { id: "5.3", file: "5-3-money-growth-inflation.html", title: "Money Growth and Inflation" },
     { id: "5.4", file: "5-4-deficits-national-debt.html", title: "Government Deficits and the National Debt" },
     { id: "5.5", file: "5-5-crowding-out.html", title: "Crowding Out" },
     { id: "5.6", file: "5-6-economic-growth.html", title: "Economic Growth" },
-    { id: "5.7", file: "5-7-public-policy-growth.html", title: "Public Policy and Economic Growth" }
+    { id: "5.7", file: "5-7-public-policy-growth.html", title: "Public Policy and Economic Growth" },
+    { id: "6.1", file: "6-1-balance-of-payments.html", title: "Balance of Payments Accounts" },
+    { id: "6.2", file: "6-2-exchange-rates.html", title: "Exchange Rates" },
+    { id: "6.3", file: "6-3-foreign-exchange-market.html", title: "The Foreign Exchange Market" },
+    { id: "6.4", file: "6-4-fx-market-shifts.html", title: "Policy and Economic Changes in the Foreign Exchange Market" },
+    { id: "6.5", file: "6-5-fx-and-net-exports.html", title: "The Foreign Exchange Market and Net Exports" },
+    { id: "6.6", file: "6-6-real-interest-rates-capital-flows.html", title: "Real Interest Rates and International Capital Flows" }
   ];
+  function unitOf(id) { return +String(id).split(".")[0]; }
 
   var NS = "http://www.w3.org/2000/svg";
   var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -79,7 +118,7 @@
   function dot(F, x, y, color, guides, xl, yl) {
     if (guides) line(F, [[x, F.yr[0]], [x, y], [F.xr[0], y]], "var(--muted)", 1, "3 3");
     el("circle", { cx: F.sx(x), cy: F.sy(y), r: 6, fill: color || "var(--ink)", stroke: "var(--surface)", "stroke-width": 2 }, F.g);
-    if (xl) el("text", { x: F.sx(x), y: F.H - F.M.b + 30, "text-anchor": "middle", style: "fill:var(--ink); font-weight:600" }, F.svg, xl);
+    if (xl) el("text", { x: F.sx(x), y: F.H - F.M.b + 16, "text-anchor": "middle", style: "fill:var(--ink); font-weight:600" }, F.svg, xl);
     if (yl) el("text", { x: F.M.l - 8, y: F.sy(y) - 6, "text-anchor": "end", style: "fill:var(--ink); font-weight:600" }, F.svg, yl);
   }
   /* arrow(F, x1,y1,x2,y2,color) — a shift arrow. */
@@ -145,13 +184,15 @@
     build();
   }
 
-  /* nav(currentId) fills #topnav and #pager on a lab page. */
+  /* nav(currentId) fills #topnav and #pager on a lab page.
+     The topic chips show the current unit; the pager walks every ready lab in course order. */
   function nav(cur) {
+    var u = unitOf(cur);
     var top = document.getElementById("topnav");
     if (top) {
-      top.innerHTML = '<span style="display:flex;gap:16px;flex-wrap:wrap"><a href="../index.html">← All Unit 5 labs</a><a href="../terms/unit-5.html">Unit 5 terms</a><a href="../terms/index.html">All terms</a></span><nav class="topics" aria-label="Unit 5 topics"></nav>';
+      top.innerHTML = '<span style="display:flex;gap:16px;flex-wrap:wrap"><a href="../index.html">\u2190 All labs</a><a href="../terms/unit-' + u + '.html">Unit ' + u + ' terms</a><a href="../terms/index.html">All terms</a></span><nav class="topics" aria-label="Unit ' + u + ' topics"></nav>';
       var t = top.querySelector(".topics");
-      TOPICS.forEach(function (x) {
+      TOPICS.filter(function (x) { return unitOf(x.id) === u; }).forEach(function (x) {
         var a = document.createElement("a"); a.href = x.file; a.textContent = x.id; a.title = x.title;
         if (x.id === cur) a.setAttribute("aria-current", "page");
         t.appendChild(a);
@@ -159,12 +200,101 @@
     }
     var pg = document.getElementById("pager");
     if (pg) {
-      var i = TOPICS.findIndex(function (x) { return x.id === cur; });
-      var prev = TOPICS[i - 1], next = TOPICS[i + 1];
-      pg.innerHTML = (prev ? '<a href="' + prev.file + '">← ' + prev.id + ' ' + prev.title + '</a>' : '<a href="../index.html">← All labs</a>') +
-        (next ? '<a href="' + next.file + '">' + next.id + ' ' + next.title + ' →</a>' : '<a href="../index.html">Back to all labs →</a>');
+      var live = TOPICS.filter(function (x) { return READY.indexOf(unitOf(x.id)) >= 0 || unitOf(x.id) === u; });
+      var i = live.findIndex(function (x) { return x.id === cur; });
+      var prev = live[i - 1], next = live[i + 1];
+      pg.innerHTML = (prev ? '<a href="' + prev.file + '">\u2190 ' + prev.id + ' ' + prev.title + '</a>' : '<a href="../index.html">\u2190 All labs</a>') +
+        (next ? '<a href="' + next.file + '">' + next.id + ' ' + next.title + ' \u2192</a>' : '<a href="../index.html">Back to all labs \u2192</a>');
     }
   }
 
-  window.Lab = { TOPICS: TOPICS, el: el, frame: frame, line: line, fn: fn, vline: vline, hline: hline, tag: tag, dot: dot, arrow: arrow, rect: rect, fmt: fmt, animate: animate, quiz: quiz, nav: nav, reduceMotion: reduceMotion };
+  /* market(svg, cfg) draws a standard market graph in a 0..10 by 0..10 space and returns the equilibrium.
+     Use it for supply and demand, AD-AS, the money market, loanable funds, and foreign exchange.
+     cfg = {
+       xLabel, yLabel,                       axis titles (e.g. "Quantity", "Price")
+       demand: { shift, label, color },      downward line; shift moves it right (+) or left (-), about -3..3
+       supply: { shift, label, color, vertical },  upward line, or vertical (money supply, fixed quantity)
+       longRun: { shift, label, color },     optional vertical line (LRAS) at x = 5 + shift
+       start: { demand, supply, longRun },   optional starting shifts; drawn as dashed ghost curves when different
+       slope: 0.8,                           steepness of demand and supply
+       eqLabels: ["Q\u2081", "P\u2081"],   axis labels for the current equilibrium
+       startLabels: ["Q\u2080", "P\u2080"] axis labels for the starting equilibrium, when it differs
+       arrows: true                          draw shift arrows from ghost to current curves
+       extra: function (F, eq) {}            hook to draw anything else (price ceilings, gaps) with Lab helpers
+     }
+     Returns { x, y, start: {x, y} } in the 0..10 space, so labs can compute readouts. */
+  function market(svg, cfg) {
+    var k = cfg.slope || 0.8;
+    var st = cfg.start || {};
+    var d = cfg.demand || null, s = cfg.supply || null, lr = cfg.longRun || null;
+    var F = frame(svg, { x: [0, 10], y: [0, 10], xLabel: cfg.xLabel, yLabel: cfg.yLabel, xTicks: [], yTicks: [] });
+    function D(sh) { return function (x) { return 5 - k * (x - 5 - sh); }; }
+    function S(sh) { return function (x) { return 5 + k * (x - 5 - sh); }; }
+    function eqOf(ds, ss, vertical) {
+      if (vertical) { var x = 5 + ss; return { x: x, y: D(ds)(x) }; }
+      return { x: 5 + (ds + ss) / 2, y: 5 + k * (ds - ss) / 2 };
+    }
+    var dsh = d ? d.shift || 0 : 0, ssh = s ? s.shift || 0 : 0;
+    var d0 = st.demand != null ? st.demand : dsh, s0 = st.supply != null ? st.supply : ssh, l0 = st.longRun != null ? st.longRun : (lr ? lr.shift || 0 : 0);
+    var vert = s && s.vertical;
+    var eq = d && s ? eqOf(dsh, ssh, vert) : null;
+    var eq0 = d && s ? eqOf(d0, s0, vert) : null;
+    var ghost = "var(--ghost)";
+    // ghosts
+    if (lr && Math.abs(l0 - (lr.shift || 0)) > 1e-9) vline(F, 5 + l0, ghost, 2, "6 5");
+    if (s && Math.abs(s0 - ssh) > 1e-9) { if (vert) vline(F, 5 + s0, ghost, 2, "6 5"); else fn(F, S(s0), ghost, 2, "6 5", 2); }
+    if (d && Math.abs(d0 - dsh) > 1e-9) fn(F, D(d0), ghost, 2, "6 5", 2);
+    var moved = eq && eq0 && (Math.abs(eq.x - eq0.x) > 1e-6 || Math.abs(eq.y - eq0.y) > 1e-6);
+    if (moved) dot(F, eq0.x, eq0.y, ghost, true, cfg.startLabels ? cfg.startLabels[0] : null, cfg.startLabels ? cfg.startLabels[1] : null);
+    // current curves
+    if (lr) { vline(F, 5 + (lr.shift || 0), lr.color || "var(--lrpc)", 3); tag(F, 5 + (lr.shift || 0) + 0.15, 9.5, lr.label || "LRAS", lr.color || "var(--lrpc)"); }
+    if (s) {
+      var sc = s.color || "var(--srpc)";
+      if (vert) { vline(F, 5 + ssh, sc, 3); tag(F, 5 + ssh + 0.15, 9.5, s.label || "S", sc); }
+      else { fn(F, S(ssh), sc, 3, null, 2); var xe = Math.min(9.6, 5 + ssh + 5.5 / k); tag(F, xe, Math.min(9.6, S(ssh)(xe)) - 0.5, s.label || "S", sc, "end"); }
+    }
+    if (d) {
+      var dc = d.color || "var(--accent)";
+      fn(F, D(dsh), dc, 3, null, 2);
+      var xd = Math.min(9.6, 5 + dsh + 4.6 / k); tag(F, xd, Math.max(0.4, D(dsh)(xd)) + 0.3, d.label || "D", dc, "end");
+    }
+    if (cfg.arrows !== false) {
+      if (d && Math.abs(d0 - dsh) > 0.2) arrow(F, 5 + d0 + 1.6, D(d0)(5 + d0 + 1.6), 5 + dsh + 1.6, D(d0)(5 + d0 + 1.6), "var(--muted)");
+      if (s && !vert && Math.abs(s0 - ssh) > 0.2) arrow(F, 5 + s0 + 2.4, S(s0)(5 + s0 + 2.4), 5 + ssh + 2.4, S(s0)(5 + s0 + 2.4), "var(--muted)");
+    }
+    if (eq) dot(F, eq.x, eq.y, "var(--ink)", true, cfg.eqLabels ? cfg.eqLabels[0] : null, cfg.eqLabels ? cfg.eqLabels[1] : null);
+    if (cfg.extra) cfg.extra(F, eq, { D: D, S: S });
+    return eq ? { x: eq.x, y: eq.y, start: eq0 } : null;
+  }
+
+  /* ppc(svg, cfg) draws a production possibilities curve with goods on each axis.
+     cfg = { xLabel, yLabel, xMax: 10, yMax: 10 (intercepts), start: {xMax, yMax} (dashed ghost when different),
+             bowed: true (increasing opportunity cost) or false (straight line, constant cost),
+             point: [x, y] (optional dot, labelled by pointLabel), pointLabel, extra(F) }
+     Returns { F, onCurve(x) -> y, status(x, y) -> "on" | "inside" | "outside" }. */
+  function ppc(svg, cfg) {
+    var F = frame(svg, { x: [0, 12], y: [0, 12], xLabel: cfg.xLabel, yLabel: cfg.yLabel, xTicks: [0, 2, 4, 6, 8, 10, 12], yTicks: [0, 2, 4, 6, 8, 10, 12], fmtX: String, fmtY: String });
+    var bowed = cfg.bowed !== false;
+    function curve(X, Y) { return function (x) { if (x > X) return NaN; var r = x / X; return bowed ? Y * Math.sqrt(Math.max(0, 1 - r * r)) : Y * (1 - r); }; }
+    function draw(X, Y, color, w, dash) {
+      var pts = [];
+      for (var i = 0; i <= 90; i++) { var th = Math.PI / 2 * i / 90; pts.push(bowed ? [X * Math.sin(th), Y * Math.cos(th)] : [X * i / 90, Y * (1 - i / 90)]); }
+      line(F, pts, color, w, dash);
+    }
+    var X = cfg.xMax || 10, Y = cfg.yMax || 10, st = cfg.start || {};
+    var X0 = st.xMax || X, Y0 = st.yMax || Y;
+    if (Math.abs(X0 - X) > 1e-9 || Math.abs(Y0 - Y) > 1e-9) draw(X0, Y0, "var(--ghost)", 2, "6 5");
+    draw(X, Y, "var(--lrpc)", 3);
+    tag(F, X * 0.72 + 0.2, curve(X, Y)(X * 0.72) + 0.5, cfg.curveLabel || "PPC", "var(--lrpc)");
+    var on = curve(X, Y);
+    function status(x, y) { var c = on(x); if (isNaN(c)) return "outside"; return Math.abs(y - c) < 0.15 ? "on" : (y < c ? "inside" : "outside"); }
+    if (cfg.point) {
+      dot(F, cfg.point[0], cfg.point[1], "var(--ink)", true);
+      if (cfg.pointLabel) tag(F, cfg.point[0] + 0.25, cfg.point[1] + 0.35, cfg.pointLabel, "var(--ink)");
+    }
+    if (cfg.extra) cfg.extra(F, on);
+    return { F: F, onCurve: on, status: status };
+  }
+
+  window.Lab = { TOPICS: TOPICS, READY: READY, UNIT_TITLES: UNIT_TITLES, unitOf: unitOf, market: market, ppc: ppc, el: el, frame: frame, line: line, fn: fn, vline: vline, hline: hline, tag: tag, dot: dot, arrow: arrow, rect: rect, fmt: fmt, animate: animate, quiz: quiz, nav: nav, reduceMotion: reduceMotion };
 })();

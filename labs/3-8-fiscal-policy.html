@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fiscal Policy Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: end; }
+.grp { display: grid; gap: 6px; }
+.grp > span { font-size: .86rem; font-weight: 500; }
+.calc-card { display: grid; gap: 12px; align-content: start; }
+.calc-card h3 { margin: 0; }
+.calc .row span:last-child { font-family: var(--mono); text-align: right; }
+#needs .row:last-child { font-weight: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.8</span>
+  <h1>The Fiscal Policy Study Lab</h1>
+  <p class="lede">Fiscal policy is the government's use of spending, taxes, and transfer payments to shift aggregate demand. Start from a recessionary or inflationary gap, pick a tool and an amount, and the lab uses the multipliers to show how far AD shifts. Then check whether your policy closes the gap, falls short, or overshoots.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Close the gap</h2>
+    <p>AP calculation questions treat the multiplier result as the change in real GDP. The graph is a sketch: it places the new equilibrium at that real GDP, and because SRAS slopes up, the price level also rises. Dashed grey lines show where the economy started.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small>short run, with LRAS at Y<sub>f</sub></small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="Aggregate demand and aggregate supply graph showing the effect of fiscal policy"></svg>
+      <div class="legend"><span class="l-ad">AD</span><span class="l-srpc">SRAS</span><span class="l-lrpc">LRAS</span><span class="l-ghost">Starting AD</span></div>
+    </div>
+    <div class="card calc-card">
+      <h3>Show your work</h3>
+      <div><span class="formula" id="f-main">ΔAD = ΔG × 1/MPS</span></div>
+      <div class="calc" id="calc" aria-live="polite"></div>
+      <div class="tag">Change needed to close this gap (gap ÷ multiplier)</div>
+      <div class="calc" id="needs"></div>
+    </div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px; margin-top:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">AP-style problems</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="toggles">
+      <div class="grp">
+        <span id="gap-lbl">Starting gap</span>
+        <div class="seg" role="group" aria-labelledby="gap-lbl">
+          <button type="button" id="g-rec" aria-pressed="true">Recessionary gap</button>
+          <button type="button" id="g-inf" aria-pressed="false">Inflationary gap</button>
+        </div>
+      </div>
+      <div class="grp">
+        <span id="tool-lbl">Fiscal policy tool</span>
+        <div class="seg" role="group" aria-labelledby="tool-lbl">
+          <button type="button" id="t-g" aria-pressed="true">Government spending</button>
+          <button type="button" id="t-t" aria-pressed="false">Taxes</button>
+          <button type="button" id="t-tr" aria-pressed="false">Transfers</button>
+        </div>
+      </div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(3, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-gap">Size of the gap <output id="o-gap"></output></label>
+        <input type="range" id="s-gap" min="20" max="400" step="10">
+        <span class="hint">Distance between real GDP and Y<sub>f</sub></span>
+      </div>
+      <div class="ctl">
+        <label for="s-mpc">MPC <output id="o-mpc"></output></label>
+        <input type="range" id="s-mpc" min="0.5" max="0.9" step="0.05">
+        <span class="hint">MPS = 1 − MPC</span>
+      </div>
+      <div class="ctl">
+        <label for="s-amt">Policy change <output id="o-amt"></output></label>
+        <input type="range" id="s-amt" min="-400" max="400" step="1">
+        <span class="hint">Right = increase, left = decrease (billions)</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-exact" type="button" class="primary">Set the exact amount that closes the gap</button>
+      <button id="btn-zero" type="button">No policy</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Multiplier for this tool</div><div class="v" id="r-m">4</div></div>
+    <div class="stat"><div class="k">Change in AD</div><div class="v" id="r-ad">0</div></div>
+    <div class="stat"><div class="k">Result</div><div class="v" id="r-res">gap</div></div>
+    <div class="stat"><div class="k">Change in budget balance</div><div class="v" id="r-bb">0</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Two directions</span><h3>Expansionary vs. contractionary</h3><p><b>Expansionary fiscal policy</b> raises government spending, cuts taxes, or raises transfers. AD shifts right, real GDP and the price level rise. Use it for a recessionary gap. <b>Contractionary fiscal policy</b> does the opposite. AD shifts left, real GDP and the price level fall. Use it for an inflationary gap.</p></div>
+    <div class="card"><span class="tag">Three multipliers</span><h3>Why the tax multiplier is smaller</h3><p>Government spending is part of AD, so every dollar counts in the first round: spending multiplier = 1/MPS. A tax cut or transfer first raises disposable income, and households spend only the MPC share of it. That skips one round, so the tax multiplier is −MPC/MPS and the transfer multiplier is MPC/MPS.</p></div>
+    <div class="card"><span class="tag">The AP formula</span><h3>Gap ÷ multiplier</h3><p>To find the change in a tool that closes a gap, divide the gap by that tool's multiplier. A $200 billion recessionary gap with MPC 0.75 needs a $50 billion increase in G (200 ÷ 4) or a tax change of 200 ÷ (−3) = −$66.7 billion, a tax cut.</p></div>
+    <div class="card"><span class="tag">Who decides</span><h3>Discretionary fiscal policy</h3><p>Discretionary fiscal policy is a deliberate decision by lawmakers, such as passing a spending bill or a tax cut. Automatic stabilizers (topic 3.9) change on their own as income rises and falls. The central bank does not run fiscal policy; that is monetary policy.</p></div>
+    <div class="card"><span class="tag">Timing</span><h3>Policy lags</h3><p>Policy lags are delays. The recognition lag is the time it takes to see the problem. The decision lag is the time lawmakers need to agree. The implementation lag is the time before the money is spent and affects AD. By the time a policy hits, the gap may have changed, so it can overshoot.</p></div>
+    <div class="card"><span class="tag">The budget</span><h3>Effect on the budget balance</h3><p>Budget balance = tax revenue − government spending − transfers. Expansionary policy moves the budget toward a <b>budget deficit</b> (a bigger deficit or smaller surplus). Contractionary policy moves it toward a <b>budget surplus</b>. Raising G and taxes by the same amount leaves the balance unchanged but still shifts AD right, because the balanced-budget multiplier is 1.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Worked examples</h2>
+    <p>Each row uses the same three steps: find MPS, find the multiplier, then divide the gap by the multiplier. A minus sign on a tax change means a tax cut.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Starting gap</th><th>MPC</th><th>Spending multiplier (1/MPS)</th><th>Tax multiplier (−MPC/MPS)</th><th>ΔG needed</th><th>ΔT needed</th><th>ΔTransfers needed</th><th>Budget balance moves toward</th></tr></thead>
+    <tbody>
+      <tr><td>$200B recessionary</td><td>0.75</td><td>4</td><td>−3</td><td>+$50B</td><td>−$66.7B</td><td>+$66.7B</td><td>Deficit</td></tr>
+      <tr><td>$100B recessionary</td><td>0.8</td><td>5</td><td>−4</td><td>+$20B</td><td>−$25B</td><td>+$25B</td><td>Deficit</td></tr>
+      <tr><td>$300B recessionary</td><td>0.5</td><td>2</td><td>−1</td><td>+$150B</td><td>−$300B</td><td>+$300B</td><td>Deficit</td></tr>
+      <tr><td>$90B inflationary</td><td>0.9</td><td>10</td><td>−9</td><td>−$9B</td><td>+$10B</td><td>−$10B</td><td>Surplus</td></tr>
+      <tr><td>$120B inflationary</td><td>0.6</td><td>2.5</td><td>−1.5</td><td>−$48B</td><td>+$80B</td><td>−$80B</td><td>Surplus</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Fiscal policy on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Tips that earn points</h3>
+      <ul>
+        <li>Label the axes <b>Real GDP</b> (horizontal) and <b>Price level</b> (vertical). Draw LRAS vertical at Y<sub>f</sub>, SRAS sloping up, AD sloping down.</li>
+        <li>Show the gap: mark Y<sub>1</sub> left of Y<sub>f</sub> for a recessionary gap or right of Y<sub>f</sub> for an inflationary gap.</li>
+        <li>Draw AD<sub>2</sub> with an arrow showing the shift, and label the new real GDP and price level (Y<sub>2</sub>, PL<sub>2</sub>).</li>
+        <li>Name a specific action and its direction: "increase government spending" or "decrease personal income taxes." "Use fiscal policy" earns nothing.</li>
+        <li>Show the calculation: MPS = 1 − MPC, multiplier = 1/MPS, then ΔG = gap ÷ multiplier. Graders want the number and the direction.</li>
+        <li>For taxes, use −MPC/MPS and state the answer in words: "decrease taxes by $66.7 billion."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Using the spending multiplier for a tax or transfer change. Transfers use MPC/MPS and taxes use −MPC/MPS; both are one smaller in absolute value than 1/MPS.</li>
+        <li>Multiplying the gap by the multiplier. The gap is the change in AD you want, so divide the gap by the multiplier to get the policy change.</li>
+        <li>Treating transfers like government purchases. Transfers are not part of G; they work through disposable income, like a tax cut.</li>
+        <li>Saying the central bank changes taxes or spending. Fiscal policy belongs to Congress and the President.</li>
+        <li>Forgetting the price level. Expansionary policy raises both real GDP and the price level in the short run.</li>
+        <li>Mixing up deficit and debt. Expansionary policy moves the budget toward deficit (a larger deficit or a smaller surplus). Any deficit then adds to the national debt.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.8. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { gap: "rec", size: 200, mpc: 0.75, tool: "g", amt: 25 };
+  var S = Object.assign({}, BASE);
+  var f = Lab.fmt;
+
+  // ---------- Model ----------
+  // Spending multiplier 1/MPS, tax multiplier -MPC/MPS, transfer multiplier MPC/MPS.
+  // AP convention: treat the multiplier result as the change in real GDP; the price level still moves along SRAS.
+  var TOOLS = {
+    g:  { name: "government spending", sym: "ΔG", short: "G" },
+    t:  { name: "taxes", sym: "ΔT", short: "Taxes" },
+    tr: { name: "transfer payments", sym: "ΔTR", short: "Transfers" }
+  };
+  function mults(mpc) {
+    var mps = 1 - mpc;
+    return { mps: mps, g: 1 / mps, t: -mpc / mps, tr: mpc / mps };
+  }
+  function model(s) {
+    var M = mults(s.mpc), m = M[s.tool];
+    var dAD = s.amt * m;
+    var start = s.gap === "rec" ? -s.size : s.size;      // output minus Yf, in billions
+    var need = -start;                                    // change in AD that closes the gap
+    var end = start + dAD;
+    var tol = Math.abs(m) * 0.5 + 1e-6;                   // within half a slider step
+    var res;
+    if (Math.abs(s.amt) < 1e-9) res = "none";
+    else if (Math.abs(end) <= tol) res = "closed";
+    else if (dAD * need < 0) res = "wrong";
+    else if (Math.abs(dAD) < Math.abs(need)) res = "short";
+    else res = "over";
+    var bb = s.tool === "t" ? s.amt : -s.amt;             // budget balance = T - G - TR
+    return { M: M, m: m, dAD: dAD, start: start, need: need, end: end, res: res, bb: bb,
+             exact: { g: need / M.g, t: need / M.t, tr: need / M.tr } };
+  }
+
+  // ---------- Formatting ----------
+  function num(v) { return Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : f(v); }
+  function bil(v) { return (v < -1e-9 ? "−" : "") + "$" + num(Math.abs(v)) + "B"; }
+  function sbil(v) { return (v > 1e-9 ? "+" : v < -1e-9 ? "−" : "") + "$" + num(Math.abs(v)) + "B"; }
+  function snum(v) { return (v < -1e-9 ? "−" : "") + num(Math.abs(v)); }
+  function words(v) { return "$" + num(Math.abs(v)) + " billion"; }
+  function change(v, toolName) { return (v > 0 ? "increase " : "decrease ") + toolName + " by " + words(v); }
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("adas");
+  function draw(m, s) {
+    var U = s.size / 2;                                   // billions per graph unit: the gap is always 2 units wide
+    var x0 = 5 + m.start / U;
+    var x1raw = 5 + m.end / U, x1 = Math.max(0.5, Math.min(9.5, x1raw));
+    var moved = Math.abs(x1 - x0) > 1e-6;
+    var closed = m.res === "closed";
+    var xlab = closed ? "Y₂ = Yf" : moved ? "Y₂" : "Y₁";
+    Lab.market(svg, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: 2 * (x1 - 5), label: moved ? "AD₂" : "AD₁" },
+      supply: { shift: 0, label: "SRAS" },
+      longRun: { shift: 0, label: "LRAS" },
+      start: { demand: 2 * (x0 - 5) },
+      slope: 0.7,
+      eqLabels: [xlab, moved ? "PL₂" : "PL₁"],
+      startLabels: ["Y₁", "PL₁"],
+      extra: function (F, eq) {
+        // Yf under the axis unless an equilibrium label already sits there
+        if (!closed && Math.abs(x1 - 5) > 0.7 && Math.abs(x0 - 5) > 0.7)
+          Lab.el("text", { x: F.sx(5), y: F.H - F.M.b + 16, "text-anchor": "middle", style: "fill:var(--lrpc); font-weight:600" }, F.svg, "Yf");
+        // bracket for the gap that remains
+        if (!closed && Math.abs(x1 - 5) > 0.15) {
+          var col = x1 < 5 ? "var(--accent)" : "var(--bad)";
+          Lab.line(F, [[x1, 8.4], [5, 8.4]], col, 4);
+          Lab.tag(F, x1 < 5 ? 4.85 : 5.15, 8.8, x1 < 5 ? "recessionary gap" : "inflationary gap", col, x1 < 5 ? "end" : "start");
+        }
+      }
+    });
+    return x1raw !== x1;
+  }
+
+  // ---------- Story ----------
+  function story(m, s) {
+    var T = TOOLS[s.tool], gapName = s.gap === "rec" ? "recessionary" : "inflationary";
+    var right = s.gap === "rec" ? "expansionary" : "contractionary";
+    var html = "<p><b>Start:</b> real GDP is " + words(s.size) + (s.gap === "rec" ? " below" : " above") + " full-employment output, a " + gapName + " gap. ";
+    html += s.gap === "rec"
+      ? "Unemployment is above its natural rate. The fix is <b>expansionary</b> fiscal policy: shift AD right.</p>"
+      : "Unemployment is below its natural rate and the price level is pushed up. The fix is <b>contractionary</b> fiscal policy: shift AD left.</p>";
+    if (m.res === "none") {
+      html += "<p><b>No policy yet.</b> With MPC " + s.mpc + ", the gap closes with " + change(m.exact.g, "government spending") + ", " + change(m.exact.t, "taxes") + ", or " + change(m.exact.tr, "transfers") + ". Pick a tool and an amount.</p>";
+      return html;
+    }
+    var dir = (s.tool === "t" ? s.amt < 0 : s.amt > 0) ? "expansionary" : "contractionary";
+    var how = s.tool === "g"
+      ? "Government purchases are part of AD, so the whole change counts in the first round. Multiplier = 1/MPS = 1/" + f(m.M.mps, 2) + " = " + num(m.m) + "."
+      : "A change in " + T.name + " first changes disposable income. Households spend the MPC share of it, so one round is skipped. Multiplier = " + (s.tool === "t" ? "−" : "") + "MPC/MPS = " + (s.tool === "t" ? "−" : "") + s.mpc + "/" + f(m.M.mps, 2) + " = " + snum(m.m) + ".";
+    html += "<p><b>Policy:</b> the government chooses to " + change(s.amt, T.name) + ". This is <b>" + dir + "</b> fiscal policy. " + how + " AD shifts " + (m.dAD > 0 ? "right" : "left") + " by " + snum(s.amt) + " × " + snum(m.m) + " = <b>" + sbil(m.dAD) + "</b>.</p>";
+    var out;
+    if (m.res === "closed") out = "<b>The gap closes.</b> Real GDP returns to Y<sub>f</sub>. The price level " + (s.gap === "rec" ? "rises" : "falls") + " as AD shifts. An AP answer: " + change(m.exact[s.tool], T.name) + " to close the gap.";
+    else if (m.res === "wrong") out = "<b>Wrong direction.</b> This is " + dir + " policy, but a " + gapName + " gap calls for " + right + " policy. The gap grows to " + words(m.end) + ".";
+    else if (m.res === "short") out = "<b>Falls short.</b> AD moves the right way, but a " + gapName + " gap of " + words(m.end) + " remains. To close it fully, " + change(m.exact[s.tool], T.name) + ".";
+    else out = "<b>Overshoots.</b> AD shifts too far. The economy now has " + (m.end > 0 ? "an inflationary" : "a recessionary") + " gap of " + words(m.end) + (m.end > 0 ? ", with a higher price level than needed." : ".") + " The right size is to " + change(m.exact[s.tool], T.name) + ". Policy lags make this kind of overshoot a real risk.";
+    html += "<p>" + out + "</p>";
+    html += "<p><b>Budget:</b> budget balance = taxes − government spending − transfers, so this policy moves the budget " + (m.bb < 0 ? "toward a <b>deficit</b> by " : "toward a <b>surplus</b> by ") + words(m.bb) + " (before any change in tax revenue from the new level of income).</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elGap = document.getElementById("s-gap"), elMpc = document.getElementById("s-mpc"), elAmt = document.getElementById("s-amt");
+  var gb = { rec: document.getElementById("g-rec"), inf: document.getElementById("g-inf") };
+  var tb = { g: document.getElementById("t-g"), t: document.getElementById("t-t"), tr: document.getElementById("t-tr") };
+  function render() {
+    var m = model(S);
+    elGap.value = S.size; elMpc.value = S.mpc; elAmt.value = Math.round(S.amt);
+    gb.rec.setAttribute("aria-pressed", S.gap === "rec"); gb.inf.setAttribute("aria-pressed", S.gap === "inf");
+    Object.keys(tb).forEach(function (k) { tb[k].setAttribute("aria-pressed", S.tool === k); });
+    document.getElementById("o-gap").textContent = "$" + S.size + "B";
+    document.getElementById("o-mpc").textContent = f(S.mpc, 2) + " (MPS " + f(1 - S.mpc, 2) + ")";
+    document.getElementById("o-amt").textContent = TOOLS[S.tool].sym + " = " + sbil(S.amt);
+    var clipped = draw(m, S);
+
+    var sym = TOOLS[S.tool].sym;
+    document.getElementById("f-main").textContent = "ΔAD = " + sym + " × " + (S.tool === "g" ? "1/MPS" : S.tool === "t" ? "(−MPC/MPS)" : "MPC/MPS");
+    var rows = [
+      ["MPS = 1 − MPC", "1 − " + f(S.mpc, 2) + " = " + f(m.M.mps, 2)],
+      ["Multiplier for " + TOOLS[S.tool].name, snum(m.m)],
+      ["Change in AD = " + sym + " × multiplier", snum(S.amt) + " × " + snum(m.m) + " = " + sbil(m.dAD)],
+      ["Change needed to close the gap", sbil(m.need)],
+      ["Real GDP vs. Yf after policy", Math.abs(m.end) < Math.abs(m.m) * 0.5 + 1e-6 ? "$0B (at Yf)" : sbil(m.end)]
+    ];
+    document.getElementById("calc").innerHTML = rows.map(function (r) { return '<div class="row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>'; }).join("");
+    document.getElementById("needs").innerHTML = [["g", "ΔG", m.M.g], ["t", "ΔT", m.M.t], ["tr", "ΔTR", m.M.tr]].map(function (r) {
+      var cur = r[0] === S.tool ? ' style="font-weight:600"' : "";
+      return '<div class="row"' + cur + '><span>' + r[1] + ' = ' + snum(m.need) + ' ÷ ' + snum(r[2]) + '</span><span>' + sbil(m.exact[r[0]]) + '</span></div>';
+    }).join("");
+    document.getElementById("r-m").textContent = snum(m.m);
+    document.getElementById("r-ad").textContent = sbil(m.dAD);
+    var res = document.getElementById("r-res");
+    res.innerHTML = {
+      none: '<span class="pill ' + (S.gap === "rec" ? "rec" : "infl") + '">' + (S.gap === "rec" ? "Recessionary" : "Inflationary") + ' gap</span>',
+      closed: '<span class="pill lr">Gap closed</span>',
+      short: '<span class="pill rec">Falls short</span>',
+      over: '<span class="pill infl">Overshoots</span>',
+      wrong: '<span class="pill infl">Wrong way</span>'
+    }[m.res];
+    document.getElementById("r-bb").textContent = Math.abs(m.bb) < 1e-9 ? "$0B" : sbil(m.bb) + (m.bb < 0 ? " deficit" : " surplus");
+    var st = story(m, S);
+    if (clipped) st += "<p><i>The shift is too large to fit on the graph, so the curve stops at the edge. The numbers above are still exact.</i></p>";
+    document.getElementById("story").innerHTML = st;
+  }
+  elGap.addEventListener("input", function () { S.size = parseFloat(elGap.value); render(); });
+  elMpc.addEventListener("input", function () { S.mpc = Math.round(parseFloat(elMpc.value) * 100) / 100; render(); });
+  elAmt.addEventListener("input", function () { S.amt = parseFloat(elAmt.value); render(); });
+  gb.rec.addEventListener("click", function () { S.gap = "rec"; render(); });
+  gb.inf.addEventListener("click", function () { S.gap = "inf"; render(); });
+  Object.keys(tb).forEach(function (k) { tb[k].addEventListener("click", function () { S.tool = k; render(); }); });
+  document.getElementById("btn-exact").addEventListener("click", function () { S.amt = model(S).exact[S.tool]; render(); });
+  document.getElementById("btn-zero").addEventListener("click", function () { S.amt = 0; render(); });
+
+  var scen = [
+    ["$200B recessionary gap, MPC 0.75: change G", { gap: "rec", size: 200, mpc: 0.75, tool: "g", amt: 50 }],
+    ["Same gap: change taxes", { gap: "rec", size: 200, mpc: 0.75, tool: "t", amt: -200 / 3 }],
+    ["Same gap: change transfers", { gap: "rec", size: 200, mpc: 0.75, tool: "tr", amt: 200 / 3 }],
+    ["$100B inflationary gap, MPC 0.8: cut G", { gap: "inf", size: 100, mpc: 0.8, tool: "g", amt: -20 }],
+    ["$100B inflationary gap, MPC 0.8: raise taxes", { gap: "inf", size: 100, mpc: 0.8, tool: "t", amt: 25 }],
+    ["Overshoot: $120B gap, MPC 0.9, G up $20B", { gap: "rec", size: 120, mpc: 0.9, tool: "g", amt: 20 }],
+    ["Falls short: cut taxes by $50B", { gap: "rec", size: 200, mpc: 0.75, tool: "t", amt: -50 }],
+    ["Wrong way: raise taxes in a recession", { gap: "rec", size: 200, mpc: 0.75, tool: "t", amt: 20 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, BASE, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "An economy has a $200 billion recessionary gap and the MPC is 0.75. Treating the multiplier result as the change in real GDP, what is the smallest increase in government spending that closes the gap?", o: ["$800 billion", "$200 billion", "$50 billion", "$66.7 billion"], c: 2, w: "MPS = 0.25, so the spending multiplier is 1/0.25 = 4. Divide the gap by the multiplier: 200 ÷ 4 = $50 billion. $800 billion multiplies instead of dividing, and $66.7 billion is the tax answer." },
+    { s: "Same economy: a $200 billion recessionary gap with MPC 0.75. If the government uses taxes alone, what change closes the gap?", o: ["Increase taxes by $66.7 billion", "Decrease taxes by $50 billion", "Decrease taxes by $200 billion", "Decrease taxes by $66.7 billion"], c: 3, w: "The tax multiplier is −MPC/MPS = −0.75/0.25 = −3. ΔT = 200 ÷ (−3) = −$66.7 billion, a tax cut. A $50 billion tax cut uses the spending multiplier by mistake and only raises AD by $150 billion." },
+    { s: "Which of the following is an example of contractionary fiscal policy?", o: ["Raising personal income taxes", "Increasing unemployment benefits", "Buying government bonds on the open market", "Increasing spending on highways"], c: 0, w: "Higher taxes cut disposable income and consumption, so AD shifts left. Higher benefits and highway spending are expansionary. Buying bonds is a central bank action, which is monetary policy." },
+    { s: "The MPC is 0.8. The government increases transfer payments by $10 billion. What is the maximum change in aggregate demand?", o: ["$8 billion", "$40 billion", "$50 billion", "$10 billion"], c: 1, w: "The transfer multiplier is MPC/MPS = 0.8/0.2 = 4, so AD rises by 10 × 4 = $40 billion. $50 billion uses the spending multiplier, which applies to government purchases, not transfers." },
+    { s: "On an AD–AS graph, current real GDP is to the left of the LRAS curve. What fiscal policy is appropriate, and what happens to real GDP and the price level in the short run?", o: ["Decrease government spending; both fall", "Increase government spending; both rise", "Increase taxes; both rise", "Increase government spending; real GDP rises and the price level falls"], c: 1, w: "Output left of LRAS is a recessionary gap, so the government should shift AD right. Moving up along an upward-sloping SRAS raises both real GDP and the price level." },
+    { s: "Why can discretionary fiscal policy end up hitting the economy at the wrong time?", o: ["The central bank must approve every change in taxes", "Automatic stabilizers cancel out any new spending", "Lawmakers need time to see the problem, agree on a bill, and get the money spent", "Fiscal policy affects only the long-run aggregate supply curve"], c: 2, w: "These are the recognition, decision, and implementation lags. By the time spending or tax changes reach the economy, the gap may have shrunk or reversed, so the policy can overshoot." },
+    { s: "The budget is balanced. The government cuts taxes by $40 billion and raises government spending by $10 billion. Ignoring any change in income, what is the budget balance now?", o: ["A deficit of $50 billion", "A deficit of $30 billion", "A surplus of $50 billion", "A surplus of $30 billion"], c: 0, w: "Budget balance = taxes − spending. Taxes fall by 40 and spending rises by 10, so the balance falls by 50: a $50 billion deficit. Both actions are expansionary, so both push toward a deficit." },
+    { s: "The MPC is 0.75. The government raises spending by $100 billion and raises taxes by $100 billion at the same time. What is the change in aggregate demand?", o: ["$0", "$400 billion", "$700 billion", "$100 billion"], c: 3, w: "Spending adds 100 × 4 = $400 billion. The tax increase subtracts 100 × 3 = $300 billion. The net change is +$100 billion, because the balanced-budget multiplier is 1. It is not zero, since the tax multiplier is smaller than the spending multiplier." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.8");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.8", compact: true, storageKey: "topic-3.8" });</script>
+</body>
+</html>

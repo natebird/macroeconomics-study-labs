@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market Equilibrium, Disequilibrium, and Changes in Equilibrium Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.side { display: grid; gap: 14px; align-content: start; }
+.group { display: grid; gap: 8px; }
+.scenarios button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 12px; font-size: .86rem; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.seg button:disabled { opacity: .5; cursor: default; }
+.side .controls { grid-template-columns: 1fr 1fr; }
+.price-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
+.stat .sub { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+.legend .l-gap { color: var(--bad); } .legend .l-sur { color: var(--c3); }
+@media (max-width: 520px) { .side .controls, .price-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 1 · Topic 1.6</span>
+  <h1>Market Equilibrium, Disequilibrium, and Changes in Equilibrium Study Lab</h1>
+  <p class="lede">A market is in equilibrium when quantity demanded equals quantity supplied. At any other price there is a shortage or a surplus, and the price moves back toward equilibrium unless a law stops it. Set a price, shift the curves, or add a price ceiling or floor, and read what an AP answer would say.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. The coffee market</h2>
+    <p>The market starts in equilibrium at a price of $10.00 a pound and 100 pounds a week. Dashed grey lines show the starting curves once something shifts. The price line shows a price that is not set by the market: a temporary price, a ceiling, or a floor.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Supply and demand <small>price vs. quantity</small></h3>
+      <svg class="chart" id="mkt" role="img" aria-label="Supply and demand graph for coffee with equilibrium, price line, and any shortage or surplus"></svg>
+    </div>
+    <div class="card side">
+      <div class="group">
+        <div class="tag">Demand shifts</div>
+        <div class="scenarios" id="sc-d"></div>
+      </div>
+      <div class="group">
+        <div class="tag">Supply shifts</div>
+        <div class="scenarios" id="sc-s"></div>
+      </div>
+      <div class="group">
+        <div class="tag">Both curves shift</div>
+        <div class="scenarios" id="sc-b"></div>
+        <div style="display:grid; gap:6px;">
+          <span style="font-size:.86rem; font-weight:500;" id="size-lbl">Which shift is larger?</span>
+          <div class="seg" role="group" aria-labelledby="size-lbl">
+            <button type="button" id="sz-d" aria-pressed="false">Demand shift larger</button>
+            <button type="button" id="sz-e" aria-pressed="true">Same size</button>
+            <button type="button" id="sz-s" aria-pressed="false">Supply shift larger</button>
+          </div>
+          <span class="hint" id="size-hint" style="font-size:.76rem; color:var(--muted);">Pick a both-curves scenario, then compare the three cases.</span>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label for="s-d">Demand <output id="o-d"></output></label>
+          <input type="range" id="s-d" min="-2" max="2" step="0.25">
+          <span class="hint">Right = demand increases</span>
+        </div>
+        <div class="ctl">
+          <label for="s-s">Supply <output id="o-s"></output></label>
+          <input type="range" id="s-s" min="-2" max="2" step="0.25">
+          <span class="hint">Right = supply increases</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="display:grid; gap:14px;">
+    <div class="group">
+      <div class="tag">Who sets the price?</div>
+      <div class="seg" role="group" aria-label="How the price is set">
+        <button type="button" id="m-eq" aria-pressed="true">Market (equilibrium)</button>
+        <button type="button" id="m-set" aria-pressed="false">Temporary price</button>
+        <button type="button" id="m-ceil" aria-pressed="false">Price ceiling</button>
+        <button type="button" id="m-floor" aria-pressed="false">Price floor</button>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="ctl">
+        <label for="s-p">Price line <output id="o-p"></output></label>
+        <input type="range" id="s-p" min="6" max="14" step="0.5">
+        <span class="hint">Moving it sets a temporary price unless a ceiling or floor is selected</span>
+      </div>
+      <button id="btn-adjust" type="button">Let the market adjust</button>
+    </div>
+    <div class="group">
+      <div class="tag">Price scenarios</div>
+      <div class="scenarios" id="sc-p"></div>
+    </div>
+    <div><button id="btn-reset" type="button">Reset to starting equilibrium</button></div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Demand</span><span class="l-srpc">Supply</span><span class="l-c4">Price line</span><span class="l-gap">Shortage</span><span class="l-sur">Surplus</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Equilibrium price</div><div class="v" id="r-p">$10.00</div><div class="sub" id="r-p2">no change</div></div>
+    <div class="stat"><div class="k">Equilibrium quantity</div><div class="v" id="r-q">100</div><div class="sub" id="r-q2">no change</div></div>
+    <div class="stat"><div class="k">Shortage or surplus</div><div class="v" id="r-g"><span class="pill lr">None</span></div><div class="sub" id="r-g2">market clears</div></div>
+    <div class="stat"><div class="k">Quantity actually sold</div><div class="v" id="r-t">100</div><div class="sub" id="r-t2">at equilibrium</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Qd = Qs</span><h3>Market equilibrium</h3><p>Equilibrium is the price where quantity demanded equals quantity supplied. Every buyer who wants the good at that price gets it, and every seller finds a buyer. Nothing pushes the price up or down.</p></div>
+    <div class="card"><span class="tag">Price below equilibrium</span><h3>Shortage</h3><p>Quantity demanded is greater than quantity supplied. Buyers compete for the limited goods and sellers raise prices. As the price rises, quantity demanded falls and quantity supplied rises until the shortage is gone.</p></div>
+    <div class="card"><span class="tag">Price above equilibrium</span><h3>Surplus</h3><p>Quantity supplied is greater than quantity demanded. Sellers have unsold goods and cut prices. As the price falls, quantity demanded rises and quantity supplied falls until the surplus is gone.</p></div>
+    <div class="card"><span class="tag">Shift vs. move along</span><h3>What a price change does</h3><p>A change in the good's own price moves the market along the curves. Only a change in a determinant (income, tastes, input costs, technology, number of sellers) shifts a curve. Shortages and surpluses fix themselves through movements along the curves.</p></div>
+    <div class="card"><span class="tag">Double shift</span><h3>One result is indeterminate</h3><p>When demand and supply both shift, you know the direction of only one of price or quantity. The other depends on which shift is larger. Without the sizes, the AP answer is "indeterminate."</p></div>
+    <div class="card"><span class="tag">Legal limits</span><h3>Price ceilings and floors</h3><p>A price ceiling is a legal maximum; it binds only when set below equilibrium and causes a shortage. A price floor is a legal minimum; it binds only when set above equilibrium and causes a surplus. Either way, the quantity sold falls.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Equilibrium cheat sheet</h2>
+    <p>Memorize the four double-shift rules. A quick check: if both shifts push price the same way, price is certain and quantity is indeterminate. If both push quantity the same way, quantity is certain and price is indeterminate.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Change</th><th>Curve shift</th><th>Equilibrium price</th><th>Equilibrium quantity</th></tr></thead>
+    <tbody>
+      <tr><td>Demand increases (income rises for a normal good, substitute's price rises)</td><td><b>D right</b></td><td>↑</td><td>↑</td></tr>
+      <tr><td>Demand decreases (complement's price rises, tastes shift away)</td><td><b>D left</b></td><td>↓</td><td>↓</td></tr>
+      <tr><td>Supply increases (better technology, more sellers, lower input costs)</td><td><span class="shift">S right</span></td><td>↓</td><td>↑</td></tr>
+      <tr><td>Supply decreases (higher input costs, bad weather)</td><td><span class="shift">S left</span></td><td>↑</td><td>↓</td></tr>
+      <tr><td>Demand increases and supply increases</td><td>Both right</td><td><b>Indeterminate</b></td><td>↑</td></tr>
+      <tr><td>Demand decreases and supply decreases</td><td>Both left</td><td><b>Indeterminate</b></td><td>↓</td></tr>
+      <tr><td>Demand increases and supply decreases</td><td>D right, S left</td><td>↑</td><td><b>Indeterminate</b></td></tr>
+      <tr><td>Demand decreases and supply increases</td><td>D left, S right</td><td>↓</td><td><b>Indeterminate</b></td></tr>
+      <tr><td>Binding price ceiling (set below equilibrium)</td><td>No shift</td><td>Held below equilibrium</td><td>Quantity sold falls to Qs; shortage = Qd − Qs</td></tr>
+      <tr><td>Binding price floor (set above equilibrium)</td><td>No shift</td><td>Held above equilibrium</td><td>Quantity sold falls to Qd; surplus = Qs − Qd</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price</b>. Horizontal axis: <b>Quantity</b>. Demand slopes down, supply slopes up; label them D and S.</li>
+        <li>Mark equilibrium with dashed lines to both axes and label P₁ and Q₁. After a shift, label the new curve D₂ or S₂, draw an arrow, and label P₂ and Q₂.</li>
+        <li>For a price ceiling, draw a horizontal line <b>below</b> equilibrium labeled P<sub>c</sub>. For a floor, draw it <b>above</b> equilibrium labeled P<sub>f</sub>.</li>
+        <li>Show a shortage or surplus as the <b>horizontal</b> distance between Qs and Qd at that price. Label both quantities on the horizontal axis.</li>
+        <li>Show the math: shortage = Qd − Qs; surplus = Qs − Qd. To find equilibrium from equations, set Qd = Qs and solve for P, then plug P back in for Q.</li>
+        <li>For a double shift with no sizes given, write "the change in price is indeterminate" (or quantity). Graders accept that word.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting a curve because the price changed. A change in the good's own price causes a change in <b>quantity demanded</b> or <b>quantity supplied</b>, a movement along the curve.</li>
+        <li>Saying a shortage shifts demand left or supply right. The price rises and the market moves along both curves back to equilibrium.</li>
+        <li>Putting a binding ceiling above equilibrium. A ceiling above equilibrium and a floor below equilibrium have no effect.</li>
+        <li>Saying quantity sold under a ceiling is Qd. Buyers can only buy what sellers offer, so the quantity sold is Qs. Under a floor it is Qd.</li>
+        <li>Giving a direction for both price and quantity in a double shift. One of them is always indeterminate unless the sizes are given.</li>
+        <li>Measuring a shortage vertically on the graph. It is a quantity, so it is a horizontal gap.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 1.6. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-1.html">Unit 1 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var K = 0.8;   // slope used by Lab.market
+  // Lab.market space (0..10): demand y = 5 - K(x - 5 - d), supply y = 5 + K(x - 5 - s).
+  // Equilibrium x = 5 + (d + s)/2, y = 5 + K(d - s)/2.
+  // Teaching numbers: price = $2 per graph unit (start $10.00), quantity = 20 pounds per graph unit (start 100).
+  var BASE = { d: 0, s: 0, mode: "eq", p: 10, key: null, size: "e" };
+  var S = Object.assign({}, BASE);
+  var EPS = 0.01;
+  function sgn(v) { return v > EPS ? 1 : v < -EPS ? -1 : 0; }
+  function money(v) { return "$" + v.toFixed(2); }
+  function qty(v) { return String(Math.round(v)); }
+
+  // ---------- Model ----------
+  function qdAt(s, P) { var y = P / 2; return 20 * (5 + s.d + (5 - y) / K); }
+  function qsAt(s, P) { var y = P / 2; return 20 * (5 + s.s + (y - 5) / K); }
+  function model(s) {
+    var x = 5 + (s.d + s.s) / 2, y = 5 + K * (s.d - s.s) / 2;
+    var Pe = 2 * y, Qe = 20 * x;
+    var sd = sgn(s.d), ss = sgn(s.s), both = sd !== 0 && ss !== 0;
+    var m = { Pe: Pe, Qe: Qe, sd: sd, ss: ss, both: both,
+      pInd: both && sd === ss,     // same direction: price indeterminate
+      qInd: both && sd !== ss,     // opposite directions: quantity indeterminate
+      binding: false, Pm: Pe, Qd: Qe, Qs: Qe, gap: 0 };
+    var P = s.p;
+    if (s.mode === "set") m.binding = Math.abs(P - Pe) > 0.005;
+    if (s.mode === "ceil") m.binding = P < Pe - 0.005;
+    if (s.mode === "floor") m.binding = P > Pe + 0.005;
+    if (m.binding) { m.Pm = P; m.Qd = qdAt(s, P); m.Qs = qsAt(s, P); m.gap = m.Qd - m.Qs; }   // gap > 0 shortage, < 0 surplus
+    m.sold = Math.min(m.Qd, m.Qs);
+    return m;
+  }
+
+  // ---------- Scenarios ----------
+  // Double-shift scenarios store directions; sizes come from the "which is larger" control.
+  var SC = {
+    inc:   { g: "d", name: "Incomes rise", d: 2, s: 0, why: "Coffee is a normal good, so higher incomes raise demand. <b>Demand shifts right.</b>" },
+    tea:   { g: "d", name: "Price of tea rises", d: 1.5, s: 0, why: "Tea is a substitute for coffee. When tea costs more, some buyers switch to coffee. <b>Demand shifts right.</b>" },
+    cream: { g: "d", name: "Price of cream rises", d: -1.5, s: 0, why: "Cream is a complement to coffee. When cream costs more, drinking coffee is more expensive overall. <b>Demand shifts left.</b>" },
+    beans: { g: "s", name: "Coffee bean costs rise", d: 0, s: -2, why: "Beans are an input. Higher input costs mean sellers offer less at every price. <b>Supply shifts left.</b>" },
+    tech:  { g: "s", name: "Faster roasting technology", d: 0, s: 2, why: "Better technology lowers the cost of producing each pound. Sellers offer more at every price. <b>Supply shifts right.</b>" },
+    enter: { g: "s", name: "More sellers enter", d: 0, s: 1.5, why: "More sellers means more coffee offered at every price. <b>Supply shifts right.</b>" },
+    upup:  { g: "b", name: "Incomes rise + new technology", d: 1, s: 1, why: "Higher incomes shift <b>demand right</b> and new technology shifts <b>supply right</b>. Both shifts raise quantity. They push price in opposite directions." },
+    dndn:  { g: "b", name: "Health scare + bean costs rise", d: -1, s: -1, why: "A health scare shifts <b>demand left</b> and higher bean costs shift <b>supply left</b>. Both shifts lower quantity. They push price in opposite directions." },
+    updn:  { g: "b", name: "Incomes rise + drought", d: 1, s: -1, why: "Higher incomes shift <b>demand right</b> and a drought in coffee-growing regions shifts <b>supply left</b>. Both shifts raise price. They push quantity in opposite directions." },
+    dnup:  { g: "b", name: "Tea gets cheaper + more sellers", d: -1, s: 1, why: "Cheaper tea pulls buyers away, so <b>demand shifts left</b>, and new sellers shift <b>supply right</b>. Both shifts lower price. They push quantity in opposite directions." }
+  };
+  var SIZES = { d: [2, 1], e: [1.5, 1.5], s: [1, 2] };   // [demand size, supply size]
+  function targetFor(key, size) {
+    var x = SC[key];
+    if (x.g !== "b") return { d: x.d, s: x.s };
+    var z = SIZES[size];
+    return { d: x.d * z[0], s: x.s * z[1] };
+  }
+
+  var PSC = [
+    { name: "Price stuck at $8 (shortage)", mode: "set", p: 8 },
+    { name: "Price stuck at $12 (surplus)", mode: "set", p: 12 },
+    { name: "Ceiling at $8 (binding)", mode: "ceil", p: 8 },
+    { name: "Ceiling at $12 (not binding)", mode: "ceil", p: 12 },
+    { name: "Floor at $12 (binding)", mode: "floor", p: 12 },
+    { name: "Floor at $8 (not binding)", mode: "floor", p: 8 }
+  ];
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("mkt");
+  function draw(s) {
+    var m = model(s);
+    var moved = Math.abs(s.d) > 1e-9 || Math.abs(s.s) > 1e-9;
+    var dx = (m.Qe - 100) / 20, dy = (m.Pe - 10) / 2;
+    Lab.market(svg, {
+      xLabel: "Quantity (pounds per week)", yLabel: "Price ($ per pound)", slope: K,
+      demand: { shift: s.d, label: Math.abs(s.d) > 0.2 ? "D₂" : "D₁" },
+      supply: { shift: s.s, label: Math.abs(s.s) > 0.2 ? "S₂" : "S₁" },
+      start: { demand: 0, supply: 0 },
+      eqLabels: moved ? [Math.abs(dx) >= 0.45 ? "Q₂" : null, Math.abs(dy) >= 0.45 ? "P₂" : null] : ["Q₁", "P₁"],
+      startLabels: ["Q₁", "P₁"],
+      extra: function (F, eq, c) {
+        if (Math.abs(s.d) >= 0.75) Lab.tag(F, 9.6, Math.max(0.4, c.D(0)(9.6)) + 0.3, "D₁", "var(--muted)", "end");
+        if (Math.abs(s.s) >= 0.75) Lab.tag(F, 9.6, Math.min(9.6, c.S(0)(9.6)) - 0.5, "S₁", "var(--muted)", "end");
+        if (s.mode === "eq") return;
+        var y = s.p / 2;
+        var name = s.mode === "ceil" ? "Price ceiling " : s.mode === "floor" ? "Price floor " : "Price ";
+        Lab.line(F, [[0, y], [10, y]], "var(--c4)", 2.5, s.mode === "set" ? "7 5" : null);
+        Lab.tag(F, 0.2, y + 0.25, name + money(s.p) + (m.binding || s.mode === "set" ? "" : " (not binding)"), "var(--c4)");
+        if (!m.binding) return;
+        var xd = m.Qd / 20, xs = m.Qs / 20;
+        var short = m.gap > 0, col = short ? "var(--bad)" : "var(--c3)";
+        Lab.rect(F, Math.min(xd, xs), y - 0.17, Math.max(xd, xs), y + 0.17, col, 0.35);
+        Lab.line(F, [[xs, y], [xd, y]], col, 4);
+        Lab.dot(F, xs, y, "var(--srpc)", false);
+        Lab.dot(F, xd, y, "var(--accent)", false);
+        Lab.line(F, [[xs, 0], [xs, y]], "var(--muted)", 1, "3 3");
+        Lab.line(F, [[xd, 0], [xd, y]], "var(--muted)", 1, "3 3");
+        var ty = short ? y - 0.6 : y + 0.75;
+        Lab.tag(F, (xd + xs) / 2, ty, (short ? "Shortage = " : "Surplus = ") + qty(Math.abs(m.gap)), col, "middle");
+        // axis labels for Qs and Qd, skipped when they would crowd the equilibrium label
+        var gapX = Math.abs(xd - xs);
+        if (gapX > 0.9) {
+          [[xs, "Qs"], [xd, "Qd"]].forEach(function (p) {
+            if (Math.abs(p[0] - eq.x) < 0.55) return;
+            Lab.el("text", { x: F.sx(p[0]), y: F.H - F.M.b + 16, "text-anchor": "middle", style: "fill:var(--muted); font-weight:600" }, F.svg, p[1]);
+          });
+        }
+      }
+    });
+    return m;
+  }
+
+  // ---------- Readouts ----------
+  var f = Lab.fmt;
+  function chg(v, d) { var r = Math.round(v * Math.pow(10, d)) / Math.pow(10, d); return r > 0 ? "+" + r.toFixed(d) : r < 0 ? "−" + Math.abs(r).toFixed(d) : "0"; }
+  function ind() { return '<span class="pill rec">Indeterminate</span>'; }
+  function arrowOf(v) { return v > 0.005 ? "↑ " : v < -0.005 ? "↓ " : ""; }
+  function readouts(m, s) {
+    var dP = m.Pe - 10, dQ = m.Qe - 100;
+    var p = document.getElementById("r-p"), p2 = document.getElementById("r-p2");
+    var q = document.getElementById("r-q"), q2 = document.getElementById("r-q2");
+    if (m.pInd) { p.innerHTML = ind(); p2.textContent = "this graph: " + money(m.Pe) + " (" + (Math.abs(dP) < 0.005 ? "no change" : chg(dP, 2)) + ")"; }
+    else { p.textContent = arrowOf(dP) + money(m.Pe); p2.textContent = Math.abs(dP) < 0.005 ? "no change from $10.00" : chg(dP, 2) + " from $10.00"; }
+    if (m.qInd) { q.innerHTML = ind(); q2.textContent = "this graph: " + qty(m.Qe) + " (" + (Math.abs(dQ) < 0.5 ? "no change" : chg(dQ, 0)) + ")"; }
+    else { q.textContent = arrowOf(dQ) + qty(m.Qe); q2.textContent = Math.abs(dQ) < 0.5 ? "no change from 100" : chg(dQ, 0) + " from 100"; }
+    var g = document.getElementById("r-g"), g2 = document.getElementById("r-g2");
+    if (!m.binding) { g.innerHTML = '<span class="pill lr">None</span>'; g2.textContent = s.mode === "eq" || s.mode === "set" ? "market clears" : "control is not binding"; }
+    else if (m.gap > 0) { g.innerHTML = '<span class="pill infl">Shortage ' + qty(m.gap) + '</span>'; g2.textContent = "Qd " + qty(m.Qd) + " − Qs " + qty(m.Qs); }
+    else { g.innerHTML = '<span class="pill rec">Surplus ' + qty(-m.gap) + '</span>'; g2.textContent = "Qs " + qty(m.Qs) + " − Qd " + qty(m.Qd); }
+    document.getElementById("r-t").textContent = qty(m.sold);
+    document.getElementById("r-t2").textContent = !m.binding ? "at equilibrium" : m.gap > 0 ? "limited by sellers (Qs)" : "limited by buyers (Qd)";
+  }
+
+  // ---------- Story ----------
+  function shiftWords(v, curve) {
+    var size = Math.abs(v) >= 1.75 ? "a large" : Math.abs(v) >= 0.75 ? "a moderate" : "a small";
+    return curve + " has " + size + (v > 0 ? " increase (shift right)" : " decrease (shift left)");
+  }
+  function sizeWhy(s) {
+    var a = Math.abs(s.d), b = Math.abs(s.s);
+    return a > b + 1e-9 ? "the demand shift is larger" : b > a + 1e-9 ? "the supply shift is larger" : "the two shifts are the same size";
+  }
+  function story(m, s) {
+    var html = "", li = [];
+    var dP = m.Pe - 10, dQ = m.Qe - 100;
+    var pTxt = Math.abs(dP) < 0.005 ? "stays at $10.00" : (dP > 0 ? "rises" : "falls") + " from $10.00 to " + money(m.Pe);
+    var qTxt = Math.abs(dQ) < 0.5 ? "stays at 100" : (dQ > 0 ? "rises" : "falls") + " from 100 to " + qty(m.Qe);
+    var sc = s.key ? SC[s.key] : null;
+
+    if (m.sd === 0 && m.ss === 0) {
+      html += s.mode === "eq"
+        ? "<p><b>Starting equilibrium.</b> At $10.00 a pound, buyers want 100 pounds a week and sellers offer 100 pounds. Quantity demanded equals quantity supplied, so there is no pressure for the price to change.</p>"
+        : "<p><b>The curves have not shifted.</b> Equilibrium is still $10.00 a pound and 100 pounds a week, where quantity demanded equals quantity supplied.</p>";
+    } else {
+      if (sc) html += "<p><b>" + sc.name + ".</b> " + sc.why + "</p>";
+      else {
+        var parts = [];
+        if (m.sd) parts.push(shiftWords(s.d, "Demand"));
+        if (m.ss) parts.push(shiftWords(s.s, "Supply"));
+        html += "<p><b>Your shifts.</b> " + parts.join(", and ") + ".</p>";
+      }
+      if (!m.both) {
+        li.push("The equilibrium price " + pTxt + " and the equilibrium quantity " + qTxt + ".");
+        if (m.sd !== 0) li.push("A demand shift moves price and quantity in the <b>same</b> direction. Along the supply curve, the change in price causes a change in quantity supplied; supply itself does not shift.");
+        else li.push("A supply shift moves price and quantity in <b>opposite</b> directions. Along the demand curve, the change in price causes a change in quantity demanded; demand itself does not shift.");
+      } else if (m.qInd) {
+        li.push("Price <b>" + (m.sd > 0 ? "rises" : "falls") + "</b> for sure, because both shifts push it " + (m.sd > 0 ? "up" : "down") + ". On this graph it " + pTxt + ".");
+        li.push("<b>Quantity is indeterminate.</b> The demand shift pushes it " + (m.sd > 0 ? "up" : "down") + " and the supply shift pushes it " + (m.ss > 0 ? "up" : "down") + ". On this graph quantity " + qTxt + " because " + sizeWhy(s) + ". Try the three size buttons: quantity can rise, fall, or stay the same.");
+      } else {
+        li.push("Quantity <b>" + (m.sd > 0 ? "rises" : "falls") + "</b> for sure, because both shifts push it " + (m.sd > 0 ? "up" : "down") + ". On this graph it " + qTxt + ".");
+        li.push("<b>Price is indeterminate.</b> The demand shift pushes it " + (m.sd > 0 ? "up" : "down") + " and the supply shift pushes it " + (m.ss > 0 ? "down" : "up") + ". On this graph price " + pTxt + " because " + sizeWhy(s) + ". Try the three size buttons: price can rise, fall, or stay the same.");
+      }
+    }
+
+    var P = s.p, Pe = m.Pe;
+    if (s.mode === "set") {
+      if (!m.binding) li.push("The temporary price of " + money(P) + " equals the equilibrium price, so there is no shortage or surplus.");
+      else if (m.gap > 0) li.push("At " + money(P) + ", below equilibrium, buyers want " + qty(m.Qd) + " pounds but sellers offer only " + qty(m.Qs) + ". That is a <b>shortage of " + qty(m.gap) + "</b>. Buyers compete for the coffee and sellers raise the price. As the price rises, quantity demanded falls and quantity supplied rises (movements along the curves) until the shortage disappears at " + money(Pe) + ". Press <b>Let the market adjust</b> to watch.");
+      else li.push("At " + money(P) + ", above equilibrium, sellers offer " + qty(m.Qs) + " pounds but buyers want only " + qty(m.Qd) + ". That is a <b>surplus of " + qty(-m.gap) + "</b>. Sellers with unsold coffee cut the price. As the price falls, quantity demanded rises and quantity supplied falls (movements along the curves) until the surplus disappears at " + money(Pe) + ". Press <b>Let the market adjust</b> to watch.");
+    } else if (s.mode === "ceil") {
+      if (m.binding) li.push("A <b>price ceiling</b> of " + money(P) + " is a legal maximum below the equilibrium price of " + money(Pe) + ", so it is <b>binding</b>. The price cannot rise to clear the market. Buyers want " + qty(m.Qd) + " pounds, sellers offer " + qty(m.Qs) + ", and the <b>shortage of " + qty(m.gap) + "</b> lasts as long as the law does. Only " + qty(m.Qs) + " pounds are sold.");
+      else li.push("A <b>price ceiling</b> of " + money(P) + " is at or above the equilibrium price of " + money(Pe) + ", so it is <b>not binding</b>. The market settles at equilibrium as if the law did not exist. A ceiling matters only when it is set below equilibrium.");
+    } else if (s.mode === "floor") {
+      if (m.binding) li.push("A <b>price floor</b> of " + money(P) + " is a legal minimum above the equilibrium price of " + money(Pe) + ", so it is <b>binding</b>. The price cannot fall to clear the market. Sellers offer " + qty(m.Qs) + " pounds, buyers want " + qty(m.Qd) + ", and the <b>surplus of " + qty(-m.gap) + "</b> lasts as long as the law does. Only " + qty(m.Qd) + " pounds are sold.");
+      else li.push("A <b>price floor</b> of " + money(P) + " is at or below the equilibrium price of " + money(Pe) + ", so it is <b>not binding</b>. The market settles at equilibrium as if the law did not exist. A floor matters only when it is set above equilibrium.");
+    } else if (m.sd !== 0 || m.ss !== 0) {
+      li.push("The market price adjusts to the new equilibrium, so there is no shortage or surplus.");
+    }
+    if (li.length) html += "<ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+
+    var end;
+    if (m.binding && s.mode !== "set") end = "<b>AP answer:</b> a binding " + (s.mode === "ceil" ? "ceiling causes a shortage equal to Qd − Qs" : "floor causes a surplus equal to Qs − Qd") + ", measured as the horizontal gap between the curves at the controlled price. The quantity sold falls below the equilibrium quantity.";
+    else if (m.binding) end = "<b>AP answer:</b> a price " + (m.gap > 0 ? "below" : "above") + " equilibrium creates a " + (m.gap > 0 ? "shortage, so the price rises" : "surplus, so the price falls") + " until quantity demanded equals quantity supplied. No curve shifts.";
+    else if (m.qInd) end = "<b>AP answer:</b> state the certain change in price and say the change in quantity is indeterminate.";
+    else if (m.pInd) end = "<b>AP answer:</b> state the certain change in quantity and say the change in price is indeterminate.";
+    else if (m.sd !== 0 || m.ss !== 0) end = "<b>AP answer:</b> name the curve that shifts and its direction, then give the new equilibrium price and quantity: price " + (dP > 0 ? "increases" : "decreases") + " and quantity " + (dQ > 0 ? "increases" : "decreases") + ".";
+    else end = "Pick a scenario to shift a curve, or use the price controls to push the price away from equilibrium.";
+    html += "<p>" + end + "</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elD = document.getElementById("s-d"), elS = document.getElementById("s-s"), elP = document.getElementById("s-p");
+  var modeBtns = { eq: document.getElementById("m-eq"), set: document.getElementById("m-set"), ceil: document.getElementById("m-ceil"), floor: document.getElementById("m-floor") };
+  var sizeBtns = { d: document.getElementById("sz-d"), e: document.getElementById("sz-e"), s: document.getElementById("sz-s") };
+  var btnAdjust = document.getElementById("btn-adjust");
+  var scBtns = {}, pBtns = [];
+  function shiftLabel(v) { return Math.abs(v) < 1e-9 ? "start" : (v > 0 ? "right " : "left ") + Math.abs(v).toFixed(2).replace(/\.?0+$/, ""); }
+  function render(full) {
+    var m = draw(S);
+    elD.value = S.d; elS.value = S.s; elP.value = S.p;
+    document.getElementById("o-d").textContent = shiftLabel(S.d);
+    document.getElementById("o-s").textContent = shiftLabel(S.s);
+    document.getElementById("o-p").textContent = money(S.p);
+    Object.keys(modeBtns).forEach(function (k) { modeBtns[k].setAttribute("aria-pressed", S.mode === k ? "true" : "false"); });
+    var dbl = S.key && SC[S.key].g === "b";
+    Object.keys(sizeBtns).forEach(function (k) { sizeBtns[k].setAttribute("aria-pressed", S.size === k ? "true" : "false"); sizeBtns[k].disabled = !dbl; });
+    document.getElementById("size-hint").textContent = dbl ? "Compare the cases: the certain result never changes; the indeterminate one does." : "Pick a both-curves scenario, then compare the three cases.";
+    Object.keys(scBtns).forEach(function (k) { scBtns[k].setAttribute("aria-pressed", S.key === k ? "true" : "false"); });
+    pBtns.forEach(function (x) { x.b.setAttribute("aria-pressed", S.mode === x.sc.mode && Math.abs(S.p - x.sc.p) < 1e-9 ? "true" : "false"); });
+    btnAdjust.disabled = !(S.mode === "set" && m.binding);
+    if (full !== false) { readouts(m, S); document.getElementById("story").innerHTML = story(m, S); }
+  }
+  var stop = function () {};
+  function go(target, key) {
+    stop();
+    var d0 = S.d, s0 = S.s;
+    S.key = key;
+    if (S.mode === "set") S.mode = "eq";
+    stop = Lab.animate(600, function (t) {
+      S.d = d0 + (target.d - d0) * t; S.s = s0 + (target.s - s0) * t;
+      render(false);
+    }, function () { S.d = target.d; S.s = target.s; render(); });
+  }
+  elD.addEventListener("input", function () { stop(); S.d = parseFloat(elD.value); S.key = null; render(); });
+  elS.addEventListener("input", function () { stop(); S.s = parseFloat(elS.value); S.key = null; render(); });
+  elP.addEventListener("input", function () { stop(); S.p = parseFloat(elP.value); if (S.mode === "eq") S.mode = "set"; render(); });
+  Object.keys(modeBtns).forEach(function (k) {
+    modeBtns[k].addEventListener("click", function () { stop(); S.mode = k; render(); });
+  });
+  Object.keys(sizeBtns).forEach(function (k) {
+    sizeBtns[k].addEventListener("click", function () {
+      S.size = k;
+      if (S.key && SC[S.key].g === "b") go(targetFor(S.key, k), S.key); else render();
+    });
+  });
+  btnAdjust.addEventListener("click", function () {
+    stop();
+    var p0 = S.p, pe = model(S).Pe;
+    stop = Lab.animate(900, function (t) { S.p = p0 + (pe - p0) * t; render(false); },
+      function () { S.p = Math.round(pe * 2) / 2; S.mode = "eq"; render(); });
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { stop(); S = Object.assign({}, BASE); render(); });
+
+  Object.keys(SC).forEach(function (k) {
+    var x = SC[k];
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x.name;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { go(targetFor(k, S.size), k); });
+    document.getElementById("sc-" + x.g).appendChild(b);
+    scBtns[k] = b;
+  });
+  PSC.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x.name;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { stop(); S.d = 0; S.s = 0; S.key = null; S.mode = x.mode; S.p = x.p; render(); });
+    document.getElementById("sc-p").appendChild(b);
+    pBtns.push({ b: b, sc: x });
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "A frost destroys part of the strawberry crop. At the same time, a study reports that strawberries improve health. What happens in the strawberry market?",
+      o: ["Price falls; the change in quantity is indeterminate", "Price and quantity both rise", "Price rises; the change in quantity is indeterminate", "The change in price is indeterminate; quantity falls"], c: 2,
+      w: "The frost shifts supply left and the study shifts demand right. Both shifts push price up, so price must rise. Supply left lowers quantity and demand right raises it, so quantity is indeterminate. Choice B assumes the demand shift is larger." },
+    { s: "In a market, Qd = 100 − 5P and Qs = 20 + 5P. What are the equilibrium price and quantity?",
+      o: ["$8 and 60 units", "$10 and 50 units", "$8 and 80 units", "$12 and 40 units"], c: 0,
+      w: "Set Qd = Qs: 100 − 5P = 20 + 5P, so 80 = 10P and P = $8. Plug in: Qd = 100 − 40 = 60 and Qs = 20 + 40 = 60. Choice C uses 100 − 20 instead of plugging the price into an equation." },
+    { s: "In the market where Qd = 100 − 5P and Qs = 20 + 5P, the government sets a price ceiling of $6. What is the result?",
+      o: ["A surplus of 20 units", "A shortage of 10 units", "No effect, because the ceiling is below equilibrium", "A shortage of 20 units"], c: 3,
+      w: "Equilibrium is $8, so a $6 ceiling is binding. At $6, Qd = 100 − 30 = 70 and Qs = 20 + 30 = 50. Shortage = 70 − 50 = 20 units, and only 50 units are sold. A ceiling has no effect only when it is above equilibrium." },
+    { s: "At the current price of a good, quantity supplied is greater than quantity demanded. Which of the following describes the market and what happens next?",
+      o: ["There is a shortage, and the price will rise", "There is a surplus; the price will fall, quantity demanded will rise, and quantity supplied will fall", "There is a surplus, and the supply curve will shift left until the surplus is gone", "There is a shortage, and the demand curve will shift left"], c: 1,
+      w: "Qs > Qd is a surplus. Sellers cut the price, which moves the market along both curves: quantity demanded rises and quantity supplied falls. Choice C is tempting, but a price change never shifts the supply curve." },
+    { s: "The government sets a price floor below the equilibrium price. What is the effect?",
+      o: ["A surplus, because sellers offer more than buyers want", "A shortage, because the price is too low", "No effect on price or quantity", "The price rises to the floor"], c: 2,
+      w: "A floor is a legal minimum. If it is below equilibrium, the market price is already above it, so the floor does not bind. A floor causes a surplus only when it is set above equilibrium." },
+    { s: "Consumer incomes rise for a normal good while new technology lowers the cost of producing it. Which of the following must be true?",
+      o: ["Price rises; the change in quantity is indeterminate", "Quantity rises; the change in price is indeterminate", "Price and quantity both rise", "Price falls and quantity rises"], c: 1,
+      w: "Higher incomes shift demand right and lower costs shift supply right. Both shifts raise quantity. Demand pushes price up and supply pushes it down, so the change in price is indeterminate without the sizes." },
+    { s: "Which of the following causes a movement along the demand curve for coffee, with no shift in demand?",
+      o: ["A rise in the price of tea", "A rise in consumer incomes", "A report that coffee improves memory", "A fall in the cost of coffee beans"], c: 3,
+      w: "Cheaper beans shift the supply of coffee right, which lowers the price of coffee. Buyers respond to the lower price by moving down the existing demand curve. Choices A, B, and C change a determinant of demand, so they shift demand." },
+    { s: "The table shows a market. Price $4: Qd = 80, Qs = 20. Price $6: Qd = 60, Qs = 40. Price $8: Qd = 50, Qs = 50. Price $10: Qd = 40, Qs = 60. If the price is $10, which is true?",
+      o: ["There is a surplus of 20 units, and the price will fall toward $8", "There is a shortage of 20 units, and the price will rise", "There is a surplus of 60 units, and the price will fall toward $8", "There is a surplus of 20 units, and the price will rise toward $12"], c: 0,
+      w: "At $10, Qs = 60 and Qd = 40, so the surplus is 60 − 40 = 20. Equilibrium is $8, where Qd = Qs = 50, so sellers cut the price toward $8. Choice C reports quantity supplied instead of the gap." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("1.6");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [1], topic: "1.6", compact: true, storageKey: "topic-1.6" });</script>
+</body>
+</html>

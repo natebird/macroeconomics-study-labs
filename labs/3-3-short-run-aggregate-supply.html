@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Short-Run Aggregate Supply Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.scen-group { display: grid; gap: 6px; }
+.scen-group + .scen-group { margin-top: 10px; }
+.scen-group .gl { font-size: .82rem; color: var(--muted); font-weight: 500; }
+.scenarios button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); font-weight: 600; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.story h4 { margin: 0 0 4px; font-size: .95rem; }
+.story h4 + p { margin-top: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.3</span>
+  <h1>The Short-Run Aggregate Supply Study Lab</h1>
+  <p class="lede">Short-run aggregate supply (SRAS) shows how much real GDP firms produce at each price level while nominal wages and some other input prices are still stuck. Use the left graph to move along SRAS by changing the price level. Use the right graph to shift SRAS with real-world events and see what happens to real GDP and the price level when AD stays put.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Move along SRAS, then shift it</h2>
+    <p>Teaching numbers: the economy starts at a price level of 100 and real GDP of $1,000 billion. Dashed grey lines show where each graph started.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>A. Change the price level <small>movement along SRAS</small></h3>
+      <svg class="chart" id="along" role="img" aria-label="SRAS graph showing a movement along the curve when the price level changes"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>B. Change a determinant <small>shift of SRAS, AD unchanged</small></h3>
+      <svg class="chart" id="shift" role="img" aria-label="AD and SRAS graph showing a shift of SRAS"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-srpc">SRAS</span><span class="l-ad">AD</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Graph B: pick an SRAS shifter</div>
+      <div class="scen-group"><span class="gl">Decrease in SRAS (shifts left)</span><div class="scenarios" id="scen-left"></div></div>
+      <div class="scen-group"><span class="gl">Increase in SRAS (shifts right)</span><div class="scenarios" id="scen-right"></div></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-pl">Graph A: price level <output id="o-pl"></output></label>
+        <input type="range" id="s-pl" min="85" max="115" step="1">
+        <span class="hint">Nominal wage stays at $20 an hour in the short run</span>
+      </div>
+      <div class="ctl">
+        <label for="s-sh">Graph B: SRAS shift <output id="o-sh"></output></label>
+        <input type="range" id="s-sh" min="-3" max="3" step="0.5">
+        <span class="hint">Left = decrease in SRAS, right = increase</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:16px 24px; flex-wrap:wrap; align-items:center;">
+      <label class="check" for="c-ad"><input type="checkbox" id="c-ad" checked> Show AD on graph B</label>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Graph A: real GDP supplied</div><div class="v" id="r-qs">$1,000B</div></div>
+    <div class="stat"><div class="k">Graph B: SRAS shift</div><div class="v" id="r-dir"><span class="pill lr">None</span></div></div>
+    <div class="stat"><div class="k">Real GDP (AD unchanged)</div><div class="v" id="r-y">$1,000B</div></div>
+    <div class="stat"><div class="k">Price level (AD unchanged)</div><div class="v" id="r-p">100</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Why it slopes up</span><h3>Sticky wages and input prices</h3><p>In the short run, nominal wages are fixed by contracts and norms, and some other input prices are slow to change. When the price level rises, firms get more for their output while costs stay the same. Profit per unit rises, so firms produce more real GDP.</p></div>
+    <div class="card"><span class="tag">Movement</span><h3>Change in quantity supplied</h3><p>A change in the price level moves the economy <b>along</b> the SRAS curve. A higher price level means more real GDP supplied; a lower price level means less. The curve itself does not move.</p></div>
+    <div class="card"><span class="tag">Shift</span><h3>Change in SRAS</h3><p>A change in anything that affects production costs at every price level shifts the whole curve. Higher per-unit costs shift SRAS left (a decrease). Lower per-unit costs shift it right (an increase).</p></div>
+    <div class="card"><span class="tag">Determinants</span><h3>What shifts SRAS</h3><p>Input prices such as wages and oil, productivity, business taxes and subsidies, government regulation, expected inflation, and supply shocks. Each one works through the cost of producing a unit of output.</p></div>
+    <div class="card"><span class="tag">Expectations</span><h3>Expected inflation</h3><p>If workers and firms expect higher inflation, workers ask for higher nominal wages and suppliers raise input prices now. Costs rise at every price level, so SRAS shifts left.</p></div>
+    <div class="card"><span class="tag">Stagflation</span><h3>Negative supply shocks</h3><p>When SRAS shifts left and AD does not change, the price level rises and real GDP falls at the same time. That mix of inflation and falling output is called stagflation, and the price rise is cost-push inflation.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. SRAS cheat sheet</h2>
+    <p>Each row assumes AD does not change. Memorize the direction of the shift first; the price level and real GDP follow from the graph.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Effect on SRAS</th><th>Price level</th><th>Real GDP</th></tr></thead>
+    <tbody>
+      <tr><td>The price level rises</td><td><b>Movement up along</b> SRAS (quantity supplied rises)</td><td>↑ (the cause)</td><td>↑</td></tr>
+      <tr><td>The price level falls</td><td><b>Movement down along</b> SRAS (quantity supplied falls)</td><td>↓ (the cause)</td><td>↓</td></tr>
+      <tr><td>Oil or other commodity prices rise</td><td><span class="shift">Shifts left</span></td><td>↑</td><td>↓</td></tr>
+      <tr><td>Oil or other commodity prices fall</td><td><span class="shift">Shifts right</span></td><td>↓</td><td>↑</td></tr>
+      <tr><td>Nominal wages rise across the economy</td><td><span class="shift">Shifts left</span></td><td>↑</td><td>↓</td></tr>
+      <tr><td>Productivity rises (better technology, training)</td><td><span class="shift">Shifts right</span></td><td>↓</td><td>↑</td></tr>
+      <tr><td>Business taxes rise</td><td><span class="shift">Shifts left</span></td><td>↑</td><td>↓</td></tr>
+      <tr><td>Government subsidizes producers</td><td><span class="shift">Shifts right</span></td><td>↓</td><td>↑</td></tr>
+      <tr><td>New costly government regulation</td><td><span class="shift">Shifts left</span></td><td>↑</td><td>↓</td></tr>
+      <tr><td>Regulation is reduced (deregulation)</td><td><span class="shift">Shifts right</span></td><td>↓</td><td>↑</td></tr>
+      <tr><td>Expected inflation rises</td><td><span class="shift">Shifts left</span></td><td>↑</td><td>↓</td></tr>
+      <tr><td>Negative supply shock (drought, natural disaster)</td><td><span class="shift">Shifts left</span></td><td>↑</td><td>↓</td></tr>
+      <tr><td>Positive supply shock (bumper harvest)</td><td><span class="shift">Shifts right</span></td><td>↓</td><td>↑</td></tr>
+      <tr><td>Consumer spending, government spending, or net exports change</td><td>No shift (these shift <b>AD</b>)</td><td colspan="2">See topic 3.1</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price level</b> (PL). Horizontal axis: <b>Real GDP</b> (or real output). Never "price" and "quantity".</li>
+        <li>Draw SRAS sloping upward and AD sloping downward. Label both curves.</li>
+        <li>Mark the starting equilibrium and drop dashed lines to both axes: PL₁ and Y₁.</li>
+        <li>For a shift, draw SRAS₂ to the correct side, add an arrow, and label the new PL₂ and Y₂ on the axes.</li>
+        <li>In words, name the determinant and the cost link: "Higher oil prices raise production costs, so SRAS shifts left; the price level rises and real GDP falls."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Shifting SRAS when the price level changes. A price level change is a <b>movement along</b> SRAS.</li>
+        <li>Shifting SRAS "up" for a decrease and then drawing it to the right. A decrease in SRAS is a shift <b>left</b> (which also looks up).</li>
+        <li>Saying a negative supply shock lowers the price level. With AD unchanged, a left shift raises the price level and lowers real GDP.</li>
+        <li>Shifting SRAS for a change in consumer or government spending. Spending changes shift AD.</li>
+        <li>Calling a subsidy a cost. A subsidy lowers firms' net costs, so SRAS shifts <b>right</b>; a business tax shifts it left.</li>
+        <li>Mixing up SRAS and LRAS. Sticky wages explain the upward slope of SRAS; in the long run wages adjust and LRAS is vertical.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.3. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  // Lab.market works in a 0..10 space with slope 0.8. Teaching-number mapping:
+  //   price level PL = 75 + 5y  (y = 5 -> 100)
+  //   real GDP    Y  = 800 + 40x ($ billions; x = 5 -> 1,000)
+  var K = 0.8, WAGE = 20;
+  function toPL(y) { return 75 + 5 * y; }
+  function toY(x) { return 800 + 40 * x; }
+  function fromPL(pl) { return (pl - 75) / 5; }
+
+  // Each SRAS shifter: label, shift (negative = left), and the cost reason.
+  var SHIFTERS = {
+    oilUp:   { b: "Oil prices rise", sh: -2, k: "Input prices", why: "Oil is an input for transportation and for making many goods. A higher oil price raises the cost of producing each unit of output." },
+    wageUp:  { b: "Nominal wages rise", sh: -2, k: "Input prices", why: "Wages are the largest cost for most firms. When nominal wages rise across the economy, the cost of producing each unit of output rises." },
+    taxUp:   { b: "Business taxes rise", sh: -1.5, k: "Business taxes", why: "A higher tax on businesses acts like a higher cost of production, so firms supply less at each price level." },
+    regUp:   { b: "Costly new regulation", sh: -1.5, k: "Government regulation", why: "Complying with new rules takes paperwork, equipment, and labor. That raises the cost of producing each unit of output." },
+    expUp:   { b: "Expected inflation rises", sh: -2, k: "Expected inflation", why: "When workers and firms expect higher inflation, workers bargain for higher nominal wages and suppliers raise input prices now. Costs rise at every price level." },
+    shockN:  { b: "Drought (negative supply shock)", sh: -2.5, k: "Supply shock", why: "A drought suddenly destroys crops and raises the cost of food and other farm inputs. This is a negative supply shock." },
+    oilDown: { b: "Oil prices fall", sh: 2, k: "Input prices", why: "Cheaper oil lowers transportation and production costs, so each unit of output costs less to make." },
+    prodUp:  { b: "Productivity rises", sh: 2, k: "Productivity", why: "Better technology or better-trained workers produce more output per hour. With the same wages, the cost of each unit of output falls." },
+    subsidy: { b: "Subsidies to producers", sh: 1.5, k: "Business subsidies", why: "A government subsidy pays firms part of their costs, so their net cost of producing each unit falls." },
+    dereg:   { b: "Regulations reduced", sh: 1.5, k: "Government regulation", why: "Fewer or simpler rules cut compliance costs, so each unit of output costs less to make." },
+    expDown: { b: "Expected inflation falls", sh: 1.5, k: "Expected inflation", why: "When people expect less inflation, wage and input-price increases are smaller. Costs are lower at every price level than they would have been." },
+    shockP:  { b: "Bumper harvest (positive supply shock)", sh: 2.5, k: "Supply shock", why: "An unusually large harvest lowers the cost of food and farm inputs. This is a positive supply shock." }
+  };
+  var LEFT = ["oilUp", "wageUp", "taxUp", "regUp", "expUp", "shockN"];
+  var RIGHT = ["oilDown", "prodUp", "subsidy", "dereg", "expDown", "shockP"];
+
+  var BASE = { pl: 110, sh: -2, key: "oilUp", ad: true };
+  var S = Object.assign({}, BASE);
+
+  // ---------- Model ----------
+  function along(pl) { var y = fromPL(pl), x = 5 + (y - 5) / K; return { x: x, y: y, Y: toY(x) }; }
+  function eqB(sh) { var x = 5 + sh / 2, y = 5 - K * sh / 2; return { x: x, y: y, Y: toY(x), PL: toPL(y) }; }
+
+  // ---------- Graphs ----------
+  var svgA = document.getElementById("along"), svgB = document.getElementById("shift");
+  function drawA() {
+    var p0 = along(100), p = along(S.pl), moved = Math.abs(S.pl - 100) > 0.01;
+    Lab.market(svgA, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      supply: { shift: 0, label: " " },
+      extra: function (F) {
+        if (moved) {
+          Lab.dot(F, p0.x, p0.y, "var(--ghost)", true, "Y₁", "PL₁");
+          var ax0 = p0.x + (p.x - p0.x) * 0.15, ax1 = p0.x + (p.x - p0.x) * 0.85;
+          var off = 0.55;
+          Lab.arrow(F, ax0 - off, 5 + K * (ax0 - 5) + off, ax1 - off, 5 + K * (ax1 - 5) + off, "var(--muted)");
+          Lab.dot(F, p.x, p.y, "var(--ink)", true, "Y₂", "PL₂");
+        } else {
+          Lab.dot(F, p.x, p.y, "var(--ink)", true, "Y₁", "PL₁");
+        }
+        Lab.tag(F, 8.9, 8.9, "SRAS", "var(--srpc)", "end");
+        Lab.tag(F, 0.4, 9.4, "Nominal wage: $" + WAGE + "/hr (fixed)", "var(--muted)");
+      }
+    });
+  }
+  function drawB() {
+    var sh = S.sh, big = Math.abs(sh) >= 1.25;
+    Lab.market(svgB, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: 0, label: "AD", color: S.ad ? "var(--accent)" : "transparent" },
+      supply: { shift: sh, label: sh === 0 ? "SRAS₁" : "SRAS₂" },
+      start: { supply: 0 },
+      eqLabels: sh === 0 ? ["Y₁", "PL₁"] : big ? ["Y₂", "PL₂"] : null,
+      startLabels: big ? ["Y₁", "PL₁"] : null,
+      extra: function (F, eq, fns) {
+        if (sh !== 0) Lab.tag(F, 9.6, fns.S(0)(9.6) + (sh > 0 ? 0.5 : -0.9), "SRAS₁", "var(--muted)", "end");
+      }
+    });
+  }
+
+  // ---------- Story ----------
+  var f = Lab.fmt;
+  function money(v) { return "$" + Math.round(v).toLocaleString("en-US") + "B"; }
+  function storyA() {
+    var p = along(S.pl), real = WAGE * 100 / S.pl;
+    if (Math.abs(S.pl - 100) < 0.01) {
+      return "<h4>Graph A: moving along SRAS</h4><p>At a price level of 100, firms supply <b>" + money(p.Y) + "</b> of real GDP. The nominal wage is $20 an hour, so the real wage is also $20. Slide the price level to see the economy move along the curve.</p>";
+    }
+    var up = S.pl > 100;
+    return "<h4>Graph A: moving along SRAS</h4><p>The price level " + (up ? "rises" : "falls") + " from 100 to <b>" + S.pl + "</b>. Nominal wages are set by contracts, so they stay at $20 an hour. In real terms, that wage is now worth <b>$" + f(real, 2) + "</b> (20 × 100 ÷ " + S.pl + "). " +
+      (up ? "Firms sell their output for more while labor costs stay the same, so profit per unit rises. Firms hire more workers and produce more."
+          : "Firms sell their output for less while labor costs stay the same, so profit per unit falls. Firms cut back production.") +
+      " Real GDP supplied " + (up ? "rises" : "falls") + " from $1,000B to <b>" + money(p.Y) + "</b>. This is a <b>change in quantity supplied</b>, a movement " + (up ? "up" : "down") + " along SRAS. The curve does not shift.</p>";
+  }
+  function storyB() {
+    var e = eqB(S.sh), sh = S.sh;
+    var head = "<h4>Graph B: shifting SRAS</h4>";
+    if (sh === 0) return head + "<p>No determinant has changed, so SRAS₁ stays put. AD and SRAS cross at a price level of 100 and real GDP of $1,000B. Pick an event above to shift SRAS.</p>";
+    var sc = S.key && SHIFTERS[S.key] && Math.sign(SHIFTERS[S.key].sh) === Math.sign(sh) ? SHIFTERS[S.key] : null;
+    var left = sh < 0;
+    var lead = sc ? "<b>" + sc.b + "</b> (" + sc.k.toLowerCase() + "). " + sc.why + " "
+                  : "<b>A determinant of SRAS changed.</b> Per-unit production costs " + (left ? "rose" : "fell") + ". ";
+    lead += left ? "Firms supply less real GDP at every price level, so SRAS <b>decreases</b> and shifts <b>left</b> to SRAS₂."
+                 : "Firms supply more real GDP at every price level, so SRAS <b>increases</b> and shifts <b>right</b> to SRAS₂.";
+    var res = "<p>With AD unchanged, the price level " + (left ? "rises" : "falls") + " from 100 to <b>" + f(e.PL, 0) + "</b> and real GDP " + (left ? "falls" : "rises") + " from $1,000B to <b>" + money(e.Y) + "</b>. ";
+    res += left ? "Higher prices with lower output is <b>stagflation</b>, and the price rise is <b>cost-push inflation</b>. An AP answer says: SRAS shifts left, PL increases, real GDP decreases, unemployment increases."
+                : "Lower prices with higher output is the best case for the economy. An AP answer says: SRAS shifts right, PL decreases, real GDP increases, unemployment decreases.";
+    res += "</p>";
+    if (!S.ad) res += "<p>AD is hidden on the graph, but the results above still assume AD has not moved.</p>";
+    return head + "<p>" + lead + "</p>" + res;
+  }
+
+  // ---------- Controls ----------
+  var elPL = document.getElementById("s-pl"), elSH = document.getElementById("s-sh"), elAD = document.getElementById("c-ad");
+  var allBtns = [];
+  function render() {
+    elPL.value = S.pl; elSH.value = S.sh; elAD.checked = S.ad;
+    document.getElementById("o-pl").textContent = S.pl;
+    document.getElementById("o-sh").textContent = S.sh === 0 ? "none" : (S.sh < 0 ? "left " : "right ") + Math.abs(S.sh);
+    allBtns.forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.key === S.key && Math.abs(S.sh - SHIFTERS[S.key].sh) < 1e-9 ? "true" : "false"); });
+    drawA(); drawB();
+    var p = along(S.pl), e = eqB(S.sh);
+    document.getElementById("r-qs").textContent = money(p.Y) + " at PL " + S.pl;
+    document.getElementById("r-dir").innerHTML = S.sh < 0 ? '<span class="pill infl">Left (decrease)</span>' : S.sh > 0 ? '<span class="pill lr">Right (increase)</span>' : '<span class="pill lr">None</span>';
+    document.getElementById("r-y").textContent = (S.sh < 0 ? "↓ " : S.sh > 0 ? "↑ " : "") + money(e.Y);
+    document.getElementById("r-p").textContent = (S.sh < 0 ? "↑ " : S.sh > 0 ? "↓ " : "") + f(e.PL, 0);
+    document.getElementById("story").innerHTML = storyA() + storyB();
+  }
+  elPL.addEventListener("input", function () { S.pl = parseFloat(elPL.value); render(); });
+  elSH.addEventListener("input", function () { S.sh = parseFloat(elSH.value); S.key = null; render(); });
+  elAD.addEventListener("change", function () { S.ad = elAD.checked; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = { pl: 100, sh: 0, key: null, ad: true }; render(); });
+
+  function addBtns(keys, host) {
+    keys.forEach(function (k) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = SHIFTERS[k].b; b.dataset.key = k;
+      b.addEventListener("click", function () { S.key = k; S.sh = SHIFTERS[k].sh; render(); });
+      host.appendChild(b); allBtns.push(b);
+    });
+  }
+  addBtns(LEFT, document.getElementById("scen-left"));
+  addBtns(RIGHT, document.getElementById("scen-right"));
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following best explains why the short-run aggregate supply curve slopes upward?", o: ["Consumers buy more when the price level falls", "Higher interest rates reduce investment at higher price levels", "Nominal wages and some input prices are slow to adjust, so a higher price level raises profit per unit", "Firms can always adjust all input prices immediately"], c: 2, w: "Sticky nominal wages and input prices mean a higher price level raises the price firms receive faster than their costs. Profit per unit rises, so firms produce more. Choices A and B describe why AD slopes downward, not SRAS." },
+    { s: "Assume aggregate demand does not change. A sharp increase in the world price of oil will most likely cause which of the following in the short run?", o: ["The price level rises and real GDP falls", "The price level falls and real GDP rises", "The price level rises and real GDP rises", "The price level falls and real GDP falls"], c: 0, w: "Oil is a key input, so its higher price shifts SRAS left. Along an unchanged AD curve, the price level rises and real GDP falls. That is stagflation." },
+    { s: "Which of the following would shift the short-run aggregate supply curve to the right?", o: ["An increase in nominal wages across the economy", "An increase in labor productivity", "An increase in business taxes", "An increase in the price level"], c: 1, w: "Higher productivity lowers the cost of each unit of output, so SRAS shifts right. Higher wages and business taxes shift SRAS left. A higher price level is a movement along SRAS, not a shift." },
+    { s: "The price level rises from 100 to 110 while all determinants of short-run aggregate supply stay the same. This causes:", o: ["A leftward shift of SRAS", "A rightward shift of SRAS", "A leftward shift of AD", "A movement up along SRAS to a higher quantity of real GDP supplied"], c: 3, w: "A change in the price level changes the quantity of real GDP supplied. That is a movement along the curve. Only a change in a determinant, such as input prices, shifts SRAS." },
+    { s: "A worker's nominal wage is fixed by contract at $30 an hour. The price level rises from 100 to 120 before the contract can be renegotiated. What is the worker's real wage, measured in base-year dollars?", o: ["$36.00", "$30.00", "$25.00", "$24.00"], c: 2, w: "Real wage = nominal wage × (100 ÷ price level) = $30 × 100 ÷ 120 = $25. Because the real cost of labor fell, firms want to produce more, which is why SRAS slopes upward. $36 multiplies instead of divides." },
+    { s: "Workers and firms come to expect a higher rate of inflation next year. In the short run, the SRAS curve will:", o: ["Shift right, because firms expect to sell at higher prices", "Shift left, because workers demand higher nominal wages and input prices rise", "Not shift, because only actual inflation affects SRAS", "Become vertical at full-employment output"], c: 1, w: "Higher expected inflation leads to higher nominal wage demands and input prices now. Production costs rise at every price level, so SRAS shifts left." },
+    { s: "On a correctly labeled AD–SRAS graph, the economy starts at price level PL₁ and real GDP Y₁. The government then gives producers a per-unit subsidy, and AD does not change. Compared with PL₁ and Y₁, the new equilibrium has:", o: ["A higher price level and lower real GDP", "A higher price level and higher real GDP", "A lower price level and lower real GDP", "A lower price level and higher real GDP"], c: 3, w: "A subsidy lowers firms' net cost of production, so SRAS shifts right to SRAS₂. Along the same AD curve, the new intersection is at PL₂ below PL₁ and Y₂ above Y₁." },
+    { s: "Which of the following would NOT shift the short-run aggregate supply curve?", o: ["An increase in consumer spending", "A drought that destroys much of the wheat crop", "New environmental rules that raise production costs", "A decrease in the price of steel and other raw materials"], c: 0, w: "Consumer spending is a component of aggregate demand, so a change in it shifts AD. A drought (supply shock), costly regulation, and cheaper raw materials (input prices) all shift SRAS." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.3");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.3", compact: true, storageKey: "topic-3.3" });</script>
+</body>
+</html>

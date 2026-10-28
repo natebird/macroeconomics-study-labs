@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Costs of Inflation Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.board { display: grid; gap: 0; }
+.who { display: grid; grid-template-columns: minmax(0, 1.25fr) 104px minmax(0, 1fr) minmax(0, 1.6fr); gap: 6px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.who:last-child { border-bottom: 0; }
+.who h4 { margin: 0; font-size: .95rem; font-weight: 600; }
+.who .sub { font-size: .8rem; color: var(--muted); }
+.who .why-txt { font-size: .86rem; }
+.who .verdict { text-align: center; }
+.pill.neu { background: var(--paper); color: var(--muted); border: 1px solid var(--rule); }
+.bar { display: grid; gap: 3px; }
+.bar .track { position: relative; height: 14px; border-radius: 4px; background: var(--paper); border: 1px solid var(--rule); overflow: hidden; }
+.bar .track::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 2px; background: var(--ink); transform: translateX(-1px); }
+.bar .fill { position: absolute; top: 0; bottom: 0; transition: width .25s ease, left .25s ease; }
+.bar .num { font-family: var(--mono); font-size: .78rem; color: var(--muted); display: flex; justify-content: space-between; }
+.board-head { display: grid; grid-template-columns: minmax(0, 1.25fr) 104px minmax(0, 1fr) minmax(0, 1.6fr); gap: 16px; font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-family: var(--mono); padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+@media (prefers-reduced-motion: reduce) { .bar .fill { transition: none; } }
+@media (max-width: 860px) {
+  .board-head { display: none; }
+  .who { grid-template-columns: minmax(0, 1fr) auto; }
+  .who .bar, .who .why-txt { grid-column: 1 / -1; }
+  .who .verdict { text-align: right; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 2 · Topic 2.5</span>
+  <h1>Costs of Inflation Study Lab</h1>
+  <p class="lede">Inflation erodes the purchasing power of money, and when it is unanticipated it moves purchasing power from some people to others. Set the inflation rate people expected and the rate that actually happened, then watch who gains, who loses, and who is protected. Even fully anticipated inflation has costs, and the lab tracks those too.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Winners and losers simulator</h2>
+    <p>Everyone made plans a year ago using the expected inflation rate. Loans were signed at a nominal rate of 3% plus expected inflation. Then actual inflation arrived.</p>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-exp">Expected inflation <output id="o-exp"></output></label>
+        <input type="range" id="s-exp" min="0" max="10" step="0.5">
+        <span class="hint">What lenders, borrowers, and workers planned on when they signed contracts</span>
+      </div>
+      <div class="ctl">
+        <label for="s-act">Actual inflation <output id="o-act"></output></label>
+        <input type="range" id="s-act" min="-2" max="15" step="0.5">
+        <span class="hint">What really happened to the price level this year (below 0 = deflation)</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-match" type="button">Make it fully anticipated</button>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Unanticipated inflation</div><div class="v" id="r-u"></div></div>
+    <div class="stat"><div class="k">Nominal rate on fixed loan</div><div class="v" id="r-i"></div></div>
+    <div class="stat"><div class="k">Real rate actually paid</div><div class="v" id="r-r"></div></div>
+    <div class="stat"><div class="k">$100 in cash now buys</div><div class="v" id="r-pp"></div></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:4px;">Who gains, who loses <small style="font-weight:400; color:var(--muted);">bar = real gain or loss, as a % of the amount</small></h3>
+    <div class="board-head" aria-hidden="true"><span>Person</span><span style="text-align:center;">Result</span><span>Real gain or loss</span><span>Why</span></div>
+    <div class="board" id="board"></div>
+    <p style="margin:10px 0 0; font-size:.84rem; color:var(--muted);">Most bars compare the result with the plan the person made using expected inflation. The retiree and cash saver bars compare with stable prices, because a fixed pension and cash lose purchasing power to any inflation, expected or not.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Purchasing power of cash <small>real value of $100 over 10 years</small></h3>
+      <svg class="chart" id="pp" role="img" aria-label="Line graph of the real value of 100 dollars in cash over ten years at the expected and actual inflation rates"></svg>
+      <div class="legend"><span class="l-ad">At actual inflation</span><span class="l-ghost">At expected inflation</span></div>
+    </div>
+    <div class="card graph-card">
+      <h3>Real interest rate <small>planned vs. what borrowers actually paid</small></h3>
+      <svg class="chart" id="rr" role="img" aria-label="Bar chart of the planned real interest rate and the real rate actually paid on fixed-rate and variable-rate loans"></svg>
+      <div class="legend"><span class="l-ghost">Planned (3%)</span><span class="l-srpc">Fixed-rate loan</span><span class="l-lrpc">Variable-rate loan</span></div>
+    </div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Purchasing power</span><h3>Inflation erodes money's value</h3><p>When the price level rises, each dollar buys fewer goods and services. Cash and any income fixed in dollars, such as a pension with no cost-of-living adjustment, lose purchasing power whether or not the inflation was expected.</p></div>
+    <div class="card"><span class="tag">Expected vs. surprise</span><h3>Anticipated vs. unanticipated inflation</h3><p>Anticipated inflation can be built into nominal interest rates and wage contracts, so it causes little redistribution. Unanticipated inflation catches people locked into contracts at the wrong rate, and purchasing power moves from one side of the contract to the other.</p></div>
+    <div class="card"><span class="tag">r = i − π</span><h3>Borrowers vs. lenders</h3><p>A fixed nominal rate includes the inflation lenders expected. If actual inflation is higher, the real rate falls: borrowers repay with dollars that buy less, so borrowers gain and lenders lose. If inflation is lower than expected, or prices fall, the reverse happens.</p></div>
+    <div class="card"><span class="tag">Real wage ≈ % ΔW − π</span><h3>Real wages and real income</h3><p>Real income is what your income can buy. A worker whose raise was fixed using expected inflation loses real income when inflation comes in higher, and the employer gains. A cost-of-living adjustment (COLA) raises pay with the price index and protects the real wage.</p></div>
+    <div class="card"><span class="tag">Even if anticipated</span><h3>Shoe-leather and menu costs</h3><p>Shoe-leather costs are the time and effort people spend holding less cash, such as extra trips to the bank. Menu costs are the real costs firms pay to change listed prices, such as reprinting menus and price tags. Both grow as inflation rises.</p></div>
+    <div class="card"><span class="tag">Measuring stick</span><h3>Unit-of-account costs</h3><p>Money is the unit we measure value in. Inflation makes that measure less reliable, which distorts decisions. Taxes are a key example: people can pay tax on nominal gains that are not real gains. In hyperinflation all of these costs become severe.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Who wins and who loses</h2>
+    <p>Memorize the middle column. To get the last column, flip every result.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Person or group</th><th>Why they are exposed</th><th>Inflation higher than expected</th><th>Inflation lower than expected (or deflation)</th></tr></thead>
+    <tbody>
+      <tr><td>Borrower with a fixed-rate loan</td><td>Repays a fixed number of dollars</td><td><b>Gains</b>: repays with dollars that buy less</td><td>Loses: real burden of the debt rises</td></tr>
+      <tr><td>Lender or bank with fixed-rate loans</td><td>Receives a fixed number of dollars</td><td>Loses: real interest rate earned is lower than planned</td><td><b>Gains</b></td></tr>
+      <tr><td>Retiree on a fixed pension (no COLA)</td><td>Income fixed in dollars</td><td>Loses purchasing power</td><td><b>Gains</b> if prices fall; loses less if inflation is just lower</td></tr>
+      <tr><td>Worker with a multi-year fixed wage contract</td><td>Raise set using expected inflation</td><td>Loses: real wage below plan</td><td><b>Gains</b>: real wage above plan</td></tr>
+      <tr><td>Employer paying fixed wages</td><td>Pays a fixed number of dollars</td><td><b>Gains</b>: real labor cost falls</td><td>Loses</td></tr>
+      <tr><td>Saver holding cash</td><td>Cash pays 0% nominal interest</td><td>Loses purchasing power</td><td><b>Gains</b> if prices fall</td></tr>
+      <tr><td>Worker with a COLA</td><td>Pay rises with the price index</td><td>Protected</td><td>Protected</td></tr>
+      <tr><td>Borrower or lender with a variable-rate loan</td><td>Rate resets with inflation</td><td>Protected</td><td>Protected</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Writing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Answers that earn points</h3>
+      <ul>
+        <li>Name the direction and give the reason in one sentence: "Unanticipated inflation helps borrowers with fixed-rate loans because they repay with dollars that have less purchasing power."</li>
+        <li>Show the real interest rate work: <b>real rate = nominal rate − inflation</b>. A 7% loan with 5% inflation has a real rate of 7 − 5 = 2%.</li>
+        <li>Show the real wage work the same way: % change in real wage ≈ % change in nominal wage − inflation rate. A 4% raise with 6% inflation is a real wage change of about −2%.</li>
+        <li>Use the word <b>unanticipated</b> (or "unexpected") when you explain redistribution. Graders look for the link between expectations and contracts.</li>
+        <li>If asked about anticipated inflation, say it still has costs: shoe-leather costs, menu costs, and unit-of-account costs.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Saying inflation hurts everyone. Borrowers with fixed-rate loans and employers paying fixed wages gain from unanticipated inflation.</li>
+        <li>Saying higher prices always cut real income. If nominal income rises as fast as prices, real income is unchanged.</li>
+        <li>Forgetting that the results flip when inflation is lower than expected or when prices fall. Deflation helps lenders and hurts borrowers.</li>
+        <li>Mixing up shoe-leather costs (people holding less cash) with menu costs (firms changing prices).</li>
+        <li>Treating a COLA or a variable-rate loan as exposed. Both adjust with inflation, so they protect against surprises.</li>
+        <li>Confusing a high price level with inflation. Inflation is the rate at which the price level rises.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 2.5. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-2.html">Unit 2 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { pe: 2, pa: 6 };
+  var S = Object.assign({}, BASE);
+  var R = 3;          // planned real interest rate on loans (%)
+  var RAISE = 1;      // planned real raise in the fixed wage contract (%)
+  var f = Lab.fmt;
+  function money(v) { return "$" + Math.round(v).toLocaleString("en-US"); }
+  function pct(v) { return (v > 0.04 ? "+" : v < -0.04 ? "−" : "") + f(Math.abs(v)) + "%"; }
+
+  // ---------- Model ----------
+  // AP approximation: real change ≈ nominal change − inflation.
+  // d = real gain (+) or loss (−) in % of the amount: compared with the person's plan,
+  // or with stable prices for rows marked ref: "stable" (cash and un-indexed pensions).
+  function model(s) {
+    var pe = s.pe, pa = s.pa, u = pa - pe;
+    var i = R + pe;                   // fixed nominal loan rate (Fisher: planned real rate + expected inflation)
+    var rFixed = i - pa;              // real rate actually paid / earned
+    var iVar = R + pa;                // variable rate resets with actual inflation
+    var w = RAISE + pe;               // nominal raise locked into the contract
+    var people = [
+      { id: "borrow", name: "Borrower, fixed-rate loan", sub: "Borrowed $10,000", d: u,
+        why: "Owes " + f(i) + "% nominal. With " + f(pa) + "% inflation the real rate is " + f(i) + " − " + f(pa) + " = " + f(rFixed) + "%, " + cmp(rFixed, R, "below", "above") + " the planned 3%." },
+      { id: "lend", name: "Lender or bank", sub: "Made that $10,000 fixed-rate loan", d: -u,
+        why: "Earns " + f(i) + "% nominal, a real return of about " + f(rFixed) + "% instead of the planned 3%. The dollars repaid buy " + (u > 0.04 ? "less" : u < -0.04 ? "more" : "what was planned") + "." },
+      { id: "retire", name: "Retiree, fixed pension", sub: "$2,000 a month, no COLA", d: -pa, ref: "stable",
+        why: "The pension is fixed in dollars. It now buys about " + money(2000 * (1 - pa / 100)) + " of last year's goods. " + (pa > 0.04 ? "Any inflation cuts a fixed income, expected or not." : pa < -0.04 ? "Falling prices raise the real value of a fixed income." : "Prices are stable, so purchasing power holds.") },
+      { id: "fixedw", name: "Worker, 3-year fixed wage contract", sub: "Raise locked in at " + f(w) + "% a year", d: -u,
+        why: "Planned a 1% real raise (" + f(w) + "% nominal − " + f(pe) + "% expected). Real wage change ≈ " + f(w) + " − " + f(pa) + " = " + pct(w - pa) + ". " + (u > 0.04 ? "The employer gains what the worker loses." : u < -0.04 ? "The employer pays more in real terms than planned." : "") },
+      { id: "cola", name: "Worker with a COLA", sub: "Raise = 1% + actual inflation", d: 0,
+        why: "Pay rises " + f(RAISE + pa) + "% automatically, tied to the price index. Real wage change ≈ " + f(RAISE + pa) + " − " + f(pa) + " = +1.0%, as planned." },
+      { id: "cash", name: "Saver, cash under the mattress", sub: "$1,000 in cash, 0% interest", d: -pa, ref: "stable",
+        why: "Cash earns 0% nominal, so its real return is about " + pct(-pa) + ". The $1,000 now buys about " + money(1000 * (1 - pa / 100)) + " of last year's goods." },
+      { id: "var", name: "Borrower, variable-rate loan", sub: "Rate = 3% + actual inflation", d: 0,
+        why: "The rate reset to " + f(iVar) + "% nominal, so the real rate stays " + f(iVar) + " − " + f(pa) + " = 3.0%. Neither borrower nor lender is surprised." }
+    ];
+    return { pe: pe, pa: pa, u: u, i: i, rFixed: rFixed, iVar: iVar, w: w, people: people, pp10: 100 / Math.pow(1 + pa / 100, 10) };
+  }
+  function cmp(a, b, lo, hi) { return Math.abs(a - b) < 0.05 ? "the same as" : a < b ? lo : hi; }
+  function verdict(d) { return d > 0.04 ? "gain" : d < -0.04 ? "lose" : "none"; }
+
+  // ---------- Board ----------
+  var board = document.getElementById("board");
+  var rows = {};
+  model(S).people.forEach(function (p) {
+    var row = document.createElement("div"); row.className = "who";
+    row.innerHTML = '<div><h4></h4><div class="sub"></div></div><div class="verdict"></div>' +
+      '<div class="bar"><div class="track"><div class="fill"></div></div><div class="num"><span>−15</span><span class="val"></span><span>+15</span></div><div class="ref" style="font-size:.74rem; color:var(--muted);"></div></div>' +
+      '<div class="why-txt"></div>';
+    board.appendChild(row);
+    rows[p.id] = row;
+  });
+  function drawBoard(m) {
+    m.people.forEach(function (p) {
+      var r = rows[p.id], v = verdict(p.d);
+      r.querySelector("h4").textContent = p.name;
+      r.querySelector(".sub").textContent = p.sub;
+      r.querySelector(".verdict").innerHTML = v === "gain" ? '<span class="pill lr">Gains</span>' : v === "lose" ? '<span class="pill infl">Loses</span>' : '<span class="pill neu">Unaffected</span>';
+      var w = Math.min(15, Math.abs(p.d)) / 15 * 50;
+      var fill = r.querySelector(".fill");
+      fill.style.width = w + "%";
+      fill.style.left = (p.d >= 0 ? 50 : 50 - w) + "%";
+      fill.style.background = p.d >= 0 ? "var(--good)" : "var(--bad)";
+      r.querySelector(".val").textContent = pct(p.d);
+      r.querySelector(".why-txt").textContent = p.why;
+      r.querySelector(".ref").textContent = p.ref === "stable" ? "Real change vs. stable prices" : "Real change vs. plan";
+      r.querySelector(".track").setAttribute("aria-label", p.name + ": real " + (p.d >= 0 ? "gain" : "loss") + " of " + f(Math.abs(p.d)) + "% compared with " + (p.ref === "stable" ? "stable prices" : "plan"));
+      r.querySelector(".track").setAttribute("role", "img");
+    });
+  }
+
+  // ---------- Graphs ----------
+  var svgPP = document.getElementById("pp"), svgRR = document.getElementById("rr");
+  function drawPP(m) {
+    var F = Lab.frame(svgPP, { x: [0, 10], y: [0, 140], xLabel: "Years from now", yLabel: "Real value of $100 ($)",
+      xTicks: [0, 2, 4, 6, 8, 10], yTicks: [0, 20, 40, 60, 80, 100, 120, 140],
+      fmtX: function (v) { return v; }, fmtY: function (v) { return v; } });
+    Lab.hline(F, 100, "var(--muted)", 1, "2 4");
+    function path(p) { return function (t) { return 100 / Math.pow(1 + p / 100, t); }; }
+    var endE = path(m.pe)(10), endA = m.pp10;
+    var close = Math.abs(endE - endA) < 9;
+    if (!close || Math.abs(m.u) > 0.04) Lab.fn(F, path(m.pe), "var(--ghost)", 2, "6 5");
+    Lab.fn(F, path(m.pa), "var(--accent)", 3);
+    Lab.dot(F, 10, endA, "var(--accent)", false);
+    var up = endA >= endE;
+    Lab.tag(F, 9.6, endA + (close ? (up ? 7 : -9) : (up ? 6 : -8)) , "$" + f(endA, 0) + " at " + f(m.pa) + "%", "var(--accent)", "end");
+    if (!close) Lab.tag(F, 9.6, endE + (up ? -8 : 6), "$" + f(endE, 0) + " at " + f(m.pe) + "% expected", "var(--muted)", "end");
+    if (Math.abs(endA - 100) > 12 && Math.abs(endE - 100) > 12) Lab.tag(F, 9.6, 103, "Stable prices", "var(--muted)", "end");
+  }
+  function drawRR(m) {
+    var names = { 1: "Planned", 2: "Fixed rate", 3: "Variable rate" };
+    var F = Lab.frame(svgRR, { x: [0.4, 3.6], y: [-14, 16], xLabel: "Loan type", yLabel: "Real interest rate (%)",
+      xTicks: [1, 2, 3], yTicks: [-12, -8, -4, 0, 4, 8, 12, 16],
+      fmtX: function (v) { return names[v] || ""; }, fmtY: function (v) { return v + "%"; } });
+    Lab.hline(F, 0, "var(--ink)", 1.5);
+    Lab.hline(F, R, "var(--ghost)", 1.5, "6 5");
+    var bars = [[1, R, "var(--ghost)"], [2, m.rFixed, "var(--srpc)"], [3, R, "var(--lrpc)"]];
+    bars.forEach(function (b) {
+      Lab.rect(F, b[0] - 0.28, 0, b[0] + 0.28, b[1], b[2], 0.85);
+      var y = b[1] >= 0 ? b[1] + 1.2 : b[1] - 2.4;
+      Lab.tag(F, b[0], y, f(b[1]) + "%", b[0] === 1 ? "var(--muted)" : b[2], "middle");
+    });
+  }
+
+  // ---------- Story ----------
+  function level(p) { var a = Math.abs(p); return a < 0.05 ? "none" : a <= 3 ? "small" : a <= 8 ? "noticeable" : "large"; }
+  function story(m) {
+    var html = "", u = m.u;
+    var gains = m.people.filter(function (p) { return verdict(p.d) === "gain"; }).map(function (p) { return p.name.toLowerCase(); });
+    var loses = m.people.filter(function (p) { return verdict(p.d) === "lose"; }).map(function (p) { return p.name.toLowerCase(); });
+    var lead;
+    if (Math.abs(u) < 0.05) lead = "<b>Inflation was fully anticipated</b> (expected " + f(m.pe) + "%, actual " + f(m.pa) + "%). Lenders built it into the " + f(m.i) + "% nominal rate and workers built it into their raises, so loan and wage contracts redistribute nothing." +
+      (m.pa > 0.04 ? " Cash and un-indexed pensions still lose purchasing power." : m.pa < -0.04 ? " Cash and un-indexed pensions still gain purchasing power because prices fell." : "");
+    else if (u > 0) lead = "<b>Inflation came in " + f(u) + " points higher than expected</b> (expected " + f(m.pe) + "%, actual " + f(m.pa) + "%). That is <b>unanticipated inflation</b>. Contracts written in dollars were set using the wrong rate, so purchasing power moves from the people being paid fixed dollars to the people paying them.";
+    else lead = "<b>Inflation came in " + f(-u) + " points lower than expected</b> (expected " + f(m.pe) + "%, actual " + f(m.pa) + "%)" + (m.pa < 0 ? ", and prices actually fell (deflation)" : "") + ". The surprise runs the other way: lenders and workers on fixed-wage contracts gain, and borrowers and employers lose.";
+    html += "<p>" + lead + "</p><ul>";
+    html += "<li><b>Fixed-rate loan:</b> nominal rate " + f(m.i) + "% = 3% planned real rate + " + f(m.pe) + "% expected inflation. Real rate actually paid = " + f(m.i) + " − " + f(m.pa) + " = <b>" + f(m.rFixed) + "%</b>. " +
+      (u > 0.04 ? "The borrower gains and the lender loses because the loan is repaid with dollars that buy less." : u < -0.04 ? "The lender gains and the borrower loses because the dollars repaid buy more than planned." : "Neither side gains.") + "</li>";
+    html += "<li><b>Real wages and real income:</b> the contract worker's real wage changes by about " + pct(m.w - m.pa) + " instead of the planned +1.0%. The COLA worker gets exactly +1.0% because pay tracks the price index.</li>";
+    if (Math.abs(m.pa) >= 0.05) html += "<li><b>Purchasing power:</b> at " + f(m.pa) + "% a year, $100 in cash is worth about $" + f(m.pp10, 0) + " in today's dollars after 10 years. Cash and fixed pensions " + (m.pa > 0 ? "lose" : "gain") + " purchasing power whether the inflation was expected or not.</li>";
+    else html += "<li><b>Purchasing power:</b> prices are stable, so cash and fixed pensions keep their real value.</li>";
+    html += "</ul>";
+    if (gains.length || loses.length) html += "<p><b>Gain:</b> " + (gains.join("; ") || "nobody") + ". <b>Lose:</b> " + (loses.join("; ") || "nobody") + ".</p>";
+    var lv = level(m.pa);
+    var costs;
+    if (lv === "none") costs = "With zero inflation there are no shoe-leather, menu, or unit-of-account costs.";
+    else if (m.pa < 0) costs = "Deflation still forces firms to change prices (menu costs) and still distorts money as a measuring stick (unit-of-account costs). Shoe-leather costs disappear because holding cash now earns a real return.";
+    else costs = "These costs are <b>" + lv + "</b> at " + f(m.pa) + "% and exist even when inflation is anticipated: <b>shoe-leather costs</b> (people make extra trips to keep less cash), <b>menu costs</b> (firms reprint menus and price tags more often), and <b>unit-of-account costs</b> (money is a less reliable measure of value, and people pay tax on nominal gains that are not real gains)." + (lv === "large" ? " At rates like this, people spend real resources avoiding cash, which is why hyperinflation is so damaging." : "");
+    html += "<p>" + costs + "</p>";
+    html += "<p><b>AP answer:</b> " + (u > 0.04 ? "unanticipated inflation helps borrowers with fixed-rate loans and hurts lenders, savers holding cash, and people on fixed incomes, because fixed dollar amounts lose purchasing power." : u < -0.04 ? "inflation lower than expected helps lenders and hurts borrowers with fixed-rate loans, because the dollars repaid have more purchasing power than planned." : "fully anticipated inflation does not redistribute income through contracts, but it still erodes the value of cash and fixed incomes and still has shoe-leather, menu, and unit-of-account costs.") + "</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elE = document.getElementById("s-exp"), elA = document.getElementById("s-act");
+  function render() {
+    var m = model(S);
+    elE.value = S.pe; elA.value = S.pa;
+    document.getElementById("o-exp").textContent = f(S.pe) + "%";
+    document.getElementById("o-act").textContent = f(S.pa) + "%";
+    drawBoard(m); drawPP(m); drawRR(m);
+    var ru = document.getElementById("r-u");
+    ru.innerHTML = Math.abs(m.u) < 0.05 ? '<span class="pill lr">0.0 pts</span>' : '<span class="pill ' + (m.u > 0 ? "infl" : "rec") + '">' + (m.u > 0 ? "+" : "−") + f(Math.abs(m.u)) + " pts</span>";
+    document.getElementById("r-i").textContent = f(m.i) + "%";
+    document.getElementById("r-r").textContent = f(m.rFixed) + "%";
+    document.getElementById("r-pp").textContent = "$" + f(100 * (1 - m.pa / 100), 0) + " of goods";
+    document.getElementById("story").innerHTML = story(m);
+  }
+  elE.addEventListener("input", function () { S.pe = parseFloat(elE.value); render(); });
+  elA.addEventListener("input", function () { S.pa = parseFloat(elA.value); render(); });
+  document.getElementById("btn-match").addEventListener("click", function () { S.pa = S.pe; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Surprise inflation (2% expected, 6% actual)", { pe: 2, pa: 6 }],
+    ["Fully anticipated (3% and 3%)", { pe: 3, pa: 3 }],
+    ["Inflation lower than expected (6% expected, 2% actual)", { pe: 6, pa: 2 }],
+    ["Surprise deflation (2% expected, −2% actual)", { pe: 2, pa: -2 }],
+    ["High but anticipated (10% and 10%)", { pe: 10, pa: 10 }],
+    ["Inflation spike (3% expected, 15% actual)", { pe: 3, pa: 15 }],
+    ["Price stability (0% and 0%)", { pe: 0, pa: 0 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following people is most likely to benefit from unanticipated inflation?", o: ["A bank that made loans at a fixed interest rate", "A homeowner repaying a fixed-rate mortgage", "A retiree living on a fixed pension", "A family that keeps its savings in cash"], c: 1, w: "The homeowner repays a fixed number of dollars, and those dollars buy less than expected. The real interest rate is lower than planned. The bank, the retiree, and the cash holder all receive fixed dollar amounts and lose purchasing power." },
+    { s: "A bank makes a one-year loan at a fixed nominal interest rate of 7%. Over the year the inflation rate turns out to be 5%. What real interest rate did the bank actually earn?", o: ["2%", "5%", "7%", "12%"], c: 0, w: "Real interest rate = nominal rate − inflation rate = 7% − 5% = 2%. Adding the two (12%) is the most common error." },
+    { s: "A worker's nominal wage rises by 4% in a year in which the price level rises by 6%. The worker's real wage:", o: ["rises by about 10%", "rises by about 2%", "is unchanged because her nominal wage rose", "falls by about 2%"], c: 3, w: "% change in real wage ≈ % change in nominal wage − inflation = 4% − 6% = −2%. Her pay rose in dollars, but it buys less than before." },
+    { s: "During a period of high inflation, people keep less cash and make more frequent trips to the bank. The cost of this extra time and effort is called:", o: ["menu costs", "unit-of-account costs", "shoe-leather costs", "the inflation tax on lenders"], c: 2, w: "Shoe-leather costs are the resources people use to avoid holding cash when inflation is high. Menu costs are the costs firms pay to change listed prices." },
+    { s: "If inflation is fully anticipated and built into all interest rates and wage contracts, which of the following is true?", o: ["Borrowers still gain at the expense of lenders", "Inflation redistributes little income through contracts, but menu and shoe-leather costs remain", "Inflation has no costs of any kind", "Workers with fixed wage contracts lose real income"], c: 1, w: "When everyone expects the inflation, nominal rates and raises already include it, so no one is surprised and there is little redistribution. Firms must still change prices and people still economize on cash, so menu and shoe-leather costs remain." },
+    { s: "A bank lends at a fixed rate, expecting 4% inflation. Actual inflation is 1%. Who gains from the difference?", o: ["The borrower, because the real interest rate is lower than expected", "Neither, because the nominal interest rate was fixed in advance", "The borrower, because she repays with dollars that buy less", "The bank, because the real interest rate it earns is higher than expected"], c: 3, w: "Inflation was 3 points lower than expected, so the real rate is 3 points higher than planned. The dollars repaid buy more than expected, which helps the lender and hurts the borrower." },
+    { s: "Which person is best protected against unanticipated inflation?", o: ["A worker whose wage has a cost-of-living adjustment tied to the CPI", "A retiree on a pension with no cost-of-living adjustment", "A worker on a three-year contract with fixed annual raises", "A lender holding fixed-rate bonds"], c: 0, w: "A COLA raises pay automatically with the price index, so the real wage holds steady whatever inflation turns out to be. The other three receive fixed dollar amounts set in advance." },
+    { s: "Because of rapid inflation, a restaurant must reprint its menus every few weeks. This expense is an example of:", o: ["shoe-leather costs", "unit-of-account costs", "menu costs", "a loss of real income for the restaurant's lenders"], c: 2, w: "Menu costs are the real costs of changing listed prices: reprinting menus, relabeling shelves, updating catalogs. They exist even when inflation is anticipated." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("2.5");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [2], topic: "2.5", compact: true, storageKey: "topic-2.5" });</script>
+</body>
+</html>

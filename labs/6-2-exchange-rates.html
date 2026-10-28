@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exchange Rates Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.controls.c3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+@media (max-width: 860px) { .controls.c3 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .controls.c3 { grid-template-columns: 1fr; } }
+.ctl-btn { display: grid; align-content: end; gap: 4px; }
+.stat .sub { font-size: .78rem; color: var(--muted); }
+.drill { display: grid; gap: 14px; }
+.drill-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.drill .rule { font-size: .9rem; color: var(--muted); }
+.drill .stem { font-weight: 500; font-size: 1.05rem; }
+.drill .step { display: grid; gap: 8px; }
+.drill .step-h { font-size: .86rem; font-weight: 600; }
+.dopts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 640px) { .dopts { grid-template-columns: 1fr; } }
+.dopt { text-align: left; border-radius: 8px; padding: 9px 14px; width: 100%; }
+.dopt.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.dopt.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.dopt:disabled { cursor: default; }
+.dopt:disabled:not(.right):not(.wrong) { opacity: .55; }
+.fb { font-size: .92rem; color: var(--muted); min-height: 1.4em; }
+.drill-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 6 · Topic 6.2</span>
+  <h1>The Exchange Rates Study Lab</h1>
+  <p class="lede">An exchange rate is the price of one currency in terms of another. Move the rate between the dollar and the euro, watch what happens to the price of each country's goods, and see which currency appreciated. Then practice reading rate changes in the drill until you can do it without thinking.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Dollar and euro converter</h2>
+    <p>The two rate sliders are always reciprocals: move one and the other follows. Grey dashed marks show the starting rate and starting prices. The sellers' prices in their own currencies stay fixed, so every change you see comes from the exchange rate.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>One rate, two ways to write it <small>dollars per euro = 1 ÷ euros per dollar</small></h3>
+      <svg class="chart" id="recip" role="img" aria-label="Graph of dollars per euro against euros per dollar, showing they are reciprocals"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>What foreign buyers pay <small>each good priced in the buyer's currency</small></h3>
+      <svg class="chart" id="prices" role="img" aria-label="Bar chart of the price of a U.S. good in euros and a European good in dollars"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">U.S. good, in euros</span><span class="l-srpc">European good, in dollars</span><span class="l-lrpc">Reciprocal curve</span><span class="l-ghost">Starting rate and prices</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls c3">
+      <div class="ctl">
+        <label for="s-epd">Euros per dollar (€/$) <output id="o-epd"></output></label>
+        <input type="range" id="s-epd" min="0.5" max="2" step="0.01">
+        <span class="hint">The price of one dollar in euros</span>
+      </div>
+      <div class="ctl">
+        <label for="s-dpe">Dollars per euro ($/€) <output id="o-dpe"></output></label>
+        <input type="range" id="s-dpe" min="0.5" max="2" step="0.01">
+        <span class="hint">The price of one euro in dollars</span>
+      </div>
+      <div class="ctl">
+        <label for="s-start">Starting rate (€/$) <output id="o-start"></output></label>
+        <input type="range" id="s-start" min="0.5" max="2" step="0.05">
+        <span class="hint">What the change is measured against</span>
+      </div>
+      <div class="ctl">
+        <label for="s-pus">U.S. good price <output id="o-pus"></output></label>
+        <input type="range" id="s-pus" min="10" max="200" step="5">
+        <span class="hint">Set by the U.S. seller, in dollars</span>
+      </div>
+      <div class="ctl">
+        <label for="s-peu">European good price <output id="o-peu"></output></label>
+        <input type="range" id="s-peu" min="10" max="200" step="5">
+        <span class="hint">Set by the European seller, in euros</span>
+      </div>
+      <div class="ctl-btn">
+        <button id="btn-setstart" type="button">Make this the new starting rate</button>
+        <button id="btn-reset" type="button">Reset to start</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Exchange rate</div><div class="v" id="r-rate">1.25 €/$</div><div class="sub" id="r-rate2"></div></div>
+    <div class="stat"><div class="k">U.S. good in euros</div><div class="v" id="r-us">€75.00</div><div class="sub" id="r-us2"></div></div>
+    <div class="stat"><div class="k">European good in dollars</div><div class="v" id="r-eu">$32.00</div><div class="sub" id="r-eu2"></div></div>
+    <div class="stat"><div class="k">The dollar has</div><div class="v" id="r-st"></div><div class="sub" id="r-st2"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="card drill" id="drill">
+    <div class="drill-top">
+      <h3>Is it appreciation or depreciation?</h3>
+      <span class="score" id="d-score">0 / 0 correct</span>
+    </div>
+    <p class="rule"><b>Rule:</b> in a rate written "A per B", the number is the price of one B. If the number rises, B appreciated and A depreciated. If it falls, B depreciated and A appreciated.</p>
+    <div class="qn tag" id="d-prog"></div>
+    <div class="stem" id="d-stem"></div>
+    <div class="step">
+      <div class="step-h">Step 1. Which currency appreciated?</div>
+      <div class="dopts" id="d-o1"></div>
+      <div class="fb" id="d-f1" aria-live="polite"></div>
+    </div>
+    <div class="step">
+      <div class="step-h">Step 2. What happens to each country's exports and imports?</div>
+      <div class="dopts" id="d-o2"></div>
+      <div class="fb" id="d-f2" aria-live="polite"></div>
+    </div>
+    <div class="drill-btns">
+      <button id="d-next" type="button" class="primary">Next item</button>
+      <button id="d-shuffle" type="button">Reshuffle and start over</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Exchange rate</h3><p>The price of one currency in terms of another. "0.80 euros per dollar" means one dollar costs 0.80 euros. The currency after "per" is the one being priced.</p></div>
+    <div class="card"><span class="tag">1 ÷ rate</span><h3>Reciprocal rates</h3><p>Every rate can be written two ways, and the two numbers are reciprocals. If $1 = €0.80, then €1 = 1 ÷ 0.80 = $1.25. When one number goes up, the other goes down.</p></div>
+    <div class="card"><span class="tag">Stronger</span><h3>Appreciation</h3><p>A currency appreciates when one unit buys more of the other currency. If the rate rises from 1.00 to 1.25 euros per dollar, the dollar appreciated.</p></div>
+    <div class="card"><span class="tag">Weaker</span><h3>Depreciation</h3><p>A currency depreciates when one unit buys less of the other currency. When the dollar appreciates against the euro, the euro depreciates against the dollar. Both happen at once.</p></div>
+    <div class="card"><span class="tag">Trade</span><h3>Exports and imports</h3><p>An appreciating currency makes the country's goods more expensive to foreign buyers and foreign goods cheaper at home. Its exports fall and its imports rise. A depreciating currency does the opposite.</p></div>
+    <div class="card"><span class="tag">Who sets it</span><h3>Floating vs. fixed</h3><p>Under a floating exchange rate, supply and demand in the foreign exchange market set the rate. Under a fixed exchange rate, a government or central bank buys and sells currency to hold the rate at a target.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Exchange rate cheat sheet</h2>
+    <p>Read the label first. Then decide which currency got stronger, and finish the chain to U.S. exports and imports.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Rate change</th><th>Same change, other way</th><th>Dollar</th><th>Other currency</th><th>U.S. exports</th><th>U.S. imports</th></tr></thead>
+    <tbody>
+      <tr><td>€/$ rises: 1.00 → 1.25</td><td>$/€ falls: 1.00 → 0.80</td><td><b>Appreciates</b> (+25%)</td><td>Euro depreciates (−20%)</td><td>↓ (cost more in euros)</td><td>↑ (cost less in dollars)</td></tr>
+      <tr><td>€/$ falls: 1.00 → 0.80</td><td>$/€ rises: 1.00 → 1.25</td><td><span class="shift">Depreciates</span> (−20%)</td><td>Euro appreciates (+25%)</td><td>↑</td><td>↓</td></tr>
+      <tr><td>$/€ rises: 1.10 → 1.30</td><td>€/$ falls: 0.91 → 0.77</td><td><span class="shift">Depreciates</span></td><td>Euro appreciates</td><td>↑</td><td>↓</td></tr>
+      <tr><td>¥/$ rises: 100 → 120</td><td>$/¥ falls: 0.0100 → 0.0083</td><td><b>Appreciates</b></td><td>Yen depreciates</td><td>↓</td><td>↑</td></tr>
+      <tr><td>$/£ falls: 1.40 → 1.20</td><td>£/$ rises: 0.71 → 0.83</td><td><b>Appreciates</b></td><td>Pound depreciates</td><td>↓</td><td>↑</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="card calc" aria-label="Conversion formulas">
+    <div class="row"><span>Price of a U.S. good in euros</span><span class="formula">dollar price × (euros per dollar)</span></div>
+    <div class="row"><span>Price of a European good in dollars</span><span class="formula">euro price × (dollars per euro)</span></div>
+    <div class="row"><span>Switch the way the rate is written</span><span class="formula">$/€ = 1 ÷ (€/$)</span></div>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Writing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Answers that earn points</h3>
+      <ul>
+        <li>Name the currency, the direction, and the other currency: "The dollar <b>appreciates</b> relative to the euro." "Stronger" alone may not earn the point.</li>
+        <li>Show the reciprocal as a step: €1 = 1 ÷ 0.80 = $1.25. Graders want to see the division.</li>
+        <li>Show conversions with units: $60 × 1.25 €/$ = €75. Keep the units so you can tell whether to multiply or divide.</li>
+        <li>For trade effects, give the price link and the result: "U.S. goods become more expensive for Europeans, so U.S. exports to Europe decrease."</li>
+        <li>If asked about net exports, finish it: exports fall and imports rise, so U.S. net exports decrease.</li>
+        <li>On a foreign exchange graph for dollars, label the vertical axis with the price of the dollar (for example, "Euros per dollar") and the horizontal axis "Quantity of dollars".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Reading "dollars per euro rose" as the dollar getting stronger. That number is the price of a <b>euro</b>, so the euro appreciated.</li>
+        <li>Saying both currencies appreciated. If one currency appreciates against a second, the second depreciates against the first.</li>
+        <li>Assuming the two percent changes match. A move from 1.00 to 1.25 €/$ is a 25% appreciation of the dollar but a 20% depreciation of the euro.</li>
+        <li>Saying an appreciation helps a country's exporters. It hurts them, because their goods cost more abroad. It helps that country's importers and consumers of foreign goods.</li>
+        <li>Changing the seller's own price. A U.S. good still costs $60 in the U.S.; only its price in euros changes.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 6.2. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-6.html">Unit 6 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  // e = euros per dollar (price of one dollar in euros). 1/e = dollars per euro.
+  var BASE = { e: 1, e0: 1, pus: 60, peu: 40 };
+  var S = Object.assign({}, BASE, { e: 1.25 });
+  var f = Lab.fmt;
+
+  function r3(v) { var s = f(v, 3); return s.replace(/0$/, ""); }       // 1.250 -> 1.25, 1.205 stays
+  function eur(v) { return "€" + f(v, 2); }
+  function usd(v) { return "$" + f(v, 2); }
+  function pct(v) { return f(Math.abs(v) * 100, 1) + "%"; }
+
+  function model(s) {
+    var d = 1 / s.e, d0 = 1 / s.e0;
+    var dir = Math.abs(s.e - s.e0) < 0.0005 ? 0 : (s.e > s.e0 ? 1 : -1); // +1 dollar appreciated
+    return {
+      d: d, d0: d0, dir: dir,
+      usE: s.pus * s.e, usE0: s.pus * s.e0,          // U.S. good in euros
+      euD: s.peu * d, euD0: s.peu * d0,              // European good in dollars
+      dollarPct: s.e / s.e0 - 1,                     // change in value of the dollar
+      euroPct: s.e0 / s.e - 1                        // change in value of the euro
+    };
+  }
+
+  // ---------- Graphs ----------
+  var svgR = document.getElementById("recip"), svgP = document.getElementById("prices");
+  function drawRecip(m, s) {
+    var F = Lab.frame(svgR, { x: [0.4, 2.1], y: [0.4, 2.1], xLabel: "Euros per dollar (€/$)", yLabel: "Dollars per euro ($/€)",
+      xTicks: [0.5, 1, 1.5, 2], yTicks: [0.5, 1, 1.5, 2], fmtX: function (v) { return f(v, 2); }, fmtY: function (v) { return f(v, 2); } });
+    Lab.fn(F, function (x) { return 1 / x; }, "var(--lrpc)", 3, null, 120);
+    Lab.tag(F, 0.62, 2.0, "$/€ = 1 ÷ (€/$)", "var(--lrpc)");
+    Lab.tag(F, 2.05, 1.05, "dollar stronger →", "var(--muted)", "end");
+    Lab.tag(F, 0.45, 0.62, "← euro stronger", "var(--muted)");
+    if (m.dir !== 0) {
+      Lab.dot(F, s.e0, m.d0, "var(--ghost)", true);
+      Lab.tag(F, s.e0 + 0.05, m.d0 + 0.08, "start", "var(--muted)");
+    }
+    Lab.dot(F, s.e, m.d, "var(--ink)", true);
+    var right = s.e > 1.45;
+    Lab.tag(F, s.e + (right ? -0.06 : 0.06), m.d + 0.12, r3(s.e) + " €/$ = " + r3(m.d) + " $/€", "var(--ink)", right ? "end" : "start");
+  }
+
+  function drawPrices(m, s) {
+    var top = Math.max(m.usE, m.usE0, m.euD, m.euD0) * 1.2;
+    var step = top > 300 ? 100 : top > 150 ? 50 : top > 60 ? 20 : 10;
+    top = Math.ceil(top / step) * step;
+    var ticks = []; for (var v = 0; v <= top + 1e-9; v += step) ticks.push(v);
+    var F = Lab.frame(svgP, { x: [0, 10], y: [0, top], xLabel: "", yLabel: "Price to the foreign buyer",
+      yTicks: ticks, fmtY: function (v) { return String(v); } });
+    var moved = m.dir !== 0;
+    function bar(x0, x1, val, color, op, label) {
+      Lab.rect(F, x0, 0, x1, val, color, op);
+      Lab.el("text", { x: (F.sx(x0) + F.sx(x1)) / 2, y: F.sy(val) - 6, "text-anchor": "middle", "class": "lbl", style: "fill:" + (op < 1 ? "var(--muted)" : color) }, F.svg, label);
+    }
+    // U.S. good (euros)
+    if (moved) bar(0.8, 2.6, m.usE0, "var(--ghost)", 0.55, eur(m.usE0));
+    bar(moved ? 2.8 : 1.7, moved ? 4.6 : 3.5, m.usE, "var(--accent)", 1, eur(m.usE));
+    // European good (dollars)
+    if (moved) bar(5.4, 7.2, m.euD0, "var(--ghost)", 0.55, usd(m.euD0));
+    bar(moved ? 7.4 : 6.3, moved ? 9.2 : 8.1, m.euD, "var(--srpc)", 1, usd(m.euD));
+    var yb = F.H - F.M.b + 16;
+    Lab.el("text", { x: F.sx(2.7), y: yb, "text-anchor": "middle", "class": "lbl", style: "fill:var(--accent)" }, F.svg, "$" + s.pus + " U.S. good, in €");
+    Lab.el("text", { x: F.sx(7.3), y: yb, "text-anchor": "middle", "class": "lbl", style: "fill:var(--srpc)" }, F.svg, "€" + s.peu + " European good, in $");
+    if (moved) Lab.el("text", { x: F.sx(5), y: F.H - 8, "text-anchor": "middle" }, F.svg, "grey = at the starting rate");
+  }
+
+  // ---------- Story ----------
+  function story(m, s) {
+    var html;
+    var rec = "One dollar buys <b>€" + r3(s.e) + "</b>, so one euro costs 1 ÷ " + r3(s.e) + " = <b>$" + r3(m.d) + "</b>. Those two numbers are the same exchange rate written two ways.";
+    if (m.dir === 0) {
+      html = "<p><b>The rate equals the starting rate.</b> " + rec + "</p>" +
+        "<p>A $" + s.pus + " U.S. good costs Europeans " + s.pus + " × " + r3(s.e) + " = " + eur(m.usE) + ". A €" + s.peu + " European good costs Americans " + s.peu + " × " + r3(m.d) + " = " + usd(m.euD) + ". Move a rate slider or pick a scenario to see what appreciation and depreciation do to these prices.</p>";
+      return html;
+    }
+    var up = m.dir > 0;
+    var lead = up
+      ? "<b>The dollar appreciated against the euro, and the euro depreciated against the dollar.</b> "
+      : "<b>The dollar depreciated against the euro, and the euro appreciated against the dollar.</b> ";
+    lead += "One dollar used to buy €" + r3(s.e0) + "; now it buys €" + r3(s.e) + ". Written the other way, one euro used to cost $" + r3(m.d0) + " and now costs $" + r3(m.d) + ".";
+    var p2 = "The dollar " + (up ? "gained " : "lost ") + pct(m.dollarPct) + " of its value in euros, and the euro " + (up ? "lost " : "gained ") + pct(m.euroPct) + " of its value in dollars. The two percentages differ because each one is measured from a different starting number.";
+    var li = [];
+    li.push("<b>U.S. good:</b> the seller still charges $" + s.pus + ". To Europeans it went from " + eur(m.usE0) + " to " + eur(m.usE) + ", so it is " + (up ? "more" : "less") + " expensive. U.S. exports to Europe <b>" + (up ? "decrease" : "increase") + "</b>.");
+    li.push("<b>European good:</b> the seller still charges €" + s.peu + ". To Americans it went from " + usd(m.euD0) + " to " + usd(m.euD) + ", so it is " + (up ? "cheaper" : "more expensive") + ". U.S. imports from Europe <b>" + (up ? "increase" : "decrease") + "</b>.");
+    li.push("<b>Europe's side:</b> European exports to the U.S. " + (up ? "increase" : "decrease") + " and European imports from the U.S. " + (up ? "decrease" : "increase") + ". One country's exports are the other's imports.");
+    var ap = up
+      ? "<b>AP answer:</b> \"The dollar appreciated relative to the euro. U.S. goods become more expensive for Europeans and European goods become cheaper for Americans, so U.S. exports decrease, U.S. imports increase, and U.S. net exports decrease.\""
+      : "<b>AP answer:</b> \"The dollar depreciated relative to the euro. U.S. goods become cheaper for Europeans and European goods become more expensive for Americans, so U.S. exports increase, U.S. imports decrease, and U.S. net exports increase.\"";
+    return "<p>" + lead + "</p><p>" + p2 + "</p><ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul><p>" + ap + "</p>";
+  }
+
+  // ---------- Controls ----------
+  var elE = document.getElementById("s-epd"), elD = document.getElementById("s-dpe"), elS = document.getElementById("s-start");
+  var elU = document.getElementById("s-pus"), elP = document.getElementById("s-peu");
+  function render() {
+    var m = model(S);
+    elE.value = S.e; elD.value = m.d; elS.value = S.e0; elU.value = S.pus; elP.value = S.peu;
+    document.getElementById("o-epd").textContent = "€" + r3(S.e) + " per $1";
+    document.getElementById("o-dpe").textContent = "$" + r3(m.d) + " per €1";
+    document.getElementById("o-start").textContent = r3(S.e0) + " (= " + r3(m.d0) + " $/€)";
+    document.getElementById("o-pus").textContent = "$" + S.pus;
+    document.getElementById("o-peu").textContent = "€" + S.peu;
+    drawRecip(m, S); drawPrices(m, S);
+    document.getElementById("r-rate").textContent = r3(S.e) + " €/$";
+    document.getElementById("r-rate2").textContent = "= " + r3(m.d) + " $/€";
+    document.getElementById("r-us").textContent = eur(m.usE);
+    document.getElementById("r-us2").textContent = m.dir ? "was " + eur(m.usE0) : "$" + S.pus + " × " + r3(S.e);
+    document.getElementById("r-eu").textContent = usd(m.euD);
+    document.getElementById("r-eu2").textContent = m.dir ? "was " + usd(m.euD0) : "€" + S.peu + " × " + r3(m.d);
+    var st = document.getElementById("r-st");
+    st.innerHTML = m.dir > 0 ? '<span class="pill lr">appreciated</span>' : m.dir < 0 ? '<span class="pill infl">depreciated</span>' : '<span class="pill rec">not changed</span>';
+    document.getElementById("r-st2").textContent = m.dir > 0 ? "euro depreciated" : m.dir < 0 ? "euro appreciated" : "vs. starting rate";
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  elE.addEventListener("input", function () { S.e = parseFloat(elE.value); render(); });
+  elD.addEventListener("input", function () { S.e = 1 / parseFloat(elD.value); render(); });
+  elS.addEventListener("input", function () { S.e0 = parseFloat(elS.value); render(); });
+  elU.addEventListener("input", function () { S.pus = parseFloat(elU.value); render(); });
+  elP.addEventListener("input", function () { S.peu = parseFloat(elP.value); render(); });
+  document.getElementById("btn-setstart").addEventListener("click", function () { S.e0 = S.e; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Dollar appreciates: 1.00 → 1.25 €/$", { e0: 1, e: 1.25 }],
+    ["Dollar depreciates: 1.00 → 0.80 €/$", { e0: 1, e: 0.8 }],
+    ["Euro appreciates: $/€ 1.10 → 1.40", { e0: 1 / 1.1, e: 1 / 1.4 }],
+    ["Euro depreciates: $/€ 1.25 → 1.00", { e0: 0.8, e: 1 }],
+    ["Big swing: 0.80 → 0.50 €/$", { e0: 0.8, e: 0.5 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = Object.assign({}, S, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Drill ----------
+  // a, b: currencies (c = name, p = adjective for the country). up = index of the currency that appreciated.
+  var US = { c: "dollar", p: "U.S." }, EUR = { c: "euro", p: "European" };
+  var ITEMS = [
+    { s: "The exchange rate moves from 100 yen per dollar to 120 yen per dollar.", a: US, b: { c: "yen", p: "Japanese" }, up: 0, why: "The number is the price of one dollar in yen. It rose, so one dollar buys more yen. The dollar appreciated and the yen depreciated." },
+    { s: "The exchange rate moves from 1.10 dollars per euro to 1.30 dollars per euro.", a: US, b: EUR, up: 1, why: "The number is the price of one euro in dollars. A euro now costs more dollars, so the euro appreciated and the dollar depreciated." },
+    { s: "The exchange rate moves from 20 pesos per dollar to 17 pesos per dollar.", a: US, b: { c: "peso", p: "Mexican" }, up: 1, why: "One dollar now buys fewer pesos, so the dollar depreciated. One peso now costs 1/17 of a dollar instead of 1/20, so the peso appreciated." },
+    { s: "The exchange rate moves from 1.40 dollars per pound to 1.20 dollars per pound.", a: US, b: { c: "pound", p: "British" }, up: 0, why: "The number is the price of one pound in dollars. A pound now costs fewer dollars, so the pound depreciated and the dollar appreciated." },
+    { s: "The exchange rate moves from 0.90 euros per dollar to 0.75 euros per dollar.", a: US, b: EUR, up: 1, why: "One dollar now buys fewer euros, so the dollar depreciated. The euro rose from 1/0.90 = $1.11 to 1/0.75 = $1.33, so it appreciated." },
+    { s: "The exchange rate moves from 1.25 Canadian dollars per U.S. dollar to 1.40 Canadian dollars per U.S. dollar.", a: { c: "U.S. dollar", p: "U.S." }, b: { c: "Canadian dollar", p: "Canadian" }, up: 0, why: "One U.S. dollar now buys more Canadian dollars, so the U.S. dollar appreciated and the Canadian dollar depreciated." },
+    { s: "One Chinese yuan used to cost $0.15. Now it costs $0.12.", a: US, b: { c: "yuan", p: "Chinese" }, up: 0, why: "The price of a yuan in dollars fell, so the yuan depreciated. A dollar now buys 1/0.12 = 8.33 yuan instead of 1/0.15 = 6.67, so the dollar appreciated." },
+    { s: "A U.S. tourist in India used to get 80 rupees for each dollar. Now she gets 90 rupees for each dollar.", a: US, b: { c: "rupee", p: "Indian" }, up: 0, why: "Each dollar buys more rupees, so the dollar appreciated and the rupee depreciated." },
+    { s: "It now takes more dollars to buy one euro than it did last year.", a: US, b: EUR, up: 1, why: "The price of a euro in dollars went up, so the euro appreciated. Each dollar now buys less of a euro, so the dollar depreciated." },
+    { s: "It now takes fewer yen to buy one dollar than it did last year.", a: US, b: { c: "yen", p: "Japanese" }, up: 1, why: "The price of a dollar in yen went down, so the dollar depreciated and the yen appreciated." },
+    { s: "The exchange rate moves from 1.10 Swiss francs per euro to 0.95 Swiss francs per euro.", a: EUR, b: { c: "Swiss franc", p: "Swiss" }, up: 1, why: "The number is the price of one euro in francs. It fell, so the euro depreciated and the Swiss franc appreciated. The same rule works when neither currency is the dollar." },
+    { s: "The exchange rate moves from 1,200 won per dollar to 1,000 won per dollar.", a: US, b: { c: "won", p: "South Korean" }, up: 1, why: "One dollar now buys fewer won, so the dollar depreciated and the won appreciated." },
+    { s: "The exchange rate moves from 0.20 dollars per Brazilian real to 0.25 dollars per real.", a: US, b: { c: "real", p: "Brazilian" }, up: 1, why: "The number is the price of one real in dollars. A real now costs more dollars, so the real appreciated and the dollar depreciated." },
+    { s: "The price of one dollar, measured in euros, falls from 0.95 to 0.85.", a: US, b: EUR, up: 1, why: "The price of a dollar fell, so the dollar depreciated. The euro appreciated: it rose from 1/0.95 = $1.05 to 1/0.85 = $1.18." }
+  ];
+  var order = [], pos = 0, dRight = 0, dDone = 0;
+  var dStem = document.getElementById("d-stem"), dProg = document.getElementById("d-prog"), dScore = document.getElementById("d-score");
+  var o1 = document.getElementById("d-o1"), o2 = document.getElementById("d-o2"), f1 = document.getElementById("d-f1"), f2 = document.getElementById("d-f2");
+  var dNext = document.getElementById("d-next");
+  function shuffle() {
+    order = ITEMS.map(function (_, i) { return i; });
+    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+    pos = 0; dRight = 0; dDone = 0; show();
+  }
+  function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function effect(x, y) { return x.p + " exports fall and " + x.p + " imports rise; " + y.p + " exports rise and " + y.p + " imports fall"; }
+  function score() { dScore.textContent = dRight + " / " + dDone + " correct"; }
+  function makeBtn(parent, text, ok, onPick) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "dopt"; b.textContent = text; b.dataset.ok = ok ? "1" : "";
+    b.addEventListener("click", function () { onPick(b); });
+    parent.appendChild(b); return b;
+  }
+  function mark(parent, picked) {
+    parent.querySelectorAll("button").forEach(function (x) { x.disabled = true; if (x.dataset.ok) x.classList.add("right"); });
+    var ok = !!picked.dataset.ok; if (!ok) picked.classList.add("wrong");
+    dDone++; if (ok) dRight++; score(); return ok;
+  }
+  function show() {
+    var it = ITEMS[order[pos]], cur = [it.a, it.b], A = cur[it.up], B = cur[1 - it.up];
+    dProg.textContent = "Item " + (pos + 1) + " of " + ITEMS.length;
+    dStem.textContent = it.s;
+    o1.innerHTML = ""; o2.innerHTML = ""; f1.innerHTML = ""; f2.innerHTML = "";
+    dNext.disabled = true; score();
+    cur.forEach(function (c, i) {
+      makeBtn(o1, "The " + c.c + " appreciated", i === it.up, function (b) {
+        var ok = mark(o1, b);
+        f1.innerHTML = (ok ? "<b style='color:var(--good)'>Correct.</b> " : "<b style='color:var(--bad)'>Not quite.</b> ") + it.why;
+        o2.querySelectorAll("button").forEach(function (x) { x.disabled = false; });
+      });
+    });
+    [[it.a, it.b], [it.b, it.a]].forEach(function (pair) {
+      var btn = makeBtn(o2, effect(pair[0], pair[1]), pair[0] === A, function (b) {
+        var ok = mark(o2, b);
+        f2.innerHTML = (ok ? "<b style='color:var(--good)'>Correct.</b> " : "<b style='color:var(--bad)'>Not quite.</b> ") +
+          "The " + A.c + " got stronger, so " + A.p + " goods cost more for foreign buyers and foreign goods cost less for " + A.p + " buyers. " +
+          cap(A.p) + " exports fall and imports rise. The " + B.c + " got weaker, so " + B.p + " exports rise and imports fall.";
+        dNext.disabled = false;
+        if (pos === ITEMS.length - 1) dNext.textContent = "Finished: reshuffle";
+      });
+      btn.disabled = true;
+    });
+    dNext.textContent = "Next item";
+  }
+  dNext.addEventListener("click", function () { if (pos < ITEMS.length - 1) { pos++; show(); } else shuffle(); });
+  document.getElementById("d-shuffle").addEventListener("click", shuffle);
+  shuffle();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "If 1 U.S. dollar exchanges for 0.80 euro, how many dollars does 1 euro cost?", o: ["$0.80", "$1.20", "$1.25", "$1.80"], c: 2, w: "The two rates are reciprocals: 1 ÷ 0.80 = 1.25 dollars per euro. $1.20 is the tempting guess from adding 20%, but the reciprocal of 0.80 is 1.25." },
+    { s: "The exchange rate changes from 110 yen per dollar to 130 yen per dollar. Which of the following is true?", o: ["The yen appreciated against the dollar", "The dollar depreciated against the yen", "Both currencies appreciated", "The dollar appreciated against the yen"], c: 3, w: "The number is the price of one dollar in yen. One dollar now buys more yen, so the dollar appreciated and the yen depreciated. Both currencies cannot appreciate against each other." },
+    { s: "The exchange rate changes from 1.20 dollars per pound to 1.50 dollars per pound. What happens to U.S. exports to Britain and U.S. imports from Britain?", o: ["Exports fall and imports rise", "Exports rise and imports fall", "Both exports and imports rise", "Both exports and imports fall"], c: 1, w: "A pound now costs more dollars, so the pound appreciated and the dollar depreciated. U.S. goods are cheaper for British buyers, so U.S. exports rise. British goods cost more in dollars, so U.S. imports fall." },
+    { s: "A U.S. computer sells for $1,000. The exchange rate changes from 0.90 euros per dollar to 1.10 euros per dollar. What happens to the price of the computer for a buyer in Germany?", o: ["It rises from €900 to €1,100", "It falls from €1,100 to €900", "It falls from €1,111 to €909", "It stays at €1,000 because the dollar price did not change"], c: 0, w: "Price in euros = dollar price × euros per dollar. $1,000 × 0.90 = €900 before and $1,000 × 1.10 = €1,100 after. The dollar appreciated, so U.S. goods cost more in Europe. Choice C divides when it should multiply." },
+    { s: "A German car sells for €40,000. The exchange rate changes from 1.25 dollars per euro to 1.00 dollar per euro. What happens to the price of the car for a U.S. buyer?", o: ["It rises from $50,000 to $62,500", "It stays at $40,000 because the euro price did not change", "It falls from $40,000 to $32,000", "It falls from $50,000 to $40,000"], c: 3, w: "Price in dollars = euro price × dollars per euro. €40,000 × 1.25 = $50,000 before and €40,000 × 1.00 = $40,000 after. The euro depreciated, so European goods became cheaper for Americans." },
+    { s: "The Mexican peso appreciates against the U.S. dollar. Which group in the United States is most likely to benefit?", o: ["U.S. firms that export goods to Mexico", "U.S. consumers who buy goods imported from Mexico", "U.S. tourists who vacation in Mexico", "U.S. firms that buy parts made in Mexico"], c: 0, w: "If the peso appreciates, the dollar depreciates. U.S. goods become cheaper for Mexican buyers, so U.S. exporters sell more. The other three groups buy things priced in pesos, which now cost more dollars." },
+    { s: "The exchange rate rises from 1.00 euro per dollar to 1.25 euros per dollar. By what percent did the euro depreciate against the dollar?", o: ["25%", "20%", "80%", "12.5%"], c: 1, w: "The euro went from 1 ÷ 1.00 = $1.00 to 1 ÷ 1.25 = $0.80. That is a fall of 0.20 ÷ 1.00 = 20%. The dollar appreciated 25%, but the euro's percent change is measured from its own starting price, so it is 20%." },
+    { s: "When the U.S. dollar appreciates against the euro, which of the following is true?", o: ["The euro also appreciates against the dollar", "European goods become cheaper for Americans, so U.S. imports from Europe increase", "U.S. goods become cheaper for Europeans, so U.S. exports increase", "The number of dollars needed to buy one euro rises"], c: 1, w: "A stronger dollar buys more euros, so European goods cost fewer dollars and Americans buy more of them. U.S. goods cost more in euros, so U.S. exports fall. The dollars-per-euro rate falls, and the euro depreciates." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("6.2");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [6], topic: "6.2", compact: true, storageKey: "topic-6.2" });</script>
+</body>
+</html>

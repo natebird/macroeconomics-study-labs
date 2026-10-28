@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scarcity Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub-h { font-size: 1.2rem; }
+.game { display: grid; gap: 14px; align-content: start; }
+.g-count2 { font-family: var(--mono); font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.item { font-family: var(--display); font-size: 1.22rem; font-weight: 600; line-height: 1.35; min-height: 3.3em; }
+.step { display: grid; gap: 6px; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices button { text-align: left; border-radius: 8px; }
+.choices button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.choices button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choices button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choices button:disabled { cursor: default; }
+.fb { border-left: 4px solid var(--rule); padding: 8px 12px; font-size: .93rem; background: var(--paper); border-radius: 0 8px 8px 0; }
+.fb.ok { border-left-color: var(--good); }
+.fb.no { border-left-color: var(--bad); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.bins { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bin { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: .84rem; display: grid; gap: 4px; align-content: start; }
+.bin h4 { margin: 0; font-size: .8rem; font-family: var(--mono); font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.bin ul { margin: 0; padding-left: 16px; display: grid; gap: 3px; }
+.bin .none { color: var(--muted); font-style: italic; }
+.rules { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .88rem; }
+.blocks { display: grid; gap: 12px; }
+.block { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; margin: 0; display: grid; gap: 6px; }
+.block legend { font-weight: 600; font-size: .92rem; padding: 0 4px; }
+.block legend small { font-weight: 400; color: var(--muted); }
+.opt-row { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; font-size: .9rem; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+.opt-row:has(input:checked) { background: var(--accent-soft); }
+.opt-row:has(input:disabled) { opacity: .55; cursor: not-allowed; }
+.opt-row input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+.opt-row .meta { font-family: var(--mono); font-size: .74rem; color: var(--muted); white-space: nowrap; }
+.opt-row .net { font-family: var(--mono); font-size: .82rem; color: var(--ink); white-space: nowrap; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.legend .l-muted { color: var(--ghost); }
+.sticky-chart { align-content: start; align-self: start; position: sticky; top: 12px; }
+@media (max-width: 860px) { .sticky-chart { position: static; } }
+@media (max-width: 520px) { .bins { grid-template-columns: 1fr; } .opt-row { grid-template-columns: auto 1fr; } .opt-row .net { grid-column: 2; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 1 · Topic 1.1</span>
+  <h1>Scarcity Study Lab</h1>
+  <p class="lede">Scarcity means our wants are unlimited but the resources to satisfy them are limited, so every person and every society has to choose. Sort real resources into the factors of production, plan a Saturday with limited hours and money to see what each choice really costs, then drill the vocabulary AP uses to describe economic statements.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Sort it, choose it, label it</h2>
+    <p>Part A covers the resources an economy uses. Part B shows scarcity and opportunity cost for one person. Part C practices positive vs. normative and micro vs. macro.</p>
+  </div>
+
+  <h3 class="sub-h">A. Sorting game: factors of production</h3>
+  <div class="lab">
+    <div class="card game" id="gameA">
+      <div class="g-count2"><span id="a-pos"></span><span id="a-score"></span></div>
+      <p class="item" id="a-item"></p>
+      <div id="a-steps"></div>
+      <div class="btnrow">
+        <button type="button" class="primary" id="a-next">Next item</button>
+        <button type="button" id="a-shuffle">Reshuffle and restart</button>
+      </div>
+      <div class="fb" id="a-fb" aria-live="polite"></div>
+    </div>
+    <div class="card game">
+      <h3>How to decide</h3>
+      <ol class="rules">
+        <li>Found in nature, not made by people (soil, water, minerals, forests, fish): <b>land</b>. Payment: rent.</li>
+        <li>The time and effort people put into work: <b>labor</b>. Payment: wages.</li>
+        <li>A human-made tool, machine, vehicle, or building used to make other goods: <b>physical capital</b>. Payment: interest.</li>
+        <li>Knowledge, skills, and training that make a worker more productive: <b>human capital</b>.</li>
+        <li>Taking a risk to organize the other factors and start or run a business: <b>entrepreneurship</b>. Payment: profit.</li>
+        <li>Money, stocks, and bonds: <b>financial capital</b>. It buys resources but produces nothing by itself, so it is not a factor of production.</li>
+      </ol>
+      <h3>Sorted correctly so far</h3>
+      <div class="bins" id="a-bins"></div>
+    </div>
+  </div>
+
+  <h3 class="sub-h">B. Plan a Saturday: scarcity and opportunity cost</h3>
+  <div class="lab">
+    <div class="card" style="display:grid; gap:10px; align-content:start;">
+      <h3>Your free time: 11 hours <small style="font-family:var(--body); font-weight:400; font-size:.82rem; color:var(--muted);">pick one activity per block</small></h3>
+      <p style="font-size:.86rem; color:var(--muted);">Net value = what the activity is worth to you, plus any pay, minus any money it costs. Pay from a shift arrives next week, so it cannot fund this weekend. Options you cannot afford are greyed out.</p>
+      <div class="blocks" id="blocks"></div>
+    </div>
+    <div class="card graph-card sticky-chart">
+      <h3>Net value of each option <small>dollars</small></h3>
+      <svg class="chart" id="oc" role="img" aria-label="Bar chart of the net value of each Saturday option, with your choice and the next best alternative highlighted"></svg>
+      <div class="legend"><span class="l-ad">Your choice</span><span class="l-srpc">Next best = opportunity cost</span><span class="l-muted">Other options (not part of the cost)</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr)); align-items:end;">
+      <div class="ctl">
+        <label for="s-budget">Spending money this weekend <output id="o-budget"></output></label>
+        <input type="range" id="s-budget" min="0" max="100" step="5">
+        <span class="hint">Less money means fewer options you can afford</span>
+      </div>
+      <label class="check" for="c-test"><input type="checkbox" id="c-test"> Big econ test on Monday (studying is worth more to you)</label>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Money left</div><div class="v" id="r-money"></div></div>
+    <div class="stat"><div class="k">Net value of your plan</div><div class="v" id="r-value"></div></div>
+    <div class="stat"><div class="k">Opportunity cost (next best in each block)</div><div class="v" id="r-oc"></div></div>
+    <div class="stat"><div class="k">All skipped options added up (not the cost)</div><div class="v" id="r-all"></div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <h3 class="sub-h">C. Quick drill: positive or normative? Micro or macro?</h3>
+  <div class="card game" id="gameC">
+    <div class="g-count2"><span id="c-pos"></span><span id="c-score"></span></div>
+    <p class="item" id="c-item"></p>
+    <div id="c-steps" style="display:grid; gap:12px;"></div>
+    <div class="btnrow">
+      <button type="button" class="primary" id="c-next">Next statement</button>
+      <button type="button" id="c-shuffle">Reshuffle and restart</button>
+    </div>
+    <div class="fb" id="c-fb" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Always vs. sometimes</span><h3>Scarcity vs. shortage</h3><p><b>Scarcity</b> is permanent: resources are limited and wants are not, so it applies to every economy and almost every good. A <b>shortage</b> is a temporary market condition where quantity demanded is greater than quantity supplied at the current price. A higher price ends a shortage; nothing ends scarcity.</p></div>
+    <div class="card"><span class="tag">Land · labor · capital · entrepreneurship</span><h3>Factors of production</h3><p>The resources used to make goods and services. Land earns rent, labor earns wages, physical capital earns interest, and entrepreneurship earns profit. Human capital is the skill inside labor. In economics, capital means tools, machines, and buildings, not money.</p></div>
+    <div class="card"><span class="tag">Next best only</span><h3>Trade-offs and opportunity cost</h3><p>Every choice under scarcity is a trade-off. The opportunity cost of a choice is the value of the <b>next best alternative</b> you give up, not the total of every option you skipped. It includes money spent and the value of time. Choose an option when its benefit is at least its opportunity cost.</p></div>
+    <div class="card"><span class="tag">What · how · for whom</span><h3>Three questions, three systems</h3><p>Every society must decide what to produce, how to produce it, and who gets it. A <b>market economy</b> answers through prices and individual choices. A <b>command economy</b> answers through government planning. Real economies are <b>mixed</b>: mostly markets, with some government decisions.</p></div>
+    <div class="card"><span class="tag">Parts vs. whole</span><h3>Microeconomics vs. macroeconomics</h3><p><b>Micro</b> studies individual households, firms, and single markets, such as the price of coffee or how many workers a bakery hires. <b>Macro</b> studies the whole economy: real GDP, the price level, inflation, unemployment, and growth.</p></div>
+    <div class="card"><span class="tag">Is vs. should</span><h3>Positive vs. normative</h3><p>A <b>positive</b> statement describes how the economy works and can be tested with evidence, even if it turns out false. A <b>normative</b> statement is a value judgment about what ought to be. Words like "should", "ought", "fair", "too high", and "better" signal normative.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Factors of production cheat sheet</h2>
+    <p>Memorize the factor, a clear example, and the payment it earns. The last row is the trap AP writers like most.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Factor</th><th>What it is</th><th>Examples</th><th>Payment (income)</th></tr></thead>
+    <tbody>
+      <tr><td><b>Land</b></td><td>Natural resources, not made by people</td><td>Farmland, oil and minerals, forests, rivers, fish</td><td>Rent</td></tr>
+      <tr><td><b>Labor</b></td><td>Human time and effort used in production</td><td>A programmer's hours, a cashier's shift</td><td>Wages</td></tr>
+      <tr><td><b>Physical capital</b></td><td>Human-made goods used to produce other goods</td><td>Tractors, factory buildings, delivery trucks, computers in an office</td><td>Interest</td></tr>
+      <tr><td><b>Human capital</b></td><td>Knowledge and skills that raise a worker's productivity</td><td>A nurse's training, a welder's skills, a college degree</td><td>Higher wages for the worker</td></tr>
+      <tr><td><b>Entrepreneurship</b></td><td>Organizing the other factors and taking business risk</td><td>A founder launching a startup, an inventor bringing a product to market</td><td>Profit</td></tr>
+      <tr><td><span class="shift">Financial capital (not a factor)</span></td><td>Money and financial assets used to buy resources</td><td>Cash, bank deposits, stocks, bonds</td><td>Not counted as a factor payment</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Answering it on the exam</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Moves that earn points</h3>
+      <ul>
+        <li>Define opportunity cost in these words: "the value of the next best alternative given up." Graders look for "next best".</li>
+        <li>When you compute an opportunity cost, include money spent plus the value of time given up, and show the addition, for example $30 ticket + $36 forgone wages = $66.</li>
+        <li>When a question says "capital" in a macro setting, read it as physical capital. An increase in physical capital or human capital raises a country's productive capacity.</li>
+        <li>When asked to identify a factor of production, use the exact AP term: land, labor, physical capital, human capital, or entrepreneurship.</li>
+        <li>To classify a statement, look for value words first. If it says "should" or "fair", it is normative. If it can be checked with data, it is positive.</li>
+        <li>Name the economic system by who decides: prices and individuals (market) or the government (command).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Calling money "capital". A bank deposit or a stock is financial capital. It is not a factor of production.</li>
+        <li>Adding up every option you skipped. Opportunity cost is only the single best alternative you gave up.</li>
+        <li>Forgetting time. Something with a free ticket still has an opportunity cost: the best other use of those hours.</li>
+        <li>Using scarcity and shortage as the same word. A shortage disappears when the price rises to equilibrium; scarcity never disappears.</li>
+        <li>Thinking a positive statement must be true. "Tax cuts always raise tax revenue" is positive because evidence can test it.</li>
+        <li>Mixing up labor and human capital. The hours worked are labor; the skills that make those hours productive are human capital.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 1.1. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-1.html">Unit 1 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Shared sorting-game engine (parts A and C) ----------
+  // cfg: { p: id prefix, steps: [{ key, label, choices: [[k, text], ...] }], items: [{ t, a: { key: k }, w }],
+  //        noun, start, bins: { key, names } (optional) }
+  function makeGame(cfg) {
+    var p = cfg.p, items = cfg.items;
+    var order = items.map(function (_, i) { return i; });
+    var G;
+    var $ = function (id) { return document.getElementById(p + "-" + id); };
+    var btns = {};
+    function reset() { G = { pos: 0, pick: {}, checked: false, right: 0, done: 0, sorted: [] }; }
+    reset();
+    cfg.steps.forEach(function (st) {
+      var wrap = document.createElement("div"); wrap.className = "step";
+      var tg = document.createElement("span"); tg.className = "tag"; tg.textContent = st.label; wrap.appendChild(tg);
+      var box = document.createElement("div"); box.className = "choices"; box.setAttribute("role", "group"); box.setAttribute("aria-label", st.label);
+      btns[st.key] = {};
+      st.choices.forEach(function (c) {
+        var b = document.createElement("button"); b.type = "button"; b.id = p + "-" + st.key + "-" + c[0]; b.textContent = c[1];
+        b.addEventListener("click", function () {
+          if (G.checked || finished()) return;
+          G.pick[st.key] = c[0];
+          if (cfg.steps.every(function (s) { return G.pick[s.key] != null; })) check();
+          draw();
+        });
+        box.appendChild(b); btns[st.key][c[0]] = b;
+      });
+      wrap.appendChild(box); $("steps").appendChild(wrap);
+    });
+    function cur() { return items[order[G.pos]]; }
+    function finished() { return G.pos >= order.length; }
+    function name(key, k) { var st = cfg.steps.filter(function (s) { return s.key === key; })[0]; return st.choices.filter(function (c) { return c[0] === k; })[0][1]; }
+    function setFb(html, cls) { var e = $("fb"); e.className = "fb" + (cls ? " " + cls : ""); e.innerHTML = html; }
+    function check() {
+      var it = cur(); G.checked = true; G.done++;
+      var miss = cfg.steps.filter(function (s) { return G.pick[s.key] !== it.a[s.key]; });
+      var html;
+      if (!miss.length) { G.right++; G.sorted.push(order[G.pos]); html = "<b style='color:var(--good)'>Correct.</b> "; }
+      else html = "<b style='color:var(--bad)'>Not quite.</b> The answer is " + miss.map(function (s) { return "<b>" + name(s.key, it.a[s.key]) + "</b>"; }).join(" and ") + ". ";
+      setFb(html + it.w, miss.length ? "no" : "ok");
+    }
+    function draw() {
+      var fin = finished();
+      $("pos").textContent = fin ? "All " + order.length + " " + cfg.noun + "s done" : cfg.noun.charAt(0).toUpperCase() + cfg.noun.slice(1) + " " + (G.pos + 1) + " of " + order.length;
+      $("score").textContent = G.right + " / " + G.done + " correct";
+      $("item").textContent = fin ? "Final score: " + G.right + " of " + G.done + ". Reshuffle to play again in a new order." : cur().t;
+      var it = fin ? null : cur();
+      cfg.steps.forEach(function (st) {
+        Object.keys(btns[st.key]).forEach(function (k) {
+          var b = btns[st.key][k];
+          b.className = ""; b.disabled = fin || G.checked;
+          b.setAttribute("aria-pressed", G.pick[st.key] === k ? "true" : "false");
+          if (G.checked) { if (k === it.a[st.key]) b.className = "right"; else if (k === G.pick[st.key]) b.className = "wrong"; }
+        });
+      });
+      $("next").disabled = fin;
+      if (cfg.bins) {
+        var bins = $("bins"); bins.innerHTML = "";
+        cfg.bins.names.forEach(function (bn) {
+          var d = document.createElement("div"); d.className = "bin";
+          var h = document.createElement("h4"); h.textContent = bn[1]; d.appendChild(h);
+          var list = G.sorted.filter(function (i) { return items[i].a[cfg.bins.key] === bn[0]; });
+          if (!list.length) { var n = document.createElement("span"); n.className = "none"; n.textContent = "Nothing yet"; d.appendChild(n); }
+          else {
+            var ul = document.createElement("ul");
+            list.forEach(function (i) { var li = document.createElement("li"); li.textContent = items[i].t; ul.appendChild(li); });
+            d.appendChild(ul);
+          }
+          bins.appendChild(d);
+        });
+      }
+    }
+    $("next").addEventListener("click", function () {
+      if (!G.checked && !finished()) G.done++;
+      G.pos++; G.pick = {}; G.checked = false;
+      setFb(finished() ? "Done. Skipped items count as missed." : cfg.start);
+      draw();
+    });
+    $("shuffle").addEventListener("click", function () {
+      for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+      reset(); setFb(cfg.start); draw();
+    });
+    setFb(cfg.start); draw();
+  }
+
+  // ---------- A. Factors of production ----------
+  var FACT = [["land", "Land"], ["labor", "Labor"], ["pk", "Physical capital"], ["hk", "Human capital"], ["ent", "Entrepreneurship"], ["fin", "Not a factor: financial capital"]];
+  var A_ITEMS = [
+    { t: "A tractor a farmer uses to plow her fields", a: { f: "pk" }, w: "A tractor is a human-made machine used to produce crops. Tools, machines, and vehicles used in production are physical capital, and the payment for capital is interest." },
+    { t: "Oil reserves under the ground on a ranch", a: { f: "land" }, w: "Oil is a natural resource. Every gift of nature counts as land, even when it is underground or underwater. The payment for land is rent." },
+    { t: "The medical knowledge a nurse gained in nursing school", a: { f: "hk" }, w: "Knowledge and skills from education and training are human capital. The nurse's hours at the hospital are labor; the training is what makes those hours more productive." },
+    { t: "A factory building where sneakers are made", a: { f: "pk" }, w: "A building used to produce goods is physical capital because people made it. The ground under the factory is land, but the building itself is capital." },
+    { t: "A startup founder risking her savings to launch a new app", a: { f: "ent" }, w: "Taking a personal risk to organize resources and start a business is entrepreneurship. Its reward is profit, and it can also bring losses if the business fails." },
+    { t: "A forest that a company harvests for lumber", a: { f: "land" }, w: "Forests are natural resources, so they are land. The saws and trucks used to harvest the trees would be physical capital." },
+    { t: "The hours a programmer spends writing code", a: { f: "labor" }, w: "Time and effort people spend producing goods and services is labor. The payment for labor is wages." },
+    { t: "A delivery truck owned by a grocery store", a: { f: "pk" }, w: "The truck is a human-made good used to provide a service (delivery), so it is physical capital." },
+    { t: "$50,000 sitting in a company's bank account", a: { f: "fin" }, w: "This is the trick item. Money is financial capital. It cannot produce anything by itself; a firm uses it to buy physical capital, labor, and other resources. When AP says capital, it means physical capital: tools, machines, and buildings." },
+    { t: "Fresh water a farm pumps from a river to irrigate crops", a: { f: "land" }, w: "River water is a natural resource, so it is land. The pump is physical capital." },
+    { t: "A cashier's eight-hour shift at the register", a: { f: "labor" }, w: "The cashier's time and effort is labor, and it earns wages." },
+    { t: "The welding skills a worker learned in a training program", a: { f: "hk" }, w: "Skills gained through training are human capital. They raise how much the worker can produce in each hour of labor." },
+    { t: "An inventor who brings together workers, machines, and materials to sell a new product", a: { f: "ent" }, w: "Combining the other factors of production and taking the risk of a new product is entrepreneurship." },
+    { t: "Shares of stock a family owns in a car company", a: { f: "fin" }, w: "Stocks are financial assets, a claim on a company's profits. Buying shares moves money from one owner to another; it does not add a machine or building to the economy. That makes it financial capital, not a factor of production." },
+    { t: "An engineer's college degree and training", a: { f: "hk" }, w: "Education is the classic example of human capital. Countries that invest in education raise their human capital and their productive capacity." },
+    { t: "The effort of a crew building a new highway", a: { f: "labor" }, w: "The crew's physical work is labor. The bulldozers they drive are physical capital, and the finished highway will also be capital (public infrastructure)." }
+  ];
+  makeGame({ p: "a", noun: "item", items: A_ITEMS,
+    steps: [{ key: "f", label: "Which factor of production is this?", choices: FACT }],
+    bins: { key: "f", names: FACT.map(function (x) { return [x[0], x[0] === "fin" ? "Financial capital (not a factor)" : x[1]]; }) },
+    start: "Read the item and pick a category. You get the reason right away, right or wrong." });
+
+  // ---------- B. Saturday planner ----------
+  // Each option: name, short chart label, worth to the student, pay earned, money cost, worth when there is a test.
+  // Net value = worth + pay - cost. Pay arrives next week, so only cost uses up the budget.
+  var BLOCKS = [
+    { id: "m", name: "Morning", hrs: "9 a.m. to 1 p.m., 4 hours", opts: [
+      { id: "study", n: "Study for the econ test", s: "Study", worth: 30, test: 70, pay: 0, cost: 0 },
+      { id: "work", n: "Work a café shift ($10 an hour)", s: "Café shift", worth: 0, pay: 40, cost: 0 },
+      { id: "sleep", n: "Sleep in and relax", s: "Sleep in", worth: 25, pay: 0, cost: 0 },
+      { id: "shelter", n: "Volunteer at the animal shelter", s: "Shelter", worth: 28, pay: 0, cost: 0 } ] },
+    { id: "a", name: "Afternoon", hrs: "1 to 5 p.m., 4 hours", opts: [
+      { id: "park", n: "Theme park with friends", s: "Theme park", worth: 100, pay: 0, cost: 55 },
+      { id: "soccer", n: "Pick-up soccer", s: "Soccer", worth: 30, pay: 0, cost: 0 },
+      { id: "study", n: "Study for the econ test", s: "Study", worth: 25, test: 55, pay: 0, cost: 0 },
+      { id: "work", n: "Work a café shift ($10 an hour)", s: "Café shift", worth: 0, pay: 40, cost: 0 } ] },
+    { id: "e", name: "Evening", hrs: "6 to 9 p.m., 3 hours", opts: [
+      { id: "concert", n: "Concert", s: "Concert", worth: 75, pay: 0, cost: 40 },
+      { id: "movie", n: "Movie with friends", s: "Movie", worth: 35, pay: 0, cost: 12 },
+      { id: "babysit", n: "Babysit for a neighbor", s: "Babysit", worth: 0, pay: 30, cost: 0 },
+      { id: "games", n: "Family game night", s: "Game night", worth: 20, pay: 0, cost: 0 } ] }
+  ];
+  var BASE = { budget: 70, test: false, pick: { m: "work", a: "park", e: "babysit" } };
+  var S = clone(BASE);
+  function clone(s) { return { budget: s.budget, test: s.test, pick: Object.assign({}, s.pick) }; }
+  function opt(b, id) { return b.opts.filter(function (o) { return o.id === id; })[0]; }
+  function net(o, s) { return (s.test && o.test != null ? o.test : o.worth) + o.pay - o.cost; }
+  function spentExcept(s, skip) { var t = 0; BLOCKS.forEach(function (b) { if (b.id !== skip) t += opt(b, s.pick[b.id]).cost; }); return t; }
+  function affordable(s, b, o) { return spentExcept(s, b.id) + o.cost <= s.budget; }
+  function money(v) { return (v < 0 ? "−$" : "$") + Math.abs(v); }
+
+  // If the plan no longer fits the budget, swap the costliest pick for the best affordable option in its block.
+  function fixBudget(s) {
+    for (var guard = 0; guard < 6; guard++) {
+      if (spentExcept(s, null) <= s.budget) return;
+      var worst = BLOCKS.slice().sort(function (x, y) { return opt(y, s.pick[y.id]).cost - opt(x, s.pick[x.id]).cost; })[0];
+      var fits = worst.opts.filter(function (o) { return affordable(s, worst, o); }).sort(function (x, y) { return net(y, s) - net(x, s); });
+      if (!fits.length) fits = worst.opts.filter(function (o) { return o.cost === 0; }).sort(function (x, y) { return net(y, s) - net(x, s); });
+      s.pick[worst.id] = fits[0].id;
+    }
+  }
+  function bestPlan(s) {
+    var best = null, bv = -1;
+    BLOCKS[0].opts.forEach(function (o0) { BLOCKS[1].opts.forEach(function (o1) { BLOCKS[2].opts.forEach(function (o2) {
+      if (o0.cost + o1.cost + o2.cost > s.budget) return;
+      var v = net(o0, s) + net(o1, s) + net(o2, s);
+      if (v > bv) { bv = v; best = { m: o0.id, a: o1.id, e: o2.id }; }
+    }); }); });
+    return best;
+  }
+
+  function model(s) {
+    var rows = BLOCKS.map(function (b) {
+      var ch = opt(b, s.pick[b.id]);
+      var alts = b.opts.filter(function (o) { return o !== ch; });
+      var ok = alts.filter(function (o) { return affordable(s, b, o); });
+      var blocked = alts.filter(function (o) { return !affordable(s, b, o); });
+      var oc = ok.length ? Math.max.apply(null, ok.map(function (o) { return net(o, s); })) : 0;
+      var nb = ok.filter(function (o) { return net(o, s) === oc; });
+      var rest = ok.filter(function (o) { return nb.indexOf(o) < 0; });
+      return { b: b, ch: ch, v: net(ch, s), oc: oc, nb: nb, rest: rest, blocked: blocked,
+        skipped: ok.reduce(function (t, o) { return t + net(o, s); }, 0) };
+    });
+    var spent = spentExcept(s, null);
+    return { rows: rows, left: s.budget - spent, value: rows.reduce(function (t, r) { return t + r.v; }, 0),
+      oc: rows.reduce(function (t, r) { return t + r.oc; }, 0), all: rows.reduce(function (t, r) { return t + r.skipped; }, 0) };
+  }
+
+  // Build the radio lists
+  var radios = {};
+  var elBlocks = document.getElementById("blocks");
+  BLOCKS.forEach(function (b) {
+    var fs = document.createElement("fieldset"); fs.className = "block";
+    var lg = document.createElement("legend"); lg.innerHTML = b.name + " <small>" + b.hrs + "</small>"; fs.appendChild(lg);
+    b.opts.forEach(function (o) {
+      var id = "p-" + b.id + "-" + o.id;
+      var lab = document.createElement("label"); lab.className = "opt-row"; lab.setAttribute("for", id);
+      var inp = document.createElement("input"); inp.type = "radio"; inp.name = "blk-" + b.id; inp.id = id; inp.value = o.id;
+      inp.addEventListener("change", function () { if (inp.checked) { S.pick[b.id] = o.id; render(); } });
+      var txt = document.createElement("span"); txt.innerHTML = o.n + '<br><span class="meta"></span>';
+      var nv = document.createElement("span"); nv.className = "net";
+      lab.appendChild(inp); lab.appendChild(txt); lab.appendChild(nv);
+      fs.appendChild(lab);
+      radios[id] = { inp: inp, meta: txt.querySelector(".meta"), net: nv, b: b, o: o };
+    });
+    elBlocks.appendChild(fs);
+  });
+
+  var svg = document.getElementById("oc");
+  function drawChart(m, s) {
+    var F = Lab.frame(svg, { x: [0, 120], y: [0, 15], width: 520, height: 420, xLabel: "Net value to the student (dollars)", yLabel: "Options in each time block",
+      xTicks: [0, 20, 40, 60, 80, 100], fmtX: function (v) { return "$" + v; } });
+    m.rows.forEach(function (r, bi) {
+      var top = 15 - bi * 5;
+      Lab.tag(F, 1, top - 0.62, r.b.name, "var(--ink)");
+      r.b.opts.forEach(function (o, oi) {
+        var y = top - 1.5 - oi;
+        var v = net(o, s), col, op, note = "";
+        if (o === r.ch) { col = "var(--accent)"; op = .9; note = " · your choice"; }
+        else if (r.nb.indexOf(o) >= 0) { col = "var(--srpc)"; op = .85; note = " · next best"; }
+        else if (r.blocked.indexOf(o) >= 0) { col = "var(--ghost)"; op = .22; note = " · can't afford"; }
+        else { col = "var(--ghost)"; op = .55; }
+        Lab.rect(F, 0, y - 0.36, v, y + 0.36, col, op);
+        var lc = o === r.ch ? "var(--accent)" : r.nb.indexOf(o) >= 0 ? "var(--srpc)" : "var(--muted)";
+        Lab.tag(F, v + 1.5, y - 0.28, o.s + " $" + v + note, lc);
+      });
+    });
+  }
+
+  function names(list) { return list.map(function (o) { return o.n.replace(/ \(\$10 an hour\)/, "").toLowerCase(); }); }
+  function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function joinOr(a) { return a.length <= 1 ? a.join("") : a.slice(0, -1).join(", ") + " or " + a[a.length - 1]; }
+  function joinAnd(a) { return a.length <= 1 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+
+  function story(m, s) {
+    var h = "<p><b>Scarcity:</b> you have 11 free hours and " + money(s.budget) + " to spend, and you cannot do everything you want. Each time block allows one activity, so every pick is a trade-off.</p><ul>";
+    var bad = [];
+    m.rows.forEach(function (r) {
+      var li = "<b>" + r.b.name + ":</b> you chose " + r.ch.n.replace(/ \(\$10 an hour\)/, "").toLowerCase() + " (net $" + r.v + "). ";
+      if (r.nb.length) {
+        li += "The next best option is " + joinOr(names(r.nb)) + " (net $" + r.oc + "), so the opportunity cost is <b>$" + r.oc + "</b>.";
+        if (r.rest.length) li += " " + cap(joinAnd(names(r.rest))) + (r.rest.length > 1 ? " are" : " is") + " not part of the cost, because you could only have done one thing with that time.";
+      } else li += "No other option fits your budget, so there is no affordable alternative in this block.";
+      if (r.blocked.length) li += " " + cap(joinAnd(names(r.blocked))) + (r.blocked.length > 1 ? " do" : " does") + " not fit your budget with your other picks, so " + (r.blocked.length > 1 ? "they are not alternatives" : "it is not an alternative") + " you gave up.";
+      if (r.oc > r.v) { li += " <b style='color:var(--bad)'>The next best option is worth more than your choice.</b>"; bad.push(r); }
+      h += "<li>" + li + "</li>";
+    });
+    h += "</ul>";
+    h += "<p>Your plan is worth <b>$" + m.value + "</b>. Added together, the three opportunity costs are <b>$" + m.oc + "</b>. Adding up every affordable option you skipped gives $" + m.all + ", which overstates the cost: you could never have done all of those things in the same hours.</p>";
+    if (bad.length) h += "<p>A rational choice picks the option whose benefit is at least its opportunity cost. Here you would be better off if you switched: " + bad.map(function (r) { return "in the " + r.b.name.toLowerCase() + ", " + names(r.nb)[0]; }).join("; ") + ".</p>";
+    else h += "<p>Every pick is worth at least as much as what it gives up, so each choice passes the cost-benefit test.</p>";
+    h += "<p><b>AP answer:</b> opportunity cost is the value of the next best alternative given up when a choice is made.</p>";
+    return h;
+  }
+
+  var elBudget = document.getElementById("s-budget"), elTest = document.getElementById("c-test");
+  function render() {
+    fixBudget(S);
+    var m = model(S);
+    elBudget.value = S.budget; elTest.checked = S.test;
+    document.getElementById("o-budget").textContent = money(S.budget);
+    Object.keys(radios).forEach(function (id) {
+      var R = radios[id];
+      R.inp.checked = S.pick[R.b.id] === R.o.id;
+      R.inp.disabled = !R.inp.checked && !affordable(S, R.b, R.o);
+      var parts = ["worth $" + (S.test && R.o.test != null ? R.o.test : R.o.worth)];
+      if (R.o.pay) parts = ["earn $" + R.o.pay];
+      if (R.o.cost) parts.push("costs $" + R.o.cost);
+      if (R.inp.disabled) parts.push("over budget");
+      R.meta.textContent = parts.join(" · ");
+      R.net.textContent = "net $" + net(R.o, S);
+    });
+    drawChart(m, S);
+    document.getElementById("r-money").textContent = money(m.left);
+    document.getElementById("r-value").textContent = "$" + m.value;
+    document.getElementById("r-oc").textContent = "$" + m.oc;
+    document.getElementById("r-all").innerHTML = '$' + m.all + ' <span class="pill infl">not OC</span>';
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  elBudget.addEventListener("input", function () { S.budget = parseFloat(elBudget.value); render(); });
+  elTest.addEventListener("change", function () { S.test = elTest.checked; render(); });
+
+  var scen = [
+    ["Starting plan", function () { return clone(BASE); }],
+    ["Big test on Monday", function () { var s = clone(BASE); s.test = true; return s; }],
+    ["Tight budget ($15)", function () { return { budget: 15, test: false, pick: { m: "sleep", a: "soccer", e: "movie" } }; }],
+    ["Splurge: theme park and concert", function () { return { budget: 100, test: false, pick: { m: "work", a: "park", e: "concert" } }; }],
+    ["Best plan for this budget", function () { var s = clone(S); s.pick = bestPlan(s); return s; }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { S = x[1](); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- C. Positive/normative and micro/macro drill ----------
+  var C_ITEMS = [
+    { t: "\"If the price of coffee rises, people will buy less coffee.\"", a: { pn: "pos", mm: "micro" }, w: "It describes cause and effect that data can test, so it is positive. It is about one market (coffee), so it is micro." },
+    { t: "\"The government should raise the minimum wage.\"", a: { pn: "norm", mm: "micro" }, w: "\"Should\" signals a value judgment, so it is normative. The minimum wage sets a price in the labor market for low-wage workers, a single market, so AP treats it as micro." },
+    { t: "\"The unemployment rate rose from 4 percent to 6 percent last year.\"", a: { pn: "pos", mm: "macro" }, w: "It is a factual claim you can check, so it is positive. The unemployment rate describes the whole economy, so it is macro." },
+    { t: "\"The central bank ought to lower interest rates to fight the recession.\"", a: { pn: "norm", mm: "macro" }, w: "\"Ought to\" makes it normative. Monetary policy and recessions are about the whole economy, so it is macro." },
+    { t: "\"Cutting income tax rates always increases the government's total tax revenue.\"", a: { pn: "pos", mm: "macro" }, w: "This claim is probably false, but it can be tested with evidence, so it is positive. A positive statement does not have to be true. Total tax revenue is an economy-wide number, so it is macro." },
+    { t: "\"Gasoline taxes are too high.\"", a: { pn: "norm", mm: "micro" }, w: "\"Too high\" is an opinion, so it is normative. It is about the tax on one good, so it is micro." },
+    { t: "\"Reducing inflation is more important than reducing unemployment.\"", a: { pn: "norm", mm: "macro" }, w: "Ranking goals is a value judgment, so it is normative. Inflation and unemployment are economy-wide measures, so it is macro." },
+    { t: "\"A bakery hires two more workers when demand for its bread rises.\"", a: { pn: "pos", mm: "micro" }, w: "It describes what a firm does, which can be observed, so it is positive. One firm's hiring decision is micro." }
+  ];
+  makeGame({ p: "c", noun: "statement", items: C_ITEMS,
+    steps: [
+      { key: "pn", label: "Step 1: Positive or normative?", choices: [["pos", "Positive (what is)"], ["norm", "Normative (what should be)"]] },
+      { key: "mm", label: "Step 2: Micro or macro?", choices: [["micro", "Microeconomics"], ["macro", "Macroeconomics"]] }
+    ],
+    start: "Answer both steps. Feedback appears as soon as you pick the second one." });
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Scarcity exists because", o: ["prices are too high for many people to afford", "human wants are unlimited while the resources to satisfy them are limited", "governments restrict how much firms can produce", "some goods sell out when they are priced too low"], c: 1, w: "Scarcity is the basic condition of limited resources and unlimited wants. It applies to rich and poor countries alike. Goods selling out at a low price describes a shortage, which is a different idea." },
+    { s: "Which of the following is an example of physical capital?", o: ["The money a firm borrows from a bank to expand", "The cooking skills a chef learned in culinary school", "Crude oil under the ocean floor", "A delivery van a bakery uses to carry bread to stores"], c: 3, w: "Physical capital is a human-made good used to produce other goods and services, like the van. Borrowed money is financial capital, the chef's skills are human capital, and crude oil is land." },
+    { s: "Jae has a free Saturday evening. He could work a shift that pays $45, babysit for $35, or volunteer, which he values at $20. He uses free tickets to go to a concert instead. What is the opportunity cost of the concert?", o: ["$45", "$100", "$35", "$0, because the tickets were free"], c: 0, w: "Opportunity cost is the value of the next best alternative, which is the $45 shift. Adding all three options ($100) is the classic mistake: Jae could only have done one of them. Free tickets do not make the concert free, because he still gives up the use of his time." },
+    { s: "Priya pays $30 for a concert ticket. If she skipped the concert, her next best use of the time would be a 3-hour shift at $12 per hour. What is Priya's opportunity cost of going to the concert?", o: ["$30", "$36", "$66", "$6"], c: 2, w: "She gives up the $30 she could have spent on something else plus the $36 (3 × $12) she could have earned. $30 + $36 = $66. Answers of $30 or $36 count only one of the two costs." },
+    { s: "Which of the following is a normative statement?", o: ["A higher tax on cigarettes will reduce the number of cigarettes sold.", "The unemployment rate fell last quarter.", "The government should spend more on public schools.", "If interest rates rise, firms will borrow less."], c: 2, w: "\"Should\" signals a value judgment, so C is normative. The other three are positive: each one is a claim about how the world works that evidence could test." },
+    { s: "Which question would a macroeconomist be most likely to study?", o: ["How does a rise in the overall price level affect real GDP?", "How does a frost in Florida affect the price of oranges?", "How many workers should a bakery hire?", "Why do sneaker prices rise when a new style becomes popular?"], c: 0, w: "The price level and real GDP describe the whole economy, so A is macro. The other three are about a single market or a single firm, which is microeconomics." },
+    { s: "Concert tickets are priced below the market equilibrium, and many fans who are willing to pay the posted price cannot get tickets. This situation is best described as", o: ["scarcity, which a lower ticket price would eliminate", "a surplus, because the venue sold every seat", "scarcity, which exists only for luxury goods", "a shortage, which a higher ticket price would reduce or eliminate"], c: 3, w: "When quantity demanded is greater than quantity supplied at the current price, the market has a shortage. Raising the price toward equilibrium reduces it. Scarcity is different: it never goes away, and it applies to all goods, not only luxuries." },
+    { s: "In a market economy, the question of who gets the goods and services that are produced is answered mainly by", o: ["a central planning agency that assigns goods to households", "people's incomes and their willingness to pay market prices", "custom and tradition handed down over generations", "a rule that every household receives an equal share"], c: 1, w: "In a market economy, prices ration goods: people who are willing and able to pay the price get the good. A planning agency answers this question in a command economy, and tradition answers it in a traditional economy." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("1.1");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [1], topic: "1.1", compact: true, storageKey: "topic-1.1" });</script>
+</body>
+</html>

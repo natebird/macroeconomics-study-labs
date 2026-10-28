@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AD–AS Equilibrium Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.lab .graph-card { align-content: start; }
+#adas { cursor: grab; touch-action: pan-y; }
+#adas.dragging { cursor: grabbing; }
+.graph-card .controls { grid-template-columns: 1fr 1fr; margin-top: 6px; }
+.stat .sub { font-size: .76rem; color: var(--muted); margin-top: 2px; }
+.practice { display: grid; gap: 10px; align-content: start; }
+.practice .ask { font-size: .9rem; font-weight: 500; }
+.choice { display: flex; flex-wrap: wrap; gap: 6px; }
+.choice button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.choice button.ok { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choice button.no { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.p-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.p-feedback { font-size: .9rem; border-top: 1px dashed var(--rule); padding-top: 8px; display: grid; gap: 4px; }
+.p-feedback:empty { display: none; }
+@media (max-width: 520px) { .graph-card .controls { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.5</span>
+  <h1>The AD–AS Equilibrium Study Lab</h1>
+  <p class="lede">Short-run equilibrium is where aggregate demand crosses short-run aggregate supply. Comparing that point with LRAS tells you whether the economy is in long-run equilibrium, a recessionary gap, or an inflationary gap, and whether unemployment is above or below the natural rate. Drag the curves to see each case, then practice reading graphs on your own.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Find the gap</h2>
+    <p>Dashed grey lines show long-run equilibrium (real GDP of $1,000 billion at a price level of 100). Drag AD or SRAS left and right on the graph, or use the sliders. The shaded band is the output gap between short-run output and full-employment output (Y<sub>f</sub>).</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>AD–AS model <small>drag AD or SRAS</small></h3>
+      <svg class="chart" id="adas" role="img" aria-label="AD–AS graph with aggregate demand, short-run aggregate supply, and long-run aggregate supply"></svg>
+      <div class="controls">
+        <div class="ctl">
+          <label for="s-ad">Aggregate demand <output id="o-ad"></output></label>
+          <input type="range" id="s-ad" min="-2" max="2" step="0.25">
+          <span class="hint">Left = decrease, right = increase</span>
+        </div>
+        <div class="ctl">
+          <label for="s-sras">Short-run aggregate supply <output id="o-sras"></output></label>
+          <input type="range" id="s-sras" min="-2" max="2" step="0.25">
+          <span class="hint">Left = higher input costs</span>
+        </div>
+      </div>
+      <div class="tag" style="margin-top:6px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+      <div><button id="btn-reset" type="button">Reset to long-run equilibrium</button></div>
+    </div>
+    <div class="card graph-card practice">
+      <h3>Label this graph <small id="p-score">0 / 0 correct</small></h3>
+      <svg class="chart" id="practice" role="img" aria-label="Practice AD–AS graph"></svg>
+      <div class="ask" id="p-ask1">1. What state is this economy in?</div>
+      <div class="choice" id="p-gap" role="group" aria-labelledby="p-ask1">
+        <button type="button" data-v="rec" aria-pressed="false">Recessionary gap</button>
+        <button type="button" data-v="lr" aria-pressed="false">Long-run equilibrium</button>
+        <button type="button" data-v="infl" aria-pressed="false">Inflationary gap</button>
+      </div>
+      <div class="ask" id="p-ask2">2. Unemployment compared with the natural rate?</div>
+      <div class="choice" id="p-un" role="group" aria-labelledby="p-ask2">
+        <button type="button" data-v="above" aria-pressed="false">Above</button>
+        <button type="button" data-v="equal" aria-pressed="false">Equal to</button>
+        <button type="button" data-v="below" aria-pressed="false">Below</button>
+      </div>
+      <div class="p-actions">
+        <button type="button" class="primary" id="p-check" disabled>Check answer</button>
+        <button type="button" id="p-next">New graph</button>
+      </div>
+      <div class="p-feedback" id="p-feedback" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Aggregate demand (AD)</span><span class="l-srpc">Short-run aggregate supply (SRAS)</span><span class="l-lrpc">Long-run aggregate supply (LRAS)</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Real GDP vs. Y<sub>f</sub></div><div class="v" id="r-y">$1,000B</div><div class="sub" id="r-y2">Y<sub>f</sub> = $1,000B</div></div>
+    <div class="stat"><div class="k">Price level</div><div class="v" id="r-pl">100</div><div class="sub" id="r-pl2">started at 100</div></div>
+    <div class="stat"><div class="k">Unemployment rate</div><div class="v" id="r-u">5.0%</div><div class="sub" id="r-u2">natural rate 5.0%</div></div>
+    <div class="stat"><div class="k">State of the economy</div><div class="v" id="r-gap"><span class="pill lr">Long-run equilibrium</span></div><div class="sub" id="r-gap2">output gap $0B</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">AD = SRAS</span><h3>Short-run equilibrium</h3><p>The price level and real GDP where the AD curve crosses the SRAS curve. This is where the economy actually is right now, and it can sit to the left of, on, or to the right of LRAS.</p></div>
+    <div class="card"><span class="tag">AD = SRAS = LRAS</span><h3>Long-run equilibrium</h3><p>All three curves cross at one point. Real GDP equals potential output (Y<sub>f</sub>), unemployment equals the natural rate, and cyclical unemployment is zero. Unemployment is not zero.</p></div>
+    <div class="card"><span class="tag">Y &lt; Y<sub>f</sub></span><h3>Recessionary gap</h3><p>AD and SRAS cross to the left of LRAS. Real GDP is below potential, so it is a negative output gap. Firms need fewer workers, so unemployment is above the natural rate.</p></div>
+    <div class="card"><span class="tag">Y &gt; Y<sub>f</sub></span><h3>Inflationary gap</h3><p>AD and SRAS cross to the right of LRAS. Real GDP is above potential, so it is a positive output gap. Firms push workers and machines past normal use, so unemployment is below the natural rate.</p></div>
+    <div class="card"><span class="tag">Y − Y<sub>f</sub></span><h3>Output gap</h3><p>Output gap = actual real GDP − potential real GDP. Divide by potential and multiply by 100 to get it as a percent. A negative number is a recessionary gap; a positive number is an inflationary gap.</p></div>
+    <div class="card"><span class="tag">Read the x-axis</span><h3>Output decides the gap</h3><p>The type of gap depends only on where short-run output sits relative to Y<sub>f</sub>. A high price level alone does not mean an inflationary gap. An oil price shock raises the price level and still creates a recessionary gap.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Reading the AD–AS graph</h2>
+    <p>The first three rows are the three states. The rest start from long-run equilibrium and show the short-run result of one shift. Memorize both halves.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Situation</th><th>Where AD meets SRAS</th><th>Output gap</th><th>Unemployment</th><th>Price level vs. start</th></tr></thead>
+    <tbody>
+      <tr><td>Long-run equilibrium</td><td>On LRAS (at Y<sub>f</sub>)</td><td><span class="lshift">None</span> (Y = Y<sub>f</sub>)</td><td>Equal to the natural rate</td><td>Any level</td></tr>
+      <tr><td>Recessionary gap</td><td>Left of LRAS</td><td><b>Negative</b> (Y &lt; Y<sub>f</sub>)</td><td>Above the natural rate</td><td>Depends on the cause</td></tr>
+      <tr><td>Inflationary gap</td><td>Right of LRAS</td><td><span class="shift">Positive</span> (Y &gt; Y<sub>f</sub>)</td><td>Below the natural rate</td><td>Depends on the cause</td></tr>
+      <tr><td>AD decreases (falling confidence, lower spending)</td><td>Left of LRAS</td><td><b>Recessionary</b></td><td>Above natural rate</td><td>↓</td></tr>
+      <tr><td>AD increases (more spending, tax cut)</td><td>Right of LRAS</td><td><span class="shift">Inflationary</span></td><td>Below natural rate</td><td>↑</td></tr>
+      <tr><td>SRAS decreases (oil price or wage increase)</td><td>Left of LRAS</td><td><b>Recessionary</b> (stagflation)</td><td>Above natural rate</td><td>↑</td></tr>
+      <tr><td>SRAS increases (lower input prices)</td><td>Right of LRAS</td><td><span class="shift">Inflationary</span> (positive gap)</td><td>Below natural rate</td><td>↓</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Price level</b> (PL). Horizontal axis: <b>Real GDP</b> (or real output). Do not write "Price" and "Quantity".</li>
+        <li>Draw AD sloping down, SRAS sloping up, and LRAS as a vertical line. Label all three.</li>
+        <li>Mark full-employment output as <b>Y<sub>f</sub></b> where LRAS meets the horizontal axis.</li>
+        <li>Label the short-run equilibrium with dashed lines to both axes: <b>PL<sub>1</sub></b> on the vertical axis and <b>Y<sub>1</sub></b> on the horizontal axis.</li>
+        <li>For a recessionary gap, Y<sub>1</sub> must be clearly to the left of Y<sub>f</sub>. For an inflationary gap, clearly to the right. Graders check the position, not the shading.</li>
+        <li>In words, tie output to unemployment: "Real GDP is below full-employment output, so unemployment is above the natural rate."</li>
+        <li>If asked for the size of the gap, show the work: Y<sub>1</sub> − Y<sub>f</sub>, with units (billions of dollars).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Calling any high price level an inflationary gap. The gap depends on output relative to Y<sub>f</sub>. A leftward SRAS shift raises the price level and still causes a recessionary gap.</li>
+        <li>Saying unemployment is zero in long-run equilibrium. It equals the natural rate; only cyclical unemployment is zero.</li>
+        <li>Putting short-run equilibrium where AD meets LRAS. Short-run equilibrium is always AD crossing SRAS.</li>
+        <li>Mixing up the sign: recessionary gap is negative (Y &lt; Y<sub>f</sub>), inflationary gap is positive (Y &gt; Y<sub>f</sub>).</li>
+        <li>Drawing three curves that cross at one point when the question describes a gap. Only long-run equilibrium has all three crossing together.</li>
+        <li>Saying unemployment is "high" or "low" when the question asks about the natural rate. Say "above the natural rate" or "below the natural rate".</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.5. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var K = 0.8;                         // slope used by Lab.market
+  var BASE = { ad: 0, sras: 0, why: null };
+  var S = { ad: -1.5, sras: 0, why: "conf" };
+
+  // ---------- Model ----------
+  // Lab.market space: equilibrium x = 5 + (ad + sras)/2, y = 5 + K(ad - sras)/2. LRAS fixed at x = 5 (Yf).
+  // Teaching numbers: real GDP = 1000 + 40(x - 5) billion, price level = 100 + 10(y - 5),
+  // unemployment = 5% natural rate - gap/25 (each $25B of positive gap lowers unemployment 1 point).
+  function model(ad, sras) {
+    var x = 5 + (ad + sras) / 2, y = 5 + K * (ad - sras) / 2;
+    var Y = 1000 + 40 * (x - 5), PL = 100 + 10 * (y - 5), gap = Y - 1000;
+    if (Math.abs(gap) < 1e-6) gap = 0;
+    return { x: x, y: y, Y: Y, PL: PL, gap: gap, pct: gap / 10, u: 5 - gap / 25,
+      state: gap < 0 ? "rec" : gap > 0 ? "infl" : "lr" };
+  }
+  var NAME = { rec: "Recessionary gap", infl: "Inflationary gap", lr: "Long-run equilibrium" };
+  var f = Lab.fmt;
+  function money(v) { return "$" + Math.round(v).toLocaleString("en-US") + "B"; }
+  function signed(v, d) { return (v > 0 ? "+" : v < 0 ? "−" : "") + f(Math.abs(v), d); }
+
+  // ---------- Drawing helpers ----------
+  function axisText(F, x, txt, anchor) {
+    Lab.el("text", { x: F.sx(x), y: F.H - F.M.b + 16, "text-anchor": anchor || "middle", style: "fill:var(--ink); font-weight:600" }, F.svg, txt);
+  }
+  function yText(F, y, txt, color) {
+    Lab.el("text", { x: F.M.l - 8, y: F.sy(y) + 4, "text-anchor": "end", style: "fill:" + (color || "var(--ink)") + "; font-weight:600" }, F.svg, txt);
+  }
+  // Yf under LRAS and Y1 under the short-run equilibrium, pushed apart when they are close.
+  function outputLabels(F, x, y1Label) {
+    var d = x - 5;
+    if (Math.abs(d) < 1e-6) { axisText(F, 5, "Yf"); return; }
+    if (Math.abs(d) < 1) {
+      axisText(F, 5, "Yf", d > 0 ? "end" : "start");
+      axisText(F, x, y1Label, d > 0 ? "start" : "end");
+    } else { axisText(F, 5, "Yf"); axisText(F, x, y1Label); }
+  }
+  function shadeGap(F, x, label) {
+    if (Math.abs(x - 5) < 1e-6) return;
+    var rec = x < 5, c = rec ? "var(--accent)" : "var(--bad)";
+    Lab.rect(F, Math.min(x, 5), 0, Math.max(x, 5), 10, c, 0.1);
+    Lab.line(F, [[x, 0.55], [5, 0.55]], c, 4);
+    if (label && Math.abs(x - 5) >= 0.6) Lab.tag(F, rec ? x - 0.1 : x + 0.1, 1.0, rec ? "Recessionary gap" : "Inflationary gap", c, rec ? "end" : "start");
+  }
+
+  // ---------- Explore graph ----------
+  var svgA = document.getElementById("adas");
+  function drawMain(m) {
+    var moved = S.ad !== 0 || S.sras !== 0;
+    Lab.market(svgA, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: S.ad, label: S.ad !== 0 ? "AD₁" : "AD" },
+      supply: { shift: S.sras, label: S.sras !== 0 ? "SRAS₁" : "SRAS" },
+      longRun: { shift: 0, label: "LRAS" },
+      start: { demand: 0, supply: 0, longRun: 0 },
+      slope: K, arrows: true,
+      extra: function (F, eq, C) {
+        shadeGap(F, eq.x, true);
+        if (S.ad !== 0) Lab.tag(F, 1.2, C.D(0)(1.2) + (S.ad < 0 ? 0.25 : -0.65), "AD₀", "var(--muted)");
+        if (S.sras !== 0) Lab.tag(F, 8.4, C.S(0)(8.4) + (S.sras < 0 ? -0.75 : 0.3), "SRAS₀", "var(--muted)", S.sras < 0 ? "start" : "end");
+        outputLabels(F, eq.x, "Y₁");
+        var dy = eq.y - 5;
+        if (moved && Math.abs(dy) > 1e-6) {
+          if (Math.abs(dy) < 0.5) { yText(F, eq.y + (dy > 0 ? 0.25 : -0.25), "PL₁"); yText(F, 5 - (dy > 0 ? 0.25 : -0.25), "PL₀", "var(--muted)"); }
+          else { yText(F, eq.y, "PL₁"); yText(F, 5, "PL₀", "var(--muted)"); }
+        } else yText(F, eq.y, "PL₁");
+      }
+    });
+  }
+
+  // ---------- Story ----------
+  var WHY = {
+    conf: "<b>Consumer confidence falls.</b> Households cut consumption at every price level, so AD shifts left.",
+    boom: "<b>Firms launch an investment boom and the government raises spending.</b> Spending rises at every price level, so AD shifts right.",
+    oil: "<b>The price of oil jumps.</b> Production costs rise for most firms, so SRAS shifts left. This is a negative supply shock.",
+    cheap: "<b>Input prices fall.</b> Cheaper energy and materials lower production costs, so SRAS shifts right. This is a positive supply shock.",
+    both: "<b>AD rose earlier, and nominal wages have since caught up.</b> AD is to the right and SRAS has moved left by the same amount.",
+    lr: "<b>The economy is at rest.</b> Nothing has shifted AD or SRAS away from the point where they meet LRAS."
+  };
+  function story(m) {
+    var lead;
+    if (S.why) lead = WHY[S.why];
+    else {
+      var parts = [];
+      if (S.ad > 0) parts.push("AD is to the right of its starting position");
+      if (S.ad < 0) parts.push("AD is to the left of its starting position");
+      if (S.sras > 0) parts.push("SRAS is to the right of its starting position");
+      if (S.sras < 0) parts.push("SRAS is to the left of its starting position");
+      lead = parts.length ? "<b>" + parts.join(", and ") + ".</b>" : WHY.lr;
+    }
+    var where = "AD and SRAS cross at real GDP of <b>" + money(m.Y) + "</b> and a price level of <b>" + f(m.PL) + "</b>. LRAS sits at full-employment output, Y<sub>f</sub> = $1,000 billion.";
+    var state, ap, next = "", extra = [];
+    if (m.state === "rec") {
+      state = "Short-run equilibrium is to the <b>left of LRAS</b>, so the economy has a <b>recessionary (negative) output gap</b> of " + money(-m.gap) + ", which is " + f(-m.pct) + "% below Y<sub>f</sub>. Firms produce less and need fewer workers, so unemployment of " + f(m.u) + "% is <b>above the natural rate</b> of 5.0%. The extra " + f(m.u - 5) + " points is cyclical unemployment.";
+      ap = "Real GDP is less than full-employment output, so there is a recessionary gap and unemployment is above the natural rate.";
+      next = "Looking ahead to topic 3.7: if policy does nothing, nominal wages and other input prices eventually fall, SRAS shifts right, and output returns to Y<sub>f</sub> at a lower price level.";
+      if (m.PL > 100.05) extra.push("The price level rose even though output fell. That combination is stagflation, and it comes from a leftward SRAS shift. It is still a recessionary gap because output is below Y<sub>f</sub>.");
+    } else if (m.state === "infl") {
+      state = "Short-run equilibrium is to the <b>right of LRAS</b>, so the economy has an <b>inflationary (positive) output gap</b> of " + money(m.gap) + ", which is " + f(m.pct) + "% above Y<sub>f</sub>. Firms run overtime and hire extra workers, so unemployment of " + f(m.u) + "% is <b>below the natural rate</b> of 5.0%. Cyclical unemployment is negative.";
+      ap = "Real GDP is greater than full-employment output, so there is an inflationary gap and unemployment is below the natural rate.";
+      next = "Looking ahead to topic 3.7: if policy does nothing, nominal wages and other input prices eventually rise, SRAS shifts left, and output returns to Y<sub>f</sub> at a higher price level.";
+      if (m.PL < 99.95) extra.push("The price level fell even though output is above Y<sub>f</sub>. The gap type comes from output, not from the price level, so this is still a positive (inflationary) output gap.");
+    } else {
+      state = "AD, SRAS, and LRAS all cross at one point, so the economy is in <b>long-run equilibrium</b>. Real GDP equals Y<sub>f</sub>, there is no output gap, and unemployment <b>equals the natural rate</b> of 5.0%. Cyclical unemployment is zero, but unemployment is not zero.";
+      ap = "AD and SRAS intersect on LRAS, so real GDP equals full-employment output and unemployment equals the natural rate.";
+      if (Math.abs(m.PL - 100) > 0.05) extra.push("The price level is " + f(m.PL) + " instead of 100. A different price level does not create a gap. Only the position of output relative to Y<sub>f</sub> does.");
+    }
+    var pl = Math.abs(m.PL - 100) < 0.05 ? "The price level is unchanged at 100." : "The price level " + (m.PL > 100 ? "rose" : "fell") + " from 100 to " + f(m.PL) + ".";
+    var html = "<p>" + lead + " " + where + " " + pl + "</p><p>" + state + "</p>";
+    if (extra.length) html += "<ul>" + extra.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    html += "<p><b>AP answer:</b> “" + ap + "”</p>";
+    if (next) html += "<p>" + next + "</p>";
+    return html;
+  }
+
+  // ---------- Render ----------
+  var elAD = document.getElementById("s-ad"), elSR = document.getElementById("s-sras");
+  function pill(state) { return '<span class="pill ' + state + '">' + NAME[state] + "</span>"; }
+  function render() {
+    var m = model(S.ad, S.sras);
+    elAD.value = S.ad; elSR.value = S.sras;
+    document.getElementById("o-ad").textContent = S.ad === 0 ? "start" : (S.ad > 0 ? "right " : "left ") + Math.abs(S.ad);
+    document.getElementById("o-sras").textContent = S.sras === 0 ? "start" : (S.sras > 0 ? "right " : "left ") + Math.abs(S.sras);
+    drawMain(m);
+    document.getElementById("r-y").textContent = money(m.Y);
+    document.getElementById("r-y2").innerHTML = "Y<sub>f</sub> = $1,000B (" + (m.gap === 0 ? "at Y<sub>f</sub>" : signed(m.pct) + "%") + ")";
+    document.getElementById("r-pl").textContent = f(m.PL);
+    document.getElementById("r-pl2").textContent = Math.abs(m.PL - 100) < 0.05 ? "unchanged from 100" : (m.PL > 100 ? "up" : "down") + " from 100";
+    document.getElementById("r-u").textContent = f(m.u) + "%";
+    document.getElementById("r-u2").textContent = m.state === "rec" ? "above the 5.0% natural rate" : m.state === "infl" ? "below the 5.0% natural rate" : "equal to the natural rate";
+    document.getElementById("r-gap").innerHTML = pill(m.state);
+    document.getElementById("r-gap2").textContent = "output gap " + (m.gap === 0 ? "$0B" : signed(m.gap, 0).replace(/^([+−])/, "$1$") + "B");
+    document.getElementById("story").innerHTML = story(m);
+  }
+  elAD.addEventListener("input", function () { S.ad = parseFloat(elAD.value); S.why = null; render(); });
+  elSR.addEventListener("input", function () { S.sras = parseFloat(elSR.value); S.why = null; render(); });
+
+  // Dragging a curve on the graph: grab the nearer of AD or SRAS at the pointer's height.
+  var drag = null;
+  function toData(e) {
+    var r = svgA.getBoundingClientRect();
+    var px = (e.clientX - r.left) * 440 / r.width, py = (e.clientY - r.top) * 330 / r.height;
+    return { x: (px - 52) / 370 * 10, y: (330 - 46 - py) / 266 * 10 };
+  }
+  function snap(v) { return Math.max(-2, Math.min(2, Math.round(v * 4) / 4)); }
+  svgA.addEventListener("pointerdown", function (e) {
+    var p = toData(e);
+    var adX = 5 + S.ad + (5 - p.y) / K, srX = 5 + S.sras + (p.y - 5) / K;
+    var dA = Math.abs(p.x - adX), dS = Math.abs(p.x - srX);
+    var which = dA <= dS ? "ad" : "sras";
+    if (Math.min(dA, dS) > 1.2) return;
+    drag = { which: which, x0: p.x, s0: S[which] };
+    svgA.classList.add("dragging");
+    svgA.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  svgA.addEventListener("pointermove", function (e) {
+    if (!drag) return;
+    var v = snap(drag.s0 + (toData(e).x - drag.x0));
+    if (v !== S[drag.which]) { S[drag.which] = v; S.why = null; render(); }
+  });
+  function endDrag() { drag = null; svgA.classList.remove("dragging"); }
+  svgA.addEventListener("pointerup", endDrag);
+  svgA.addEventListener("pointercancel", endDrag);
+
+  // Scenarios animate from the current position.
+  var stopAnim = function () {};
+  function go(target) {
+    stopAnim();
+    var a0 = S.ad, s0 = S.sras;
+    S.why = target.why;
+    stopAnim = Lab.animate(450, function (t) {
+      S.ad = a0 + (target.ad - a0) * t; S.sras = s0 + (target.sras - s0) * t;
+      if (t === 1) { S.ad = target.ad; S.sras = target.sras; }
+      render();
+    });
+  }
+  var scen = [
+    ["Long-run equilibrium", { ad: 0, sras: 0, why: "lr" }],
+    ["Consumer confidence falls", { ad: -1.5, sras: 0, why: "conf" }],
+    ["Investment and spending boom", { ad: 1.5, sras: 0, why: "boom" }],
+    ["Oil price spike", { ad: 0, sras: -1.5, why: "oil" }],
+    ["Input prices fall", { ad: 0, sras: 1.5, why: "cheap" }],
+    ["AD up, then wages catch up", { ad: 1.5, sras: -1.5, why: "both" }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { go(x[1]); });
+    sc.appendChild(b);
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { go(BASE); });
+  render();
+
+  // ---------- Practice: label this graph ----------
+  var svgP = document.getElementById("practice");
+  var P = { ad: -1, sras: -0.5, pick: { gap: null, un: null }, checked: false, right: 0, tries: 0, last: null };
+  var STEPS = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2];
+  function rnd(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function newGraph() {
+    var types = ["rec", "lr", "infl"].filter(function (t) { return t !== P.last; });
+    var t = rnd(types), ad, sr, tries = 0;
+    do {
+      ad = rnd(STEPS); sr = rnd(STEPS); tries++;
+      if (t === "lr") sr = -ad;
+    } while (tries < 200 && !((t === "rec" && ad + sr <= -1) || (t === "infl" && ad + sr >= 1) || (t === "lr" && ad + sr === 0)));
+    P.ad = ad; P.sras = sr; P.last = t;
+    P.pick = { gap: null, un: null }; P.checked = false;
+    renderPractice();
+  }
+  function drawPractice(reveal) {
+    var m = model(P.ad, P.sras);
+    Lab.market(svgP, {
+      xLabel: "Real GDP", yLabel: "Price level",
+      demand: { shift: P.ad, label: "AD" }, supply: { shift: P.sras, label: "SRAS" }, longRun: { shift: 0, label: "LRAS" },
+      slope: K, arrows: false,
+      extra: function (F, eq) {
+        if (reveal) shadeGap(F, eq.x, true);
+        outputLabels(F, eq.x, "Y₁");
+        yText(F, eq.y, "PL₁");
+      }
+    });
+    return m;
+  }
+  var gapBtns = document.querySelectorAll("#p-gap button"), unBtns = document.querySelectorAll("#p-un button");
+  var chk = document.getElementById("p-check"), fb = document.getElementById("p-feedback");
+  var UN = { rec: "above", lr: "equal", infl: "below" };
+  function renderPractice() {
+    var m = drawPractice(P.checked);
+    [[gapBtns, "gap", m.state], [unBtns, "un", UN[m.state]]].forEach(function (g) {
+      g[0].forEach(function (b) {
+        var v = b.getAttribute("data-v");
+        b.setAttribute("aria-pressed", P.pick[g[1]] === v ? "true" : "false");
+        b.classList.toggle("ok", P.checked && v === g[2]);
+        b.classList.toggle("no", P.checked && P.pick[g[1]] === v && v !== g[2]);
+        b.disabled = P.checked;
+      });
+    });
+    chk.disabled = P.checked || !P.pick.gap || !P.pick.un;
+    document.getElementById("p-score").textContent = P.right + " / " + P.tries + " correct";
+    if (!P.checked) { fb.innerHTML = ""; return; }
+    var gOK = P.pick.gap === m.state, uOK = P.pick.un === UN[m.state];
+    var side = m.state === "rec" ? "to the left of LRAS, so Y₁ is below Y<sub>f</sub>" : m.state === "infl" ? "to the right of LRAS, so Y₁ is above Y<sub>f</sub>" : "on LRAS, so Y₁ equals Y<sub>f</sub>";
+    var uWhy = m.state === "rec" ? "Output below potential means firms need fewer workers, so unemployment is above the natural rate." : m.state === "infl" ? "Output above potential means firms hire extra workers, so unemployment is below the natural rate." : "Output at potential means unemployment equals the natural rate. Cyclical unemployment is zero.";
+    fb.innerHTML = "<div>" + (gOK && uOK ? "<b style='color:var(--good)'>Both correct.</b> " : "<b style='color:var(--bad)'>" + (gOK || uOK ? "One of two correct." : "Not quite.") + "</b> ") +
+      "AD and SRAS cross " + side + ". That is " + (m.state === "lr" ? "<b>long-run equilibrium</b>" : "an <b>" + NAME[m.state].toLowerCase() + "</b>") + ". " + uWhy + "</div>" +
+      ((m.state === "rec" && m.PL > 100.05) || (m.state === "infl" && m.PL < 99.95) ? "<div>Watch the price level: it is " + (m.PL > 100 ? "high" : "low") + " here, but the gap type comes only from output relative to Y<sub>f</sub>.</div>" : "");
+  }
+  function bindChoice(btns, key) {
+    btns.forEach(function (b) {
+      b.addEventListener("click", function () { if (P.checked) return; P.pick[key] = b.getAttribute("data-v"); renderPractice(); });
+    });
+  }
+  bindChoice(gapBtns, "gap"); bindChoice(unBtns, "un");
+  chk.addEventListener("click", function () {
+    if (!P.pick.gap || !P.pick.un) return;
+    var m = model(P.ad, P.sras);
+    P.checked = true; P.tries++;
+    if (P.pick.gap === m.state && P.pick.un === UN[m.state]) P.right++;
+    renderPractice();
+  });
+  document.getElementById("p-next").addEventListener("click", newGraph);
+  P.last = "rec";
+  renderPractice();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "On an AD–AS graph, AD and SRAS intersect to the left of the LRAS curve. Which of the following describes the economy?", o: ["An inflationary gap, with unemployment below the natural rate", "Long-run equilibrium, with unemployment equal to the natural rate", "A recessionary gap, with unemployment above the natural rate", "A recessionary gap, with unemployment below the natural rate"], c: 2, w: "An intersection left of LRAS means real GDP is below full-employment output. Firms need fewer workers, so unemployment is above the natural rate. Choice D pairs the right gap with the wrong direction of unemployment." },
+    { s: "Full-employment output is $800 billion. The economy is producing real GDP of $750 billion. Which correctly describes the output gap?", o: ["A negative output gap of $50 billion, which is a recessionary gap", "A positive output gap of $50 billion, which is an inflationary gap", "A negative output gap of $750 billion, which is a recessionary gap", "No output gap, because the economy is in short-run equilibrium"], c: 0, w: "Output gap = actual real GDP − potential = 750 − 800 = −$50 billion. A negative gap is a recessionary gap. Being in short-run equilibrium does not rule out a gap." },
+    { s: "When an economy has an inflationary gap, which of the following is true?", o: ["Real GDP is below full-employment output", "The price level must be falling", "Cyclical unemployment is positive", "The unemployment rate is below the natural rate of unemployment"], c: 3, w: "In an inflationary gap, real GDP is above potential. Firms hire more workers than normal, so unemployment is below the natural rate and cyclical unemployment is negative." },
+    { s: "An economy is in long-run equilibrium when:", o: ["AD intersects LRAS, whatever the position of SRAS", "AD, SRAS, and LRAS all intersect at the same point", "SRAS intersects LRAS, whatever the position of AD", "The price level is stable and AD equals SRAS at any output"], c: 1, w: "Long-run equilibrium needs all three curves to cross at one point. AD crossing SRAS gives short-run equilibrium, and only when that point is on LRAS is the economy in long-run equilibrium." },
+    { s: "LRAS is at real GDP of $1,000 billion. AD and SRAS intersect at real GDP of $1,050 billion and a price level of 120. Which of the following is true?", o: ["There is an inflationary gap of $50 billion, and unemployment is below the natural rate", "There is a recessionary gap of $50 billion, and unemployment is above the natural rate", "The economy is in long-run equilibrium because the price level is 120", "There is an inflationary gap of $1,050 billion, and unemployment is zero"], c: 0, w: "1,050 − 1,000 = +$50 billion, a positive output gap. That is an inflationary gap, so unemployment is below the natural rate. Unemployment does not fall to zero in an inflationary gap." },
+    { s: "An economy starts in long-run equilibrium. A sharp increase in the price of oil then occurs. In the short run, the economy will have:", o: ["An inflationary gap and a lower price level", "An inflationary gap and a higher price level", "A recessionary gap and a higher price level", "A recessionary gap and a lower price level"], c: 2, w: "Higher oil prices raise production costs, so SRAS shifts left. Real GDP falls below full-employment output (a recessionary gap) while the price level rises. The higher price level tempts students to answer inflationary gap, but the gap depends on output." },
+    { s: "When the economy is in long-run equilibrium, which of the following is true?", o: ["The unemployment rate is zero", "Frictional and structural unemployment are both zero", "Real GDP is above full-employment output", "The unemployment rate equals the natural rate, and cyclical unemployment is zero"], c: 3, w: "At full-employment output, the only unemployment is frictional and structural, which together make up the natural rate. Cyclical unemployment is zero, but total unemployment is not." },
+    { s: "Potential real GDP is $2,000 billion and actual real GDP is $2,100 billion. What is the output gap as a percent of potential output?", o: ["−5%, a recessionary gap", "+5%, an inflationary gap", "+4.8%, an inflationary gap", "+100%, an inflationary gap"], c: 1, w: "Output gap % = (2,100 − 2,000) / 2,000 × 100 = +5%. Divide by potential output, not actual output; dividing by 2,100 gives the tempting 4.8%. A positive gap is an inflationary gap." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.5");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.5", compact: true, storageKey: "topic-3.5" });</script>
+</body>
+</html>

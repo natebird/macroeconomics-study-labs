@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Money Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub { display: grid; gap: 14px; }
+.sub > h3 { font-size: 1.2rem; }
+.sub > p { color: var(--muted); max-width: 72ch; }
+.drill { display: grid; gap: 12px; align-content: start; }
+.d-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+.d-item { font-family: var(--display); font-size: 1.22rem; font-weight: 600; line-height: 1.3; padding: 14px 16px; background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; min-height: 4.4em; }
+.d-item small { display: block; font-family: var(--body); font-size: .88rem; font-weight: 400; color: var(--muted); margin-top: 4px; }
+.d-cats { display: flex; flex-wrap: wrap; gap: 8px; }
+.d-cats button { font-weight: 500; }
+.d-cats button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.d-cats button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.d-cats button:disabled { cursor: default; }
+.d-fb { font-size: .92rem; color: var(--muted); min-height: 3em; }
+.d-fb .ok { color: var(--good); } .d-fb .no { color: var(--bad); }
+.d-foot { font-size: .86rem; color: var(--muted); border-top: 1px dashed var(--rule); padding-top: 10px; margin-top: auto; }
+.d-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.hh-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.side { display: grid; gap: 14px; align-content: start; }
+.mini { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mini > div { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: var(--paper); display: grid; gap: 4px; font-size: .92rem; }
+.mini b { font-family: var(--display); font-size: 1.02rem; }
+.legend .l-sav { color: var(--c3); } .legend .l-cd { color: var(--lrpc); } .legend .l-mm { color: var(--c4); } .legend .l-chk { color: var(--srpc); }
+@media (max-width: 520px) { .hh-controls, .mini { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 4 · Topic 4.3</span>
+  <h1>The Money Study Lab</h1>
+  <p class="lede">Money is any asset people widely accept as payment. The Federal Reserve measures it two ways: M1 holds the most liquid assets, and M2 adds near money such as small CDs and retail money market funds. Sort assets into M1, M2, or not money, count a household's money as it makes transactions, and drill the three functions of money.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Sort it, count it, use it</h2>
+    <p>This lab uses the Federal Reserve's current definitions. Since 2020, M1 includes savings deposits. M2 is M1 plus small time deposits and retail money market funds.</p>
+  </div>
+
+  <div class="sub">
+    <h3>A. What counts as money?</h3>
+    <p>Pick where each item belongs. "M2 only" means it is in M2 but not in M1. Everything in M1 is also in M2. Correct answers drop into the diagram.</p>
+    <div class="lab">
+      <div class="card drill" id="sort-game" aria-label="Money sorting game"></div>
+      <div class="card graph-card">
+        <h3>Where it lands <small>M1 sits inside M2</small></h3>
+        <svg class="chart" id="nest" role="img" aria-label="Diagram showing M1 inside M2, with items outside both marked not money"></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">
+    <h3>B. Count a household's money</h3>
+    <p>Edit what the Rivera household holds, or make a transaction. The chart and the tiles tally M1 and M2 as you go.</p>
+    <div class="lab">
+      <div class="card graph-card">
+        <h3>The Rivera household <small>dollars by measure</small></h3>
+        <svg class="chart" id="bars" role="img" aria-label="Stacked bar chart of the household's M1, M2, and assets that are not money"></svg>
+        <div class="legend"><span class="l-ad">Currency</span><span class="l-chk">Checking</span><span class="l-sav">Savings</span><span class="l-cd">Small CDs</span><span class="l-mm">Retail MMMF</span><span class="l-ghost">Stocks</span></div>
+      </div>
+      <div class="card side">
+        <div class="tag">Holdings</div>
+        <div class="controls hh-controls">
+          <div class="ctl"><label for="h-cash">Currency in wallet <output id="o-cash"></output></label><input type="range" id="h-cash" min="0" max="3000" step="100"><span class="hint">Bills and coins</span></div>
+          <div class="ctl"><label for="h-chk">Checking deposits <output id="o-chk"></output></label><input type="range" id="h-chk" min="0" max="20000" step="250"><span class="hint">Spend by debit card or check</span></div>
+          <div class="ctl"><label for="h-sav">Savings deposits <output id="o-sav"></output></label><input type="range" id="h-sav" min="0" max="20000" step="500"><span class="hint">Includes money market deposit accounts</span></div>
+          <div class="ctl"><label for="h-cd">Small CDs <output id="o-cd"></output></label><input type="range" id="h-cd" min="0" max="20000" step="500"><span class="hint">Time deposits under $100,000</span></div>
+          <div class="ctl"><label for="h-mm">Retail money market funds <output id="o-mm"></output></label><input type="range" id="h-mm" min="0" max="20000" step="500"><span class="hint">Mutual fund shares</span></div>
+          <div class="ctl"><label for="h-stk">Stocks <output id="o-stk"></output></label><input type="range" id="h-stk" min="0" max="20000" step="500"><span class="hint">Must be sold before spending</span></div>
+          <div class="ctl"><label for="h-cc">Credit card limit <output id="o-cc"></output></label><input type="range" id="h-cc" min="0" max="10000" step="500"><span class="hint">Borrowing power, not an asset</span></div>
+        </div>
+        <div><button id="hh-reset" type="button">Reset household</button></div>
+      </div>
+    </div>
+
+    <div class="card" style="display:grid; gap:8px;">
+      <div class="tag">Make a transaction</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+
+    <div class="readout">
+      <div class="stat"><div class="k">M1</div><div class="v" id="r-m1"></div></div>
+      <div class="stat"><div class="k">M2</div><div class="v" id="r-m2"></div></div>
+      <div class="stat"><div class="k">In M2 only (near money)</div><div class="v" id="r-near"></div></div>
+      <div class="stat"><div class="k">Last change</div><div class="v" id="r-chg"></div></div>
+    </div>
+
+    <div class="story" id="story" aria-live="polite"></div>
+  </div>
+
+  <div class="sub">
+    <h3>C. Functions and forms of money</h3>
+    <div class="two">
+      <div class="card drill" id="fn-game" aria-label="Functions of money drill"></div>
+      <div class="card" style="display:grid; gap:12px; align-content:start;">
+        <h3>Commodity money vs. fiat money</h3>
+        <div class="mini">
+          <div><b>Commodity money</b>Has value of its own as a good, apart from its use as money. Gold and silver coins, salt, cigarettes in a prison camp.</div>
+          <div><b>Fiat money</b>Has value because the government declares it legal tender and people accept it. U.S. dollars, euros. Not backed by gold.</div>
+        </div>
+        <div class="drill" id="cf-game" aria-label="Commodity or fiat quick check"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Money</h3><p>Money is any asset that people widely accept as payment for goods and services. Its key feature is liquidity: how quickly and cheaply you can use it to buy something without losing value.</p></div>
+    <div class="card"><span class="tag">Three jobs</span><h3>Functions of money</h3><p><b>Medium of exchange:</b> used to buy things, so no barter. <b>Unit of account:</b> prices are stated in it. <b>Store of value:</b> holds purchasing power over time. Inflation weakens the store of value.</p></div>
+    <div class="card"><span class="tag">Narrow measure</span><h3>M1</h3><p>Currency held by the public, plus checkable (demand) deposits, plus savings deposits. These are the most liquid assets. Since 2020 the Fed has counted savings deposits in M1.</p></div>
+    <div class="card"><span class="tag">Broad measure</span><h3>M2</h3><p>M2 = M1 + small time deposits (CDs under $100,000) + retail money market mutual funds. The extra pieces are near money: easy to turn into M1, but not spendable directly.</p></div>
+    <div class="card"><span class="tag">Not money</span><h3>Credit cards, stocks, vault cash</h3><p>A credit card creates a loan, which you repay with money. Stocks and bonds must be sold first. Currency inside banks is reserves, so it is left out of M1 to avoid counting it twice.</p></div>
+    <div class="card"><span class="tag">Forms</span><h3>Commodity vs. fiat</h3><p>Commodity money has value as a good, like gold coins. Fiat money has value because the government declares it legal tender and people trust it. U.S. currency is fiat money.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Money measures cheat sheet</h2>
+    <p>The first table says where each asset counts. The second shows what common transactions do to M1 and M2 right away, before any bank lending (that comes in topic 4.4).</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Asset</th><th>In M1?</th><th>In M2?</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Currency held by the public</td><td><b>Yes</b></td><td><b>Yes</b></td><td>Most liquid asset there is</td></tr>
+      <tr><td>Checkable (demand) deposits</td><td><b>Yes</b></td><td><b>Yes</b></td><td>Spent directly by check, debit card, or transfer</td></tr>
+      <tr><td>Savings deposits, money market deposit accounts</td><td><b>Yes</b></td><td><b>Yes</b></td><td>In M1 since the Fed's 2020 change</td></tr>
+      <tr><td>Small time deposits (CDs under $100,000)</td><td>No</td><td><b>Yes</b></td><td>Fixed term, early-withdrawal penalty</td></tr>
+      <tr><td>Retail money market mutual funds</td><td>No</td><td><b>Yes</b></td><td>Near money; sell shares to spend</td></tr>
+      <tr><td>Stocks, bonds, Treasury bills, large CDs</td><td>No</td><td>No</td><td>Financial assets, not money</td></tr>
+      <tr><td>Credit card limit or balance</td><td>No</td><td>No</td><td>A loan, not an asset you own</td></tr>
+      <tr><td>Currency in bank vaults</td><td>No</td><td>No</td><td>Bank reserves, not held by the public</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Transaction</th><th>M1</th><th>M2</th></tr></thead>
+    <tbody>
+      <tr><td>Deposit currency into checking</td><td>No change</td><td>No change</td></tr>
+      <tr><td>Move funds from checking to savings</td><td>No change</td><td>No change</td></tr>
+      <tr><td>Move funds from a small CD to checking</td><td><b>Increases</b></td><td>No change</td></tr>
+      <tr><td>Buy retail money market fund shares with checking</td><td><span class="shift">Decreases</span></td><td>No change</td></tr>
+      <tr><td>Charge a purchase on a credit card</td><td>No change</td><td>No change</td></tr>
+      <tr><td>Pay the credit card bill from checking</td><td><span class="shift">Decreases</span> (for the household)</td><td><span class="shift">Decreases</span> (for the household)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Writing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>How to earn the points</h3>
+      <ul>
+        <li>When asked how a transaction affects M1 or M2, give the direction first ("M1 decreases, M2 does not change"), then name the components: "checkable deposits fall and money market funds rise; both are in M2."</li>
+        <li>Show the sum when given numbers: M1 = currency + checkable deposits + savings deposits; M2 = M1 + small time deposits + retail money market funds.</li>
+        <li>For a cash deposit, answer "the money supply does not change immediately." Currency in circulation falls and demand deposits rise by the same amount. Any later growth comes from bank lending (topic 4.4).</li>
+        <li>Name the function precisely: "medium of exchange," "unit of account," or "store of value." Tie it to the example in one sentence.</li>
+        <li>If a question uses the older definition (savings deposits in M2 only), the prompt will usually list the components. Follow the components the question gives you.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Calling a credit card money. It is a short-term loan; the money is the checking balance you later use to pay it off.</li>
+        <li>Calling a debit card money. The card is a tool; the checkable deposit behind it is the money.</li>
+        <li>Counting currency in bank vaults in M1. Only currency held by the public counts.</li>
+        <li>Mixing up a money market <b>deposit account</b> (a bank savings account, in M1) with a money market <b>mutual fund</b> (M2 only).</li>
+        <li>Using "money" to mean income or wealth. A person with a large stock portfolio is wealthy but may hold little money.</li>
+        <li>Saying inflation weakens the medium of exchange. The standard answer is that inflation weakens money as a <b>store of value</b>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 4.3. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-4.html">Unit 4 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Generic sorting drill ----------
+  // opts: { items: [{ n, sub, k, why, short }], cats: [{ id, label }], unit, onRight(item) , onReset() }
+  function drill(root, opts) {
+    root.innerHTML = '<div class="d-top"><span class="d-prog"></span><span class="d-score"></span></div>' +
+      '<div class="d-item"></div><div class="d-cats" role="group"></div>' +
+      '<div class="d-fb" aria-live="polite"></div>' +
+      '<div class="d-btns"><button type="button" class="d-next primary">Next item</button><button type="button" class="d-shuf">Reshuffle</button></div>' +
+      (opts.footer ? '<p class="d-foot">' + opts.footer + '</p>' : '');
+    var prog = root.querySelector(".d-prog"), score = root.querySelector(".d-score"), item = root.querySelector(".d-item");
+    var cats = root.querySelector(".d-cats"), fb = root.querySelector(".d-fb"), next = root.querySelector(".d-next"), shuf = root.querySelector(".d-shuf");
+    cats.setAttribute("aria-label", opts.groupLabel || "Choose a category");
+    var order, i, right, done, answered;
+    function start(shuffle) {
+      order = opts.items.slice();
+      if (shuffle) for (var a = order.length - 1; a > 0; a--) { var b = Math.floor(Math.random() * (a + 1)), t = order[a]; order[a] = order[b]; order[b] = t; }
+      i = 0; right = 0; done = 0;
+      if (opts.onReset) opts.onReset();
+      show();
+    }
+    function show() {
+      answered = false;
+      if (i >= order.length) {
+        item.innerHTML = "Round complete: " + right + " of " + order.length + " right.<small>Press Reshuffle to play again in a new order.</small>";
+        cats.innerHTML = ""; fb.textContent = ""; next.disabled = true;
+        prog.textContent = order.length + " of " + order.length; score.textContent = right + " / " + done + " correct";
+        return;
+      }
+      var it = order[i];
+      item.innerHTML = it.n + (it.sub ? "<small>" + it.sub + "</small>" : "");
+      prog.textContent = (opts.unit || "Item") + " " + (i + 1) + " of " + order.length;
+      score.textContent = right + " / " + done + " correct";
+      fb.textContent = opts.prompt || "Pick a category.";
+      next.disabled = true;
+      cats.innerHTML = "";
+      opts.cats.forEach(function (c) {
+        var b = document.createElement("button"); b.type = "button"; b.textContent = c.label; b.dataset.k = c.id;
+        b.addEventListener("click", function () { pick(c.id, b); });
+        cats.appendChild(b);
+      });
+    }
+    function pick(k, btn) {
+      if (answered) return;
+      answered = true; done++;
+      var it = order[i], ok = k === it.k;
+      if (ok) { right++; if (opts.onRight) opts.onRight(it); }
+      cats.querySelectorAll("button").forEach(function (b) {
+        b.disabled = true;
+        if (b.dataset.k === it.k) b.classList.add("right");
+      });
+      if (!ok) btn.classList.add("wrong");
+      var label = opts.cats.filter(function (c) { return c.id === it.k; })[0].label;
+      fb.innerHTML = (ok ? '<b class="ok">Correct.</b> ' : '<b class="no">Not quite.</b> It is <b>' + label + '</b>. ') + it.why;
+      score.textContent = right + " / " + done + " correct";
+      next.disabled = false;
+      next.textContent = i === order.length - 1 ? "See results" : "Next item";
+    }
+    next.addEventListener("click", function () { if (!answered) return; i++; show(); });
+    shuf.addEventListener("click", function () { start(true); });
+    start(false);
+  }
+
+  // ---------- A. Sorting game + nested diagram ----------
+  var SORT = [
+    { n: "Currency held by the public", sub: "Bills and coins in wallets and cash registers", k: "m1", short: "Currency (public)", why: "Currency in the hands of households and firms is the most liquid asset. It is in M1, so it is also in M2." },
+    { n: "Stocks", sub: "Shares of a company held in a brokerage account", k: "no", short: "Stocks", why: "Stocks are financial assets. You must sell them for money before you can spend, so they are in neither M1 nor M2." },
+    { n: "Small CD", sub: "A $5,000 certificate of deposit with a 1-year term", k: "m2", short: "Small CDs", why: "Small time deposits (under $100,000) carry a penalty for early withdrawal. They are less liquid, so they count in M2 but not M1." },
+    { n: "Checking deposits", sub: "Balances you can spend by debit card, check, or transfer", k: "m1", short: "Checking deposits", why: "Checkable (demand) deposits are spent directly, so they are in M1 and therefore M2." },
+    { n: "Credit card limit", sub: "A card that lets you borrow up to $5,000", k: "no", short: "Credit card limit", why: "A credit card lets you take out a short-term loan. The limit is borrowing power, not an asset you own. You repay the loan later with money from checking." },
+    { n: "Retail money market mutual fund", sub: "Shares in a fund that holds short-term bonds", k: "m2", short: "Retail MMMF", why: "Retail money market mutual fund shares are near money. They are easy to turn into checking deposits, but they count only in M2." },
+    { n: "Gold bars", sub: "Kept in a home safe", k: "no", short: "Gold bars", why: "Gold once served as commodity money. Today it is a commodity you would have to sell first, so it is not in M1 or M2." },
+    { n: "Savings deposits", sub: "A regular bank savings account", k: "m1", short: "Savings deposits", why: "Since May 2020 the Fed counts savings deposits in M1 because people can now spend from them much like checking. Some older textbooks list them in M2 only." },
+    { n: "Currency in bank vaults", sub: "Cash a bank keeps on hand", k: "no", short: "Vault cash", why: "Cash inside a bank is part of bank reserves. M1 counts only currency held by the public. Counting vault cash and the deposits it backs would count the same dollars twice." },
+    { n: "Money market deposit account", sub: "An account at a bank, insured like savings", k: "m1", short: "Money mkt deposit acct", why: "A money market deposit account is a type of bank savings deposit, so it is in M1. Do not confuse it with a money market mutual fund, which is M2 only." },
+    { n: "Treasury bills", sub: "Short-term U.S. government bonds", k: "no", short: "Treasury bills", why: "Government bonds are financial assets. They are very safe, but they are not money and are not in M1 or M2." },
+    { n: "Six-month time deposit of $20,000", sub: "Withdrawing early costs a penalty", k: "m2", short: "Small time deposits", why: "This is a small time deposit (under $100,000), so it counts in M2 but not M1." },
+    { n: "Large CD of $250,000", sub: "Held by a business", k: "no", short: "Large CDs", why: "Time deposits of $100,000 or more are left out of M2. They are not in M1 either." },
+    { n: "A debit card", sub: "The plastic card itself", k: "no", short: "Debit card (the card)", why: "A debit card is only a way to reach your checking account. The checkable deposit is money and sits in M1. The card itself is not money." }
+  ];
+  var placed = { m1: [], m2: [], no: [] };
+  var nest = document.getElementById("nest");
+  function drawNest() {
+    var E = Lab.el;
+    nest.setAttribute("viewBox", "0 0 440 330");
+    while (nest.firstChild) nest.removeChild(nest.firstChild);
+    E("rect", { x: 6, y: 6, width: 262, height: 318, rx: 12, fill: "var(--accent-soft)", stroke: "var(--accent)", "stroke-width": 2 }, nest);
+    E("text", { x: 18, y: 28, "class": "lbl", style: "fill:var(--accent)" }, nest, "M2");
+    E("text", { x: 46, y: 28, style: "fill:var(--muted)" }, nest, "= M1 + small CDs + retail MMMFs");
+    E("rect", { x: 18, y: 40, width: 238, height: 150, rx: 10, fill: "var(--surface)", stroke: "var(--srpc)", "stroke-width": 2 }, nest);
+    E("text", { x: 30, y: 62, "class": "lbl", style: "fill:var(--srpc)" }, nest, "M1");
+    E("text", { x: 56, y: 62, style: "fill:var(--muted)" }, nest, "= currency + checkable + savings");
+    E("text", { x: 18, y: 212, "class": "lbl", style: "fill:var(--lrpc)" }, nest, "M2 only (near money)");
+    E("rect", { x: 280, y: 6, width: 154, height: 318, rx: 12, fill: "none", stroke: "var(--ghost)", "stroke-width": 2, "stroke-dasharray": "6 5" }, nest);
+    E("text", { x: 292, y: 28, "class": "lbl", style: "fill:var(--muted)" }, nest, "Not money");
+    function list(arr, x, y, color, emptyTxt) {
+      if (!arr.length) { E("text", { x: x, y: y, style: "fill:var(--muted); font-style:italic" }, nest, emptyTxt); return; }
+      arr.forEach(function (t, j) { E("text", { x: x, y: y + j * 18, style: "fill:" + color + "; font-size:12px" }, nest, "• " + t); });
+    }
+    list(placed.m1, 30, 86, "var(--ink)", "Sort items to fill this box");
+    list(placed.m2, 30, 236, "var(--ink)", "Sort items to fill this area");
+    list(placed.no, 292, 52, "var(--ink)", "Sort items to fill");
+  }
+  drill(document.getElementById("sort-game"), {
+    items: SORT, unit: "Item",
+    footer: "Rule of thumb: if you can spend it directly, it is in M1. If it is a small time deposit or retail money market fund that you must convert first, it is M2 only. Loans, stocks, bonds, commodities, and bank reserves are not money.", groupLabel: "Where does it count?", prompt: "Is it in M1, in M2 only, or not money at all?",
+    cats: [{ id: "m1", label: "M1 (and M2)" }, { id: "m2", label: "M2 only" }, { id: "no", label: "Not money" }],
+    onRight: function (it) { if (placed[it.k].indexOf(it.short) < 0) placed[it.k].push(it.short); drawNest(); },
+    onReset: function () { placed = { m1: [], m2: [], no: [] }; drawNest(); }
+  });
+
+  // ---------- B. Household tally ----------
+  var KEYS = ["cash", "chk", "sav", "cd", "mm", "stk", "cc"];
+  var BASE = { cash: 300, chk: 2500, sav: 6000, cd: 5000, mm: 2000, stk: 8000, cc: 5000 };
+  var H = Object.assign({}, BASE), last = null;
+  function usd(v) { return (v < 0 ? "−$" : "$") + Math.abs(Math.round(v)).toLocaleString("en-US"); }
+  function sgn(v) { return v > 0 ? "+" + usd(v) : v < 0 ? usd(v) : "$0"; }
+  function measures(h) { var m1 = h.cash + h.chk + h.sav, m2 = m1 + h.cd + h.mm; return { m1: m1, m2: m2, near: h.cd + h.mm }; }
+
+  var bars = document.getElementById("bars");
+  function drawBars(h) {
+    var m = measures(h), top = Math.max(m.m2, h.stk + h.cc, 1000) * 1.12;
+    var step = [1000, 2000, 5000, 10000, 20000].filter(function (s) { return top / s <= 6; })[0] || 20000;
+    var ymax = Math.ceil(top / step) * step, ticks = [];
+    for (var v = 0; v <= ymax + 1; v += step) ticks.push(v);
+    var names = { 0.5: "M1", 1.5: "M2", 2.5: "Not money" };
+    var F = Lab.frame(bars, { x: [0, 3], y: [0, ymax], xLabel: "Measure", yLabel: "Dollars held", xTicks: [0.5, 1.5, 2.5], yTicks: ticks,
+      fmtX: function (v) { return names[v]; }, fmtY: function (v) { return "$" + (v / 1000) + "k"; } });
+    var minLbl = 15 * ymax / (F.H - F.M.t - F.M.b);
+    function stack(x, segs) {
+      var y0 = 0;
+      segs.forEach(function (s) {
+        if (s[0] <= 0) return;
+        Lab.rect(F, x - 0.32, y0, x + 0.32, y0 + s[0], s[1], 0.9);
+        if (s[0] > minLbl) Lab.el("text", { x: F.sx(x), y: F.sy(y0 + s[0] / 2) + 4, "text-anchor": "middle", style: "fill:var(--surface); font-weight:600; font-size:11px" }, F.svg, s[2] + " " + usd(s[0]));
+        y0 += s[0];
+      });
+      return y0;
+    }
+    var M1segs = [[h.cash, "var(--accent)", "Cash"], [h.chk, "var(--srpc)", "Chk"], [h.sav, "var(--c3)", "Sav"]];
+    var t1 = stack(0.5, M1segs);
+    Lab.tag(F, 0.5, t1 + ymax * 0.025, usd(m.m1), "var(--ink)", "middle");
+    var t2 = stack(1.5, M1segs.concat([[h.cd, "var(--lrpc)", "CDs"], [h.mm, "var(--c4)", "MMMF"]]));
+    Lab.tag(F, 1.5, t2 + ymax * 0.025, usd(m.m2), "var(--ink)", "middle");
+    var t3 = stack(2.5, [[h.stk, "var(--ghost)", "Stocks"]]);
+    if (h.cc > 0) {
+      Lab.el("rect", { x: F.sx(2.18), y: F.sy(t3 + h.cc), width: F.sx(2.82) - F.sx(2.18), height: F.sy(t3) - F.sy(t3 + h.cc), fill: "none", stroke: "var(--muted)", "stroke-width": 1.5, "stroke-dasharray": "5 4" }, F.g);
+      if (h.cc > minLbl) Lab.el("text", { x: F.sx(2.5), y: F.sy(t3 + h.cc / 2) + 4, "text-anchor": "middle", style: "fill:var(--muted); font-size:11px" }, F.svg, "Credit limit");
+    }
+    Lab.tag(F, 2.5, t3 + h.cc + ymax * 0.025, "not counted", "var(--muted)", "middle");
+  }
+
+  var ACTIONS = [
+    { label: "Deposit $200 of cash into checking", from: "cash", to: "chk", amt: 200,
+      why: "Currency held by the public falls by $200 and checkable deposits rise by $200. Both are in M1, so M1 and M2 do not change. The money only changed form." },
+    { label: "Move $2,000 from a CD to checking", from: "cd", to: "chk", amt: 2000,
+      why: "Small time deposits are in M2 only. Checkable deposits are in M1. Money moves from the M2-only part into M1, so M1 rises and M2 stays the same." },
+    { label: "Move $1,000 from checking to savings", from: "chk", to: "sav", amt: 1000,
+      why: "Under the Fed's current definition, savings deposits are in M1, so M1 and M2 do not change. (Under the pre-2020 definition, M1 would have fallen and M2 would have stayed the same.)" },
+    { label: "Buy $1,500 of money market fund shares", from: "chk", to: "mm", amt: 1500,
+      why: "Checkable deposits fall and retail money market fund shares rise. Money leaves M1 but stays inside M2, so M1 falls and M2 does not change." },
+    { label: "Charge $400 on a credit card", from: null, to: null, amt: 400,
+      why: "Using a credit card creates a loan from the card issuer. The household's currency and deposits do not change, so M1 and M2 do not change. Money changes hands only when the bill is paid." },
+    { label: "Pay a $400 card bill from checking", from: "chk", to: null, amt: 400,
+      why: "Paying the bill uses $400 of checkable deposits, so M1 and M2 fall by $400. Repaying a bank loan removes money, just as making a loan creates it (topic 4.4)." },
+    { label: "Sell $3,000 of stock, deposit the cash", from: "stk", to: "chk", amt: 3000,
+      why: "Stocks are not money. Turning them into checkable deposits raises this household's M1 and M2 by $3,000. The buyer of the stock paid from their own deposits, so the economy's money supply does not change." }
+  ];
+  var LIMITS = {};
+  KEYS.forEach(function (k) { var e = document.getElementById("h-" + k); LIMITS[k] = +e.max; });
+
+  function story() {
+    var m = measures(H), html = "";
+    if (last) {
+      var d1 = m.m1 - last.before.m1, d2 = m.m2 - last.before.m2;
+      if (last.blocked) html += "<p><b>" + last.a.label + ":</b> the household does not have enough to do that (or the account would pass the slider's limit). Try Reset household.</p>";
+      else html += "<p><b>" + last.a.label + ".</b> " + last.a.why + "</p><p>Change for this household: M1 " + (d1 === 0 ? "no change" : sgn(d1)) + ", M2 " + (d2 === 0 ? "no change" : sgn(d2)) + ".</p>";
+    } else {
+      html += "<p><b>The Rivera household's money.</b> Drag a slider or pick a transaction to see what moves M1 and M2.</p>";
+    }
+    html += "<ul><li><b>M1</b> = currency " + usd(H.cash) + " + checking " + usd(H.chk) + " + savings " + usd(H.sav) + " = <b>" + usd(m.m1) + "</b>.</li>" +
+      "<li><b>M2</b> = M1 " + usd(m.m1) + " + small CDs " + usd(H.cd) + " + retail money market funds " + usd(H.mm) + " = <b>" + usd(m.m2) + "</b>.</li>" +
+      "<li><b>Not money:</b> " + usd(H.stk) + " in stocks must be sold before it can be spent, and the " + usd(H.cc) + " credit card limit is borrowing power the household does not own.</li></ul>";
+    html += "<p>AP wording: \"M1 is the most liquid measure. M2 includes M1 plus near monies that are easy to convert into M1.\"</p>";
+    return html;
+  }
+  function render() {
+    KEYS.forEach(function (k) {
+      document.getElementById("h-" + k).value = H[k];
+      document.getElementById("o-" + k).textContent = usd(H[k]);
+    });
+    var m = measures(H);
+    drawBars(H);
+    document.getElementById("r-m1").textContent = usd(m.m1);
+    document.getElementById("r-m2").textContent = usd(m.m2);
+    document.getElementById("r-near").textContent = usd(m.near);
+    var chg = document.getElementById("r-chg");
+    if (last && !last.blocked) {
+      var d1 = m.m1 - last.before.m1, d2 = m.m2 - last.before.m2;
+      chg.innerHTML = '<span class="pill ' + (d1 > 0 ? "lr" : d1 < 0 ? "infl" : "rec") + '">M1 ' + (d1 === 0 ? "same" : sgn(d1)) + '</span> <span class="pill ' + (d2 > 0 ? "lr" : d2 < 0 ? "infl" : "rec") + '">M2 ' + (d2 === 0 ? "same" : sgn(d2)) + '</span>';
+    } else chg.textContent = "none yet";
+    document.getElementById("story").innerHTML = story();
+  }
+  KEYS.forEach(function (k) {
+    document.getElementById("h-" + k).addEventListener("input", function (e) { H[k] = parseFloat(e.target.value); last = null; render(); });
+  });
+  document.getElementById("hh-reset").addEventListener("click", function () { H = Object.assign({}, BASE); last = null; render(); });
+  var sc = document.getElementById("scenarios");
+  ACTIONS.forEach(function (a) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = a.label;
+    b.addEventListener("click", function () {
+      var before = measures(H);
+      var ok = (!a.from || H[a.from] >= a.amt) && (!a.to || H[a.to] + a.amt <= LIMITS[a.to]);
+      if (ok) { if (a.from) H[a.from] -= a.amt; if (a.to) H[a.to] += a.amt; }
+      last = { a: a, before: before, blocked: !ok };
+      render();
+    });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- C. Functions drill + commodity/fiat ----------
+  var FN = [
+    { n: "You pay $4 for a sandwich at lunch.", k: "moe", why: "Money is changing hands in a trade, so it is acting as a medium of exchange." },
+    { n: "A menu lists every item's price in dollars.", k: "uoa", why: "Stating prices in a common measure is the unit of account function." },
+    { n: "You put $50 of birthday money in a drawer to spend next summer.", k: "sov", why: "Holding money to buy things later uses it as a store of value." },
+    { n: "A plumber buys groceries without finding a grocer who needs a pipe fixed.", k: "moe", why: "Money removes the need for a double coincidence of wants. That is the medium of exchange function." },
+    { n: "You compare a $6,000 used car with a $3,000 motorcycle and see the car costs twice as much.", k: "uoa", why: "Comparing values using one measure is the unit of account function." },
+    { n: "With prices doubling every few months, families stop keeping savings in cash.", k: "sov", why: "High inflation erodes purchasing power, which weakens money as a store of value." },
+    { n: "A firm's accountant adds up the value of shirts, hats, and shoes sold this year.", k: "uoa", why: "Different goods can be added together only by measuring them in dollars, the unit of account." },
+    { n: "A worker is paid wages in dollars instead of in the products she makes.", k: "moe", why: "Wages paid in money that she can spend on anything use money as a medium of exchange." },
+    { n: "A family keeps an emergency fund in a checking account for next year.", k: "sov", why: "Keeping money to spend in the future is the store of value function." }
+  ];
+  drill(document.getElementById("fn-game"), {
+    items: FN, unit: "Scenario", groupLabel: "Which function of money?", prompt: "Which function of money does this show?",
+    cats: [{ id: "moe", label: "Medium of exchange" }, { id: "uoa", label: "Unit of account" }, { id: "sov", label: "Store of value" }]
+  });
+  var CF = [
+    { n: "Gold coins", k: "com", why: "Gold has value as a metal apart from its use as money." },
+    { n: "A U.S. $20 bill", k: "fiat", why: "The paper is worth almost nothing. It has value because the government declares it legal tender and people accept it." },
+    { n: "Cigarettes used as payment in a prison camp", k: "com", why: "Cigarettes have value as a good people consume, so they are commodity money." },
+    { n: "Euro banknotes", k: "fiat", why: "Euros are not backed by any commodity. Their value comes from government decree and public trust." },
+    { n: "Salt used to pay workers in the ancient world", k: "com", why: "Salt had value as a good for preserving food, so it served as commodity money." }
+  ];
+  drill(document.getElementById("cf-game"), {
+    items: CF, unit: "Quick check", groupLabel: "Commodity or fiat?", prompt: "Commodity money or fiat money?",
+    cats: [{ id: "com", label: "Commodity money" }, { id: "fiat", label: "Fiat money" }]
+  });
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following is included in M2 but not in M1?", o: ["Savings deposits", "Currency held by the public", "Small-denomination time deposits", "Checkable deposits"], c: 2, w: "Small time deposits (CDs under $100,000) count only in M2. Currency, checkable deposits, and savings deposits are all in M1 under the Fed's current definition, so they are in M2 as well." },
+    { s: "An economy has currency held by the public of $200 billion, checkable deposits of $500 billion, savings deposits of $1,000 billion, small time deposits of $300 billion, retail money market funds of $400 billion, and large time deposits of $600 billion. Using the current definitions, what are M1 and M2?", o: ["M1 = $700 billion; M2 = $1,400 billion", "M1 = $1,700 billion; M2 = $3,000 billion", "M1 = $2,400 billion; M2 = $3,000 billion", "M1 = $1,700 billion; M2 = $2,400 billion"], c: 3, w: "M1 = 200 + 500 + 1,000 = 1,700. M2 = 1,700 + 300 + 400 = 2,400. Large time deposits are not in M2, which rules out $3,000 billion. ($700 billion is M1 under the pre-2020 definition, which left out savings deposits.)" },
+    { s: "Maria moves $1,000 from a certificate of deposit into her checking account. What happens to M1 and M2?", o: ["M1 increases by $1,000 and M2 does not change", "M1 and M2 both increase by $1,000", "M1 does not change and M2 decreases by $1,000", "M1 decreases by $1,000 and M2 increases by $1,000"], c: 0, w: "The CD is in M2 only. Checkable deposits are in M1. The $1,000 moves into M1, but it was already counted in M2, so M2 stays the same." },
+    { s: "A store posts the price of every product in dollars, which lets shoppers compare the value of different goods. This illustrates money's function as a", o: ["medium of exchange", "unit of account", "store of value", "form of commodity money"], c: 1, w: "Measuring and comparing value in one common unit is the unit of account function. Medium of exchange would require an actual purchase." },
+    { s: "A period of high inflation most directly weakens which function of money?", o: ["Medium of exchange", "Legal tender status", "Store of value", "Liquidity of checkable deposits"], c: 2, w: "Inflation reduces the purchasing power of each dollar over time, so money held for later buys less. That weakens money as a store of value." },
+    { s: "Why are credit cards not counted in M1 or M2?", o: ["Only some stores accept credit cards", "Credit card spending is counted in M3 instead", "Credit card purchases do not involve any bank", "Using a credit card creates a loan that is later repaid with money"], c: 3, w: "A credit card purchase is a short-term loan from the card issuer. The money is the checkable deposit used to pay the bill. Acceptance by stores has nothing to do with whether it is money." },
+    { s: "U.S. paper currency is best described as", o: ["commodity money, because it is backed by gold", "fiat money, because its value comes from government decree and public acceptance", "commodity-backed money that can be exchanged for silver", "near money, because it is counted only in M2"], c: 1, w: "The dollar is not backed by gold or silver. It has value because the government declares it legal tender and people trust it, which is the definition of fiat money." },
+    { s: "Jordan deposits $500 of currency into his checking account. Before the bank makes any new loans, what happens to M1?", o: ["It does not change", "It increases by $500", "It decreases by $500", "It increases by $500 times the money multiplier"], c: 0, w: "Currency held by the public falls by $500 and checkable deposits rise by $500. Both are in M1, so the total stays the same. The money supply can grow later only if the bank lends out excess reserves (topic 4.4)." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("4.3");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [4], topic: "4.3", compact: true, storageKey: "topic-4.3" });</script>
+</body>
+</html>

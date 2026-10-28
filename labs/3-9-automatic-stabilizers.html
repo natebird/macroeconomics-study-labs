@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Automatic Stabilizers Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.legend .l-c4d { color: var(--c4); }
+.legend .l-c4d::before { background: none; border-top: 2px dashed currentColor; height: 0; }
+.stat .sub { display: block; font-family: var(--body); font-size: .76rem; color: var(--muted); margin-top: 2px; }
+.sorter { display: grid; gap: 12px; }
+.sort-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sort-n { font-family: var(--mono); font-size: .76rem; color: var(--muted); }
+.sort-item { font-size: 1.12rem; font-weight: 500; min-height: 2.6em; }
+.sort-btns, .sort-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.sort-btns button { border-radius: 8px; padding: 9px 16px; }
+.sort-btns button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.sort-btns button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.sort-btns button:disabled { cursor: default; }
+.sort-fb { font-size: .94rem; color: var(--muted); min-height: 1.5em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 3 · Topic 3.9</span>
+  <h1>The Automatic Stabilizers Study Lab</h1>
+  <p class="lede">Automatic stabilizers are tax and transfer rules that push against the business cycle on their own, with no new law. In a recession, tax revenue falls and transfer payments rise; in an expansion, the reverse happens. Step through a business cycle below, watch the budget balance move, and then sort policies into automatic and discretionary.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Ride the business cycle</h2>
+    <p>Potential GDP is 1,000 billion. At potential, tax revenue is 200, transfer payments are 50, and government purchases are 150, so the budget is balanced. Government purchases never change in this model: nobody passes a new law. All numbers are in billions of dollars.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Business cycle <small>real GDP by quarter</small></h3>
+      <svg class="chart" id="cyc" role="img" aria-label="Timeline of real GDP around potential GDP over twelve quarters"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>This quarter's budget <small>dashed line = level at potential</small></h3>
+      <svg class="chart" id="bud" role="img" aria-label="Bar chart of tax revenue compared with government purchases plus transfer payments"></svg>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Real GDP (with stabilizers)</span><span class="l-c4d">Without stabilizers</span><span class="l-lrpc">Potential GDP</span><span class="l-srpc">Tax revenue</span><span class="l-c3">Transfer payments</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-q">Quarter <output id="o-q"></output></label>
+        <input type="range" id="s-q" min="1" max="12" step="1">
+        <span class="hint">Move through the cycle one quarter at a time</span>
+      </div>
+      <div class="ctl">
+        <label for="s-k">Size of the cycle <output id="o-k"></output></label>
+        <input type="range" id="s-k" min="0.5" max="1.5" step="0.25">
+        <span class="hint">Left = mild swings, right = severe swings</span>
+      </div>
+    </div>
+    <div class="toggles">
+      <label class="check" for="c-cmp"><input type="checkbox" id="c-cmp"> Compare with an economy that has no automatic stabilizers</label>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="primary" id="btn-play" type="button">Play the cycle</button>
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Tax revenue (progressive income tax)</div><div class="v" id="r-t">200.0</div></div>
+    <div class="stat"><div class="k">Transfer payments</div><div class="v" id="r-tr">50.0</div></div>
+    <div class="stat"><div class="k">Budget balance</div><div class="v" id="r-b">0.0</div></div>
+    <div class="stat"><div class="k">Disposable income</div><div class="v" id="r-yd">850.0</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+
+  <div class="card sorter">
+    <div class="sort-top">
+      <h3>Sort it: automatic stabilizer or discretionary fiscal policy?</h3>
+      <span class="score" id="sort-score">0 / 0 correct</span>
+    </div>
+    <p style="color:var(--muted); font-size:.92rem;">Ask one question: did lawmakers have to pass something new? If yes, it is discretionary. If the change happens on its own under rules already in place, it is an automatic stabilizer.</p>
+    <p class="sort-n" id="sort-n"></p>
+    <p class="sort-item" id="sort-item"></p>
+    <div class="sort-btns">
+      <button type="button" id="sort-a">Automatic stabilizer</button>
+      <button type="button" id="sort-d">Discretionary fiscal policy</button>
+    </div>
+    <div class="sort-fb" id="sort-fb" aria-live="polite"></div>
+    <div class="sort-nav">
+      <button type="button" class="primary" id="sort-next">Next item</button>
+      <button type="button" id="sort-shuffle">Reshuffle and start over</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Automatic stabilizers</h3><p>Tax and spending rules that raise aggregate demand in a recession and restrain it in an expansion without any new action by lawmakers. The main examples are the progressive income tax, unemployment insurance, and food assistance.</p></div>
+    <div class="card"><span class="tag">No new law</span><h3>Built in, so they act fast</h3><p>Discretionary fiscal policy needs a new bill, so it faces long recognition and decision lags. Automatic stabilizers are already written into law. They start working as soon as incomes and jobs change.</p></div>
+    <div class="card"><span class="tag">Taxes</span><h3>Progressive income tax</h3><p>Higher incomes face higher tax rates. When incomes fall, tax collections fall, and they fall faster than income because people drop into lower brackets. When incomes rise, collections rise faster than income.</p></div>
+    <div class="card"><span class="tag">Transfers</span><h3>Unemployment and food assistance</h3><p>More people qualify for unemployment insurance and food assistance when jobs disappear, so transfer payments rise in a recession. As hiring picks up, fewer people qualify and transfers fall.</p></div>
+    <div class="card"><span class="tag">Budget</span><h3>Deficit in recessions, surplus in booms</h3><p>Lower taxes plus higher transfers move the budget toward deficit in a recession. Higher taxes plus lower transfers move it toward surplus in an expansion. Government purchases do not have to change at all.</p></div>
+    <div class="card"><span class="tag">Size of swings</span><h3>Smaller fluctuations, not none</h3><p>By cushioning disposable income, stabilizers keep consumption and AD from swinging as far. AD still shifts, so recessions and booms still happen. Stabilizers reduce their size; they do not close the gap by themselves.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Automatic stabilizers cheat sheet</h2>
+    <p>Memorize the direction of each row. FRQs often ask what happens to tax revenue, transfer payments, or the budget balance in a recession.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Item</th><th>In a recession</th><th>In an expansion</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Income tax revenue (progressive)</td><td><b>Falls</b>, faster than income</td><td><span class="shift">Rises</span>, faster than income</td><td>Incomes change, and people move into lower or higher tax brackets</td></tr>
+      <tr><td>Corporate profit tax revenue</td><td><b>Falls</b></td><td><span class="shift">Rises</span></td><td>Profits swing with sales</td></tr>
+      <tr><td>Unemployment insurance payments</td><td><span class="shift">Rise</span></td><td><b>Fall</b></td><td>More or fewer people are out of work</td></tr>
+      <tr><td>Food assistance and other means-tested transfers</td><td><span class="shift">Rise</span></td><td><b>Fall</b></td><td>More or fewer families have incomes low enough to qualify</td></tr>
+      <tr><td>Budget balance</td><td>Moves <b>toward deficit</b></td><td>Moves <span class="lshift">toward surplus</span></td><td>Taxes and transfers move in opposite directions</td></tr>
+      <tr><td>Disposable income and consumption</td><td>Fall by <b>less</b> than they would otherwise</td><td>Rise by <b>less</b> than they would otherwise</td><td>Disposable income = income − taxes + transfers</td></tr>
+      <tr><td>Aggregate demand</td><td>Shifts left by <b>less</b></td><td>Shifts right by <b>less</b></td><td>Smaller swings in consumption mean smaller swings in AD</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Writing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Answers that earn points</h3>
+      <ul>
+        <li>Name the direction first, then the reason: "Tax revenue decreases because incomes fall." Graders look for the direction word (increase, decrease) and the cause.</li>
+        <li>Write the chain in full: lower taxes and higher transfers, so disposable income falls by less, so consumption falls by less, so AD decreases by less.</li>
+        <li>For the budget, write "moves toward a deficit" (or "the deficit increases"). If the budget started in surplus, the correct phrasing is that the surplus shrinks.</li>
+        <li>If asked to show it on an AD–AS graph, label the axes <b>Real GDP</b> and <b>Price level</b>, draw LRAS at Y<sub>f</sub>, and show AD shifting by a smaller distance. Stabilizers do not get their own curve.</li>
+        <li>Show your math for budget questions: budget balance = tax revenue − government purchases − transfer payments.</li>
+        <li>To classify a policy, say whether it needs new legislation. "Requires no new action by Congress" is the phrase that earns the point.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Calling a new law that extends unemployment benefits an automatic stabilizer. Normal benefits are automatic; an extension voted by Congress is discretionary.</li>
+        <li>Saying stabilizers end recessions or close the output gap. They make the swing smaller; the gap still exists.</li>
+        <li>Saying the budget moves toward surplus in a recession. Revenue falls and transfers rise, so it moves toward deficit.</li>
+        <li>Saying a recession deficit means the government chose to spend more. Government purchases can stay the same; taxes and transfers did the moving.</li>
+        <li>Thinking any tax stabilizes. A lump-sum tax (the same dollar amount at every income) does not change with income, so it is not a stabilizer. Taxes that rise with income are, and progressive taxes do the most.</li>
+        <li>Listing central bank actions. Open market operations and interest on reserves are monetary policy, not fiscal policy.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 3.9. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-3.html">Unit 3 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { q: 9, k: 1, cmp: true };
+  var S = Object.assign({}, BASE);
+
+  // ---------- Model ----------
+  // Output gap with stabilizers (billions), quarter 1..12, scaled by k.
+  var GAP = [0, 15, 30, 40, 30, 10, -15, -35, -50, -40, -20, 0];
+  var PHASE = ["At potential", "Expansion", "Expansion", "Peak", "Contraction", "Contraction", "Contraction", "Contraction", "Trough", "Expansion (recovery)", "Expansion (recovery)", "Back at potential"];
+  var YP = 1000, G = 150, NOSTAB = 1.5; // without stabilizers the gap is 1.5 times as large (teaching assumption)
+  function gapAt(q, k) { return k * GAP[q - 1]; }
+  function model(q, k) {
+    var d = gapAt(q, k);
+    var T = 200 + 0.25 * d;              // progressive: marginal rate 25% > average rate 20%
+    var UI = 30 - 0.12 * d, FOOD = 20 - 0.03 * d, Tr = UI + FOOD;
+    var bal = T - G - Tr;                // = 0.4 d
+    var Y = YP + d, YD = Y - T + Tr;     // = 850 + 0.6 d
+    var dNo = NOSTAB * d, Yno = YP + dNo, YDno = Yno - 200 + 50; // taxes and transfers stuck at their potential levels
+    return { d: d, Y: Y, T: T, rate: 100 * T / Y, UI: UI, FOOD: FOOD, Tr: Tr, bal: bal, YD: YD, dNo: dNo, Yno: Yno, YDno: YDno };
+  }
+
+  // ---------- Graphs ----------
+  var f = Lab.fmt;
+  var svgC = document.getElementById("cyc"), svgB = document.getElementById("bud");
+  function drawCycle(m) {
+    var F = Lab.frame(svgC, { x: [0.5, 12.5], y: [880, 1100], xLabel: "Quarter", yLabel: "Real GDP (billions)",
+      xTicks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], yTicks: [900, 950, 1000, 1050, 1100],
+      fmtX: function (v) { return "Q" + v; }, fmtY: String });
+    Lab.rect(F, S.q - 0.4, 880, S.q + 0.4, 1100, "var(--accent)", 0.1);
+    Lab.hline(F, YP, "var(--lrpc)", 2.5);
+    Lab.tag(F, 0.65, 985, "Potential GDP", "var(--lrpc)");
+    var pts = [], ptsNo = [];
+    for (var q = 1; q <= 12; q++) { pts.push([q, YP + gapAt(q, S.k)]); ptsNo.push([q, YP + NOSTAB * gapAt(q, S.k)]); }
+    if (S.cmp) {
+      Lab.line(F, ptsNo, "var(--c4)", 2.5, "6 5");
+      Lab.tag(F, 4, YP + NOSTAB * 40 * S.k + 6, "Without stabilizers", "var(--c4)", "middle");
+      Lab.dot(F, S.q, m.Yno, "var(--c4)", false);
+    }
+    Lab.line(F, pts, "var(--accent)", 3);
+    Lab.tag(F, 4, YP + 20 * S.k - 5, "Real GDP", "var(--accent)", "middle");
+    Lab.dot(F, S.q, m.Y, "var(--ink)", false);
+  }
+
+  function drawBudget(m) {
+    var F = Lab.frame(svgB, { x: [0, 3.8], y: [0, 250], xLabel: "", yLabel: "Billions of dollars",
+      xTicks: [], yTicks: [0, 50, 100, 150, 200, 250], fmtY: String });
+    var spend = G + m.Tr;
+    Lab.rect(F, 0.5, 0, 1.4, m.T, "var(--srpc)", 0.85);
+    Lab.rect(F, 2.4, 0, 3.3, G, "var(--accent)", 0.85);
+    Lab.rect(F, 2.4, G, 3.3, spend, "var(--c3)", 0.85);
+    Lab.hline(F, 200, "var(--ghost)", 2, "6 5");
+    Lab.tag(F, 0.95, m.T / 2, "Taxes", "var(--surface)", "middle");
+    Lab.tag(F, 2.85, G / 2, "G = 150", "var(--surface)", "middle");
+    Lab.tag(F, 2.85, G + m.Tr / 2 - 4, "Transfers", "var(--surface)", "middle");
+    Lab.tag(F, 0.95, m.T + 6, f(m.T), "var(--srpc)", "middle");
+    Lab.tag(F, 2.85, spend + 6, f(spend), "var(--c3)", "middle");
+    var below = [["Tax revenue", 0.95], ["G + transfers", 2.85]];
+    below.forEach(function (b) { Lab.el("text", { x: F.sx(b[1]), y: F.H - F.M.b + 18, "text-anchor": "middle", "class": "lbl", style: "fill:var(--ink)" }, F.svg, b[0]); });
+    var bal = m.bal, col = bal > 0.05 ? "var(--good)" : bal < -0.05 ? "var(--bad)" : "var(--muted)";
+    Lab.line(F, [[1.4, m.T], [1.9, m.T]], "var(--muted)", 1, "3 3");
+    Lab.line(F, [[2.4, spend], [1.9, spend]], "var(--muted)", 1, "3 3");
+    if (Math.abs(bal) > 0.05) Lab.line(F, [[1.9, m.T], [1.9, spend]], col, 4);
+    var txt = bal > 0.05 ? "Surplus " + f(bal) : bal < -0.05 ? "Deficit " + f(-bal) : "Balanced";
+    Lab.tag(F, 1.9, Math.max(m.T, spend) + 16, txt, col, "middle");
+  }
+
+  // ---------- Story ----------
+  function story(m) {
+    var q = S.q, d = m.d, p = [];
+    var head = "<b>Quarter " + q + ": " + PHASE[q - 1].toLowerCase() + ".</b> ";
+    if (Math.abs(d) < 0.05) {
+      head += "Real GDP equals potential GDP (" + f(m.Y) + "), so there is no output gap.";
+      p.push(head);
+      p.push("Tax revenue is 200.0 and transfer payments are 50.0. With government purchases of 150, the budget is balanced (200 − 150 − 50 = 0).");
+      if (q === 12) p.push("Look back over the cycle: the budget ran a surplus near the peak and a deficit near the trough, and Congress never passed a new law. That is what makes these stabilizers <b>automatic</b>.");
+      else p.push("Press <b>Play the cycle</b> or move the quarter slider to see what the stabilizers do as the economy grows and then slides into recession.");
+      return "<p>" + p.join("</p><p>") + "</p>";
+    }
+    var up = d > 0, gapAbs = f(Math.abs(d));
+    head += "Real GDP is " + f(m.Y) + ", " + gapAbs + " " + (up ? "above" : "below") + " potential (" + (up ? "an inflationary" : "a recessionary") + " gap).";
+    if (q === 5 || q === 6) head += " Output is falling, but it is still above potential.";
+    if (q === 10 || q === 11) head += " Output is rising again, but it is still below potential.";
+    var li = [];
+    li.push(up
+      ? "Incomes rose, so income tax collections rose to <b>" + f(m.T) + "</b>. The tax is progressive, so the average tax rate rose from 20.0% to " + f(m.rate, 2) + "%. Revenue grows faster than income."
+      : "Incomes fell, so income tax collections fell to <b>" + f(m.T) + "</b>. The tax is progressive, so the average tax rate fell from 20.0% to " + f(m.rate, 2) + "%. Revenue falls faster than income.");
+    li.push(up
+      ? "Fewer people are out of work or qualify for help, so transfer payments fell to <b>" + f(m.Tr) + "</b> (unemployment benefits " + f(m.UI) + ", food assistance " + f(m.FOOD) + ")."
+      : "More people lost jobs or now qualify for help, so transfer payments rose to <b>" + f(m.Tr) + "</b> (unemployment benefits " + f(m.UI) + ", food assistance " + f(m.FOOD) + ").");
+    li.push("Government purchases stayed at 150 and no new law passed, yet the budget shows a <b>" + (m.bal > 0 ? "surplus of " + f(m.bal) : "deficit of " + f(-m.bal)) + "</b> (" + f(m.T) + " − 150 − " + f(m.Tr) + ").");
+    if (q > 1) {
+      var prev = model(q - 1, S.k), db = m.bal - prev.bal;
+      if (Math.abs(db) > 0.05) li.push("Since last quarter the budget moved <b>toward " + (db > 0 ? "surplus" : "deficit") + "</b> by " + f(Math.abs(db)) + ", because output " + (db > 0 ? "rose" : "fell") + ".");
+    }
+    var ydChg = m.YD - 850;
+    var yd = "Disposable income (income − taxes + transfers) is " + f(m.YD) + ", " + (up ? "up " : "down ") + f(Math.abs(ydChg)) + " from 850. ";
+    if (S.cmp) {
+      yd += "Without automatic stabilizers, taxes and transfers would stay at 200 and 50. Spending would swing harder, real GDP would be " + f(m.Yno) + ", and disposable income would be " + f(m.YDno) + ", " + (up ? "up " : "down ") + f(Math.abs(m.YDno - 850)) + ". The budget would stay balanced, and the swing would be bigger.";
+    } else {
+      yd += "Turn on the comparison to see how much bigger the swing would be without stabilizers.";
+    }
+    var ap = up
+      ? "<b>AP answer:</b> In an expansion, automatic stabilizers increase tax revenue and decrease transfer payments. Disposable income and consumption rise by less, so AD increases by less and the budget moves toward surplus."
+      : "<b>AP answer:</b> In a recession, automatic stabilizers decrease tax revenue and increase transfer payments. Disposable income and consumption fall by less, so AD decreases by less and the budget moves toward deficit.";
+    return "<p>" + head + "</p><ul>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul><p>" + yd + "</p><p>" + ap + "</p>";
+  }
+
+  // ---------- Controls ----------
+  var elQ = document.getElementById("s-q"), elK = document.getElementById("s-k"), elC = document.getElementById("c-cmp");
+  var btnPlay = document.getElementById("btn-play"), stopAnim = null;
+  function render() {
+    var m = model(S.q, S.k);
+    elQ.value = S.q; elK.value = S.k; elC.checked = S.cmp;
+    document.getElementById("o-q").textContent = "Q" + S.q + " · " + PHASE[S.q - 1];
+    document.getElementById("o-k").textContent = S.k === 1 ? "typical" : S.k < 1 ? "milder ×" + S.k : "severe ×" + S.k;
+    drawCycle(m); drawBudget(m);
+    document.getElementById("r-t").innerHTML = f(m.T) + '<span class="sub">' + f(m.rate, 2) + "% of GDP</span>";
+    document.getElementById("r-tr").innerHTML = f(m.Tr) + '<span class="sub">UI ' + f(m.UI) + " · food " + f(m.FOOD) + "</span>";
+    document.getElementById("r-b").innerHTML = m.bal > 0.05 ? '<span class="pill lr">Surplus ' + f(m.bal) + "</span>" : m.bal < -0.05 ? '<span class="pill infl">Deficit ' + f(-m.bal) + "</span>" : "0.0";
+    document.getElementById("r-yd").innerHTML = f(m.YD) + '<span class="sub">' + (S.cmp ? "without stabilizers: " + f(m.YDno) : "at potential: 850.0") + "</span>";
+    document.getElementById("story").innerHTML = story(m);
+  }
+  function stop() { if (stopAnim) { stopAnim(); stopAnim = null; } btnPlay.textContent = "Play the cycle"; }
+  btnPlay.addEventListener("click", function () {
+    if (stopAnim) { stop(); return; }
+    if (S.q >= 12) S.q = 1;
+    var from = S.q, n = 12 - from;
+    render();
+    btnPlay.textContent = "Pause";
+    stopAnim = Lab.animate(n * 650, function (t) {
+      var q = from + Math.round(t * n);
+      if (q !== S.q) { S.q = q; render(); }
+    }, function () { stopAnim = null; btnPlay.textContent = "Play the cycle"; });
+  });
+  elQ.addEventListener("input", function () { stop(); S.q = parseInt(elQ.value, 10); render(); });
+  elK.addEventListener("input", function () { S.k = parseFloat(elK.value); render(); });
+  elC.addEventListener("change", function () { S.cmp = elC.checked; render(); });
+  document.getElementById("btn-reset").addEventListener("click", function () { stop(); S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["At potential (Q1)", { q: 1 }],
+    ["Peak of an expansion (Q4)", { q: 4 }],
+    ["Sliding into recession (Q7)", { q: 7 }],
+    ["Trough of a recession (Q9)", { q: 9 }],
+    ["Severe recession", { q: 9, k: 1.5 }],
+    ["Mild boom", { q: 4, k: 0.5 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { stop(); S = Object.assign({}, BASE, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Sorting drill ----------
+  var ITEMS = [
+    { t: "Income tax collections fall as workers' paychecks shrink during a recession.", a: "a", w: "The tax law did not change. Lower incomes simply produce less tax revenue." },
+    { t: "More laid-off workers start collecting unemployment insurance.", a: "a", w: "Workers qualify under rules already on the books. Benefits rise without any vote." },
+    { t: "More families qualify for food assistance after their incomes drop.", a: "a", w: "Eligibility depends on income, so spending on food assistance rises on its own." },
+    { t: "A worker's raise pushes part of her income into a higher tax bracket.", a: "a", w: "This is the progressive income tax at work: tax payments rise faster than income in good times." },
+    { t: "Corporate profit tax revenue rises during a boom.", a: "a", w: "Higher profits automatically produce more tax revenue under the existing tax rate." },
+    { t: "Fewer people claim unemployment benefits as hiring picks up.", a: "a", w: "Transfer spending falls on its own as the economy expands, which restrains AD." },
+    { t: "Payroll tax collections rise as more people find jobs.", a: "a", w: "More workers earning wages means more tax collected at the same rates, with no new law." },
+    { t: "Congress passes a one-time tax rebate check for every household.", a: "d", w: "Lawmakers had to pass a new law. That makes it discretionary expansionary fiscal policy." },
+    { t: "Lawmakers vote to fund new highway projects to create jobs in a recession.", a: "d", w: "A new spending bill is a deliberate choice by Congress, so it is discretionary." },
+    { t: "Congress votes to extend unemployment benefits by 13 extra weeks.", a: "d", w: "Regular benefits are automatic, but an extension requires a new vote. That is discretionary." },
+    { t: "A new law cuts income tax rates in every bracket.", a: "d", w: "Changing the tax rates themselves takes legislation. It is discretionary fiscal policy." },
+    { t: "Congress raises income tax rates to slow an overheating economy.", a: "d", w: "A deliberate tax increase is discretionary contractionary fiscal policy." },
+    { t: "Lawmakers approve a bill that increases military purchases.", a: "d", w: "New government purchases approved by a vote are discretionary." },
+    { t: "The government passes a stimulus package that sends money to state governments.", a: "d", w: "A stimulus package is passed by lawmakers in response to conditions, so it is discretionary." }
+  ];
+  var LABEL = { a: "an automatic stabilizer", d: "discretionary fiscal policy" };
+  var order = [], idx = 0, done = 0, right = 0, answered = false;
+  var eN = document.getElementById("sort-n"), eItem = document.getElementById("sort-item"), eFb = document.getElementById("sort-fb"), eScore = document.getElementById("sort-score");
+  var bA = document.getElementById("sort-a"), bD = document.getElementById("sort-d"), bNext = document.getElementById("sort-next");
+  function shuffle() {
+    order = ITEMS.map(function (_, i) { return i; });
+    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+    idx = 0; done = 0; right = 0; showItem();
+  }
+  function showItem() {
+    answered = false;
+    var it = ITEMS[order[idx]];
+    eN.textContent = "Item " + (idx + 1) + " of " + ITEMS.length;
+    eItem.textContent = it.t;
+    eFb.textContent = "";
+    [bA, bD].forEach(function (b) { b.disabled = false; b.classList.remove("right", "wrong"); });
+    bNext.disabled = true; bNext.textContent = idx === ITEMS.length - 1 ? "Finish" : "Next item";
+    eScore.textContent = right + " / " + done + " correct";
+  }
+  function pick(choice) {
+    if (answered) return;
+    answered = true; done++;
+    var it = ITEMS[order[idx]], ok = choice === it.a;
+    if (ok) right++;
+    bA.disabled = true; bD.disabled = true;
+    (it.a === "a" ? bA : bD).classList.add("right");
+    if (!ok) (choice === "a" ? bA : bD).classList.add("wrong");
+    eFb.innerHTML = (ok ? "<b style='color:var(--good)'>Correct.</b> " : "<b style='color:var(--bad)'>Not quite.</b> This is " + LABEL[it.a] + ". ") + it.w;
+    eScore.textContent = right + " / " + done + " correct";
+    bNext.disabled = false;
+  }
+  bA.addEventListener("click", function () { pick("a"); });
+  bD.addEventListener("click", function () { pick("d"); });
+  bNext.addEventListener("click", function () {
+    if (idx < ITEMS.length - 1) { idx++; showItem(); return; }
+    eN.textContent = "Finished";
+    eItem.textContent = "You sorted " + right + " of " + ITEMS.length + " correctly. Reshuffle to try again.";
+    eFb.textContent = "";
+    bA.disabled = true; bD.disabled = true; bA.classList.remove("right", "wrong"); bD.classList.remove("right", "wrong");
+    bNext.disabled = true;
+  });
+  document.getElementById("sort-shuffle").addEventListener("click", shuffle);
+  shuffle();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following is an example of an automatic stabilizer?", o: ["A tax rebate passed by Congress during a recession", "A new federal highway construction program", "Unemployment insurance payments that rise as workers lose their jobs", "An open market purchase of bonds by the central bank"], c: 2, w: "Unemployment insurance pays out under existing rules whenever people lose jobs, with no new law. A rebate and a highway program need new legislation, so they are discretionary. An open market purchase is monetary policy." },
+    { s: "An economy enters a recession and no new fiscal legislation is passed. What happens to the government's budget?", o: ["It moves toward a deficit because tax revenue falls and transfer payments rise", "It moves toward a surplus because tax revenue falls and transfer payments fall", "It does not change because government purchases did not change", "It moves toward a surplus because the government spends less in recessions"], c: 0, w: "Falling incomes reduce tax revenue and more people qualify for transfers. Both push the budget toward deficit even with government purchases unchanged. That is why choice C is wrong: taxes and transfers change on their own." },
+    { s: "At full employment the budget is balanced: tax revenue is 200, government purchases are 150, and transfer payments are 50 (billions). In a recession, tax revenue falls to 185 and transfer payments rise to 58. Government purchases do not change. What is the budget balance now?", o: ["A deficit of 15", "A deficit of 23", "A surplus of 23", "A deficit of 8"], c: 1, w: "Budget balance = taxes − government purchases − transfers = 185 − 150 − 58 = −23, a deficit of 23. A deficit of 15 counts only the drop in taxes and a deficit of 8 counts only the rise in transfers; the stabilizers add together." },
+    { s: "A fall in consumer confidence shifts aggregate demand to the left. Compared with an economy that has no automatic stabilizers, an economy with automatic stabilizers will have:", o: ["A larger leftward shift of AD and a larger fall in real GDP", "No shift of AD, because the stabilizers fully offset the shock", "A rightward shift of AD that creates an inflationary gap", "A smaller leftward shift of AD and a smaller fall in real GDP"], c: 3, w: "Lower taxes and higher transfers cushion disposable income, so consumption falls by less and AD shifts left by less. The stabilizers reduce the size of the recession but do not eliminate it, so choice B is wrong." },
+    { s: "Why do automatic stabilizers usually affect the economy sooner than discretionary fiscal policy?", o: ["They require no new legislation, so there is no decision lag in Congress", "They are controlled by the central bank, which meets more often", "They change the money supply directly", "They only work during expansions"], c: 0, w: "Automatic stabilizers are already written into tax and transfer law, so they respond as soon as incomes and jobs change. Discretionary policy must wait for lawmakers to recognize the problem, agree on a bill, and carry it out." },
+    { s: "Under a progressive income tax, what happens during an economic expansion?", o: ["Tax revenue falls because tax rates are cut automatically", "Tax revenue rises by the same percentage as income", "Tax revenue rises by a larger percentage than income, which slows the growth of disposable income", "Tax revenue stays constant because the tax brackets do not change"], c: 2, w: "As incomes rise, more income falls into higher brackets, so the average tax rate rises. Tax revenue grows faster than income, which restrains disposable income, consumption, and AD. Revenue rising by the same percentage as income describes a proportional tax." },
+    { s: "During a deep recession, Congress votes to extend unemployment benefits for an extra 26 weeks. This action is best described as:", o: ["An automatic stabilizer, because it involves unemployment benefits", "Contractionary discretionary fiscal policy", "Expansionary monetary policy", "Expansionary discretionary fiscal policy"], c: 3, w: "The extension required a new vote, so it is discretionary. It raises transfer payments and AD, so it is expansionary. The regular benefits that start when someone loses a job are the automatic stabilizer; the extension is not." },
+    { s: "Real GDP rises by 40 billion during an expansion. Because of automatic stabilizers, tax revenue rises by 10 billion and transfer payments fall by 6 billion. By how much does disposable income change?", o: ["It rises by 40 billion", "It rises by 24 billion", "It rises by 56 billion", "It rises by 34 billion"], c: 1, w: "Disposable income = income − taxes + transfers. The change is 40 − 10 + (−6) = 24 billion. Without stabilizers, disposable income would rise by the full 40, so the stabilizers shrink the swing. Choice C adds the tax and transfer changes in the wrong direction." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("3.9");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [3], topic: "3.9", compact: true, storageKey: "topic-3.9" });</script>
+</body>
+</html>

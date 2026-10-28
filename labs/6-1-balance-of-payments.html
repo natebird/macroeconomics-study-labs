@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance of Payments Accounts Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.sub-h { font-size: 1.2rem; }
+.game { display: grid; gap: 14px; align-content: start; }
+.g-count2 { font-family: var(--mono); font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.item { font-family: var(--display); font-size: 1.22rem; font-weight: 600; line-height: 1.35; min-height: 3.3em; }
+.step { display: grid; gap: 6px; }
+.step .tag { margin: 0; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices button { text-align: left; border-radius: 8px; }
+.choices button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.choices button.right { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.choices button.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.choices button:disabled { cursor: default; }
+.fb { border-left: 4px solid var(--rule); padding: 8px 12px; font-size: .93rem; background: var(--paper); border-radius: 0 8px 8px 0; }
+.fb.ok { border-left-color: var(--good); }
+.fb.no { border-left-color: var(--bad); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.bins { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bin { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: .84rem; display: grid; gap: 4px; align-content: start; }
+.bin h4 { margin: 0; font-size: .8rem; font-family: var(--mono); font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.bin ul { margin: 0; padding-left: 16px; display: grid; gap: 3px; }
+.bin .none { color: var(--muted); font-style: italic; }
+.cr { color: var(--good); font-weight: 600; }
+.db { color: var(--bad); font-weight: 600; }
+.rules { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .88rem; }
+.txlist { display: grid; gap: 8px; }
+.sticky-chart { align-content: start; align-self: start; position: sticky; top: 12px; }
+@media (max-width: 860px) { .sticky-chart { position: static; } }
+.tx { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: .9rem; cursor: pointer; }
+.tx:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.tx input { width: 18px; height: 18px; accent-color: var(--accent); margin: 2px 0 0; }
+.tx .ents { grid-column: 2; display: flex; flex-wrap: wrap; gap: 4px 12px; font-family: var(--mono); font-size: .76rem; color: var(--muted); }
+@media (max-width: 520px) { .bins { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 6 · Topic 6.1</span>
+  <h1>Balance of Payments Accounts Study Lab</h1>
+  <p class="lede">The balance of payments records every transaction between a country's residents and the rest of the world. Trade, income, and gifts go in the current account; purchases and sales of assets go in the capital and financial account, and the two always sum to zero. Sort transactions into the right account with the right sign, then build a ledger and watch the balances offset.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Sort it, then balance it</h2>
+    <p>Every entry is from the point of view of the United States. Money flowing into the U.S. is a credit (+). Money flowing out is a debit (−).</p>
+  </div>
+
+  <h3 class="sub-h">A. Sorting game</h3>
+  <div class="lab">
+    <div class="card game">
+      <div class="g-count2"><span id="g-pos">Item 1 of 15</span><span id="g-score">0 / 0 fully correct</span></div>
+      <p class="item" id="g-item"></p>
+      <div class="step">
+        <span class="tag">Step 1: Which account?</span>
+        <div class="choices" id="g-acct" role="group" aria-label="Choose the account"></div>
+      </div>
+      <div class="step">
+        <span class="tag">Step 2: Credit or debit for the U.S.?</span>
+        <div class="choices" id="g-sign" role="group" aria-label="Choose credit or debit"></div>
+      </div>
+      <div class="btnrow">
+        <button type="button" class="primary" id="g-check" disabled>Check answer</button>
+        <button type="button" id="g-next">Next item</button>
+        <button type="button" id="g-shuffle">Reshuffle and restart</button>
+      </div>
+      <div class="fb" id="g-fb" aria-live="polite"></div>
+    </div>
+    <div class="card game">
+      <h3>How to decide</h3>
+      <ol class="rules">
+        <li>A good or service is bought or sold: <b>current account, trade in goods and services</b>.</li>
+        <li>Interest, dividends, or profits earned on assets owned abroad: <b>current account, investment income</b>.</li>
+        <li>A one-way gift, aid, or money sent home with nothing bought: <b>current account, transfers</b>.</li>
+        <li>An asset changes hands (stocks, bonds, real estate, factories, bank deposits, official reserves): <b>capital and financial account</b>.</li>
+        <li>Payment comes into the U.S. (exports, foreigners buying U.S. assets): <span class="cr">credit +</span>. Payment goes out (imports, Americans buying foreign assets): <span class="db">debit −</span>.</li>
+      </ol>
+      <h3>Sorted correctly so far</h3>
+      <div class="bins" id="g-bins"></div>
+    </div>
+  </div>
+
+  <h3 class="sub-h">B. The ledger: every transaction has two sides</h3>
+  <div class="lab">
+    <div class="card" style="display:grid; gap:10px; align-content:start;">
+      <h3>Pick this year's transactions <small style="font-family:var(--body); font-weight:400; font-size:.82rem; color:var(--muted);">billions of dollars</small></h3>
+      <div class="txlist" id="txlist"></div>
+    </div>
+    <div class="card graph-card sticky-chart">
+      <h3>U.S. balance of payments <small>billions of dollars</small></h3>
+      <svg class="chart" id="bop" role="img" aria-label="Bar chart of the U.S. balance of payments accounts"></svg>
+      <div class="legend"><span class="l-ad">Current account items</span><span class="l-srpc">Capital and financial account items</span><span class="l-lrpc">Sum of both accounts</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="display:grid; gap:10px;">
+    <div class="tag">Try a scenario</div>
+    <div class="scenarios" id="scenarios"></div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Balance of trade</div><div class="v" id="r-bt">0</div></div>
+    <div class="stat"><div class="k">Current account</div><div class="v" id="r-ca">0</div></div>
+    <div class="stat"><div class="k">Capital and financial account</div><div class="v" id="r-fa">0</div></div>
+    <div class="stat"><div class="k">Current + financial</div><div class="v" id="r-sum">0</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Definition</span><h3>Balance of payments</h3><p>A record of all transactions between one country's residents and the rest of the world over a period of time. It has two main parts: the current account and the capital and financial account.</p></div>
+    <div class="card"><span class="tag">CA = trade + income + transfers</span><h3>Current account</h3><p>Records trade in goods and services, net investment income (interest and dividends earned abroad minus those paid to foreigners), and net transfers (gifts, aid, remittances).</p></div>
+    <div class="card"><span class="tag">Not the same number</span><h3>Balance of trade vs. current account</h3><p>The balance of trade is exports minus imports of goods and services. It is one piece of the current account. A trade deficit means imports are larger than exports. The current account adds net investment income and net transfers on top.</p></div>
+    <div class="card"><span class="tag">Assets</span><h3>Capital and financial account</h3><p>Records purchases and sales of assets: stocks, bonds, bank deposits, real estate, and factories (foreign direct investment). Official reserve transactions by central banks are included here. Foreigners buying U.S. assets is a credit; Americans buying foreign assets is a debit.</p></div>
+    <div class="card"><span class="tag">+ and −</span><h3>Credits and debits</h3><p>A credit brings payment into the country: exports, income received, gifts received, and asset sales to foreigners. A debit sends payment out: imports, income paid, gifts sent, and purchases of foreign assets.</p></div>
+    <div class="card"><span class="tag">CA + FA = 0</span><h3>The two accounts offset</h3><p>Every transaction has two sides, so the balances sum to zero. A current account deficit is matched by a capital and financial account surplus of the same size: foreigners acquire more U.S. assets than Americans acquire foreign assets.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Where does it go? Cheat sheet</h2>
+    <p>All entries are for the United States. Learn the tricky pairs: buying a stock is the financial account, and the dividends it pays are the current account.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Transaction</th><th>Account</th><th>Part</th><th>U.S. entry</th></tr></thead>
+    <tbody>
+      <tr><td>U.S. firm sells goods or services to a foreign buyer (export)</td><td><b>Current</b></td><td>Trade in goods and services</td><td><span class="cr">Credit +</span></td></tr>
+      <tr><td>Americans buy foreign-made goods or services (import)</td><td><b>Current</b></td><td>Trade in goods and services</td><td><span class="db">Debit −</span></td></tr>
+      <tr><td>Foreign tourist spends money in the U.S.</td><td><b>Current</b></td><td>Trade (service export)</td><td><span class="cr">Credit +</span></td></tr>
+      <tr><td>American tourist or student spends money abroad</td><td><b>Current</b></td><td>Trade (service import)</td><td><span class="db">Debit −</span></td></tr>
+      <tr><td>U.S. owners receive interest or dividends from abroad</td><td><b>Current</b></td><td>Investment income</td><td><span class="cr">Credit +</span></td></tr>
+      <tr><td>U.S. pays interest or dividends to foreign owners</td><td><b>Current</b></td><td>Investment income</td><td><span class="db">Debit −</span></td></tr>
+      <tr><td>Remittances or foreign aid sent out of the U.S.</td><td><b>Current</b></td><td>Transfers</td><td><span class="db">Debit −</span></td></tr>
+      <tr><td>Gifts or remittances received from abroad</td><td><b>Current</b></td><td>Transfers</td><td><span class="cr">Credit +</span></td></tr>
+      <tr><td>Foreigners buy U.S. stocks, bonds, real estate, or factories</td><td><span class="shift">Capital and financial</span></td><td>Financial inflow</td><td><span class="cr">Credit +</span></td></tr>
+      <tr><td>Americans buy foreign stocks, bonds, real estate, or build factories abroad</td><td><span class="shift">Capital and financial</span></td><td>Financial outflow</td><td><span class="db">Debit −</span></td></tr>
+      <tr><td>A foreign central bank adds U.S. Treasury bonds to its reserves</td><td><span class="shift">Capital and financial</span></td><td>Official reserves</td><td><span class="cr">Credit +</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Answering it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Moves that earn points</h3>
+      <ul>
+        <li>Name the account in full: "current account" or "capital and financial account". Then say whether the balance <b>increases</b>, <b>decreases</b>, or does not change.</li>
+        <li>Write the formula before the numbers: current account = balance of trade + net investment income + net transfers.</li>
+        <li>Find the balance of trade first: exports of goods and services minus imports of goods and services.</li>
+        <li>When given the current account, get the financial account from current account + capital and financial account = 0. Show the sign: a −$40 billion current account means a +$40 billion financial account.</li>
+        <li>When a question lists official reserve transactions separately, include them in the financial account total before you check that the sum is zero.</li>
+        <li>Explain a change in one sentence that names the flow, such as "Japanese firms buying U.S. bonds is a financial inflow, so the U.S. financial account balance increases."</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Putting dividends or interest in the financial account. Buying the stock or bond is financial; the income it pays is the current account.</li>
+        <li>Calling a purchase of a foreign asset a credit because the U.S. "gains" something. Payment leaves the U.S., so it is a debit.</li>
+        <li>Treating the balance of trade and the current account as the same number. Income and transfers can make them differ.</li>
+        <li>Mixing up a trade deficit with a budget deficit. A trade deficit is about imports and exports; a budget deficit is about government spending and taxes.</li>
+        <li>Putting remittances in the financial account. No asset changes hands, so they are transfers in the current account.</li>
+        <li>Saying the balance of payments is in deficit. The two accounts always sum to zero; only the parts can be in deficit or surplus.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 6.1. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-6.html">Unit 6 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- A. Sorting game ----------
+  var ACC = {
+    trade: "Current account: trade in goods and services",
+    income: "Current account: investment income",
+    transfers: "Current account: transfers",
+    fin: "Capital and financial account"
+  };
+  var BIN = { trade: "Trade in goods and services", income: "Investment income", transfers: "Transfers", fin: "Capital and financial" };
+  var ITEMS = [
+    { t: "A U.S. software company sells programs to a firm in Japan.", a: "trade", s: 1, w: "The U.S. sells a product to a foreign buyer, so this is an export in trade in goods and services. The Japanese firm pays the U.S. firm, so payment flows in: a credit." },
+    { t: "An American buys shares of a German company.", a: "fin", s: -1, w: "Shares are a financial asset, so this goes in the capital and financial account. The American pays a foreign seller, so payment flows out: a debit (a financial outflow)." },
+    { t: "A tourist from France pays for a hotel stay in Chicago.", a: "trade", s: 1, w: "A hotel stay is a service. Selling it to a foreign visitor is a U.S. service export, even though it happens inside the U.S. Payment comes in: a credit." },
+    { t: "A worker in the U.S. sends money to family in Mexico.", a: "transfers", s: -1, w: "Nothing is bought and no asset changes hands. It is a one-way gift (a remittance), so it is a current account transfer. Money leaves the U.S.: a debit." },
+    { t: "A Chinese firm buys a U.S. Treasury bond.", a: "fin", s: 1, w: "A bond is a financial asset. A foreigner buying a U.S. asset is a financial inflow, so it is a credit in the U.S. capital and financial account." },
+    { t: "A U.S. company receives dividends from its factory in Brazil.", a: "income", s: 1, w: "Dividends are income earned on an asset owned abroad, so this is investment income in the current account. Money flows into the U.S.: a credit." },
+    { t: "Americans buy cars made in South Korea.", a: "trade", s: -1, w: "Buying foreign-made goods is an import, so it is trade in goods and services. Payment flows out of the U.S.: a debit." },
+    { t: "The U.S. government pays interest to a Japanese investor who holds Treasury bonds.", a: "income", s: -1, w: "Interest paid to a foreign owner of a U.S. asset is investment income. Money flows out of the U.S.: a debit in the current account. Buying the bond was the financial account; the interest on it is the current account." },
+    { t: "A U.S. firm builds a factory in Vietnam.", a: "fin", s: -1, w: "Building a factory abroad is foreign direct investment: the U.S. firm acquires a real asset in another country. That is a financial outflow, a debit in the capital and financial account." },
+    { t: "A British company buys an office building in New York.", a: "fin", s: 1, w: "Real estate is an asset. A foreigner buying a U.S. asset is a financial inflow, so it is a credit in the capital and financial account." },
+    { t: "An American student pays tuition to a university in Canada.", a: "trade", s: -1, w: "Education is a service. Buying it from a foreign university is a U.S. service import, so payment flows out: a debit in trade in goods and services." },
+    { t: "A U.S. family receives money from a relative working in Germany.", a: "transfers", s: 1, w: "The family gives nothing in return, so this is a transfer in the current account. Money flows into the U.S.: a credit." },
+    { t: "The U.S. government gives foreign aid to another country.", a: "transfers", s: -1, w: "Foreign aid is a one-way payment with nothing bought, so it is a current account transfer. Money leaves the U.S.: a debit." },
+    { t: "Boeing sells airplanes to an airline in India.", a: "trade", s: 1, w: "Airplanes are goods. Selling them abroad is a U.S. export, so it is a credit in trade in goods and services." },
+    { t: "The Bank of Japan adds U.S. Treasury bonds to its official reserves.", a: "fin", s: 1, w: "This is an official reserve transaction: a foreign central bank buys a U.S. asset. Official reserves are part of the capital and financial account, and a foreign purchase of a U.S. asset is a credit." }
+  ];
+
+  var order = ITEMS.map(function (_, i) { return i; });
+  var G = { pos: 0, acct: null, sign: null, checked: false, right: 0, done: 0, sorted: [] };
+  var elAcct = document.getElementById("g-acct"), elSign = document.getElementById("g-sign");
+  var elCheck = document.getElementById("g-check"), elFb = document.getElementById("g-fb");
+
+  var acctBtns = {}, signBtns = {};
+  Object.keys(ACC).forEach(function (k) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "acct-" + k; b.textContent = ACC[k];
+    b.addEventListener("click", function () { if (G.checked) return; G.acct = k; drawGame(); });
+    elAcct.appendChild(b); acctBtns[k] = b;
+  });
+  [[1, "Credit (+)"], [-1, "Debit (−)"]].forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.id = x[0] > 0 ? "sign-credit" : "sign-debit"; b.textContent = x[1];
+    b.addEventListener("click", function () { if (G.checked) return; G.sign = x[0]; drawGame(); });
+    elSign.appendChild(b); signBtns[x[0]] = b;
+  });
+
+  function cur() { return ITEMS[order[G.pos]]; }
+  function finished() { return G.pos >= order.length; }
+
+  function drawGame() {
+    var fin = finished();
+    document.getElementById("g-pos").textContent = fin ? "All 15 items done" : "Item " + (G.pos + 1) + " of " + order.length;
+    document.getElementById("g-score").textContent = G.right + " / " + G.done + " fully correct";
+    document.getElementById("g-item").textContent = fin ? "You sorted every transaction. Reshuffle to play again." : cur().t;
+    var it = fin ? null : cur();
+    Object.keys(acctBtns).forEach(function (k) {
+      var b = acctBtns[k];
+      b.className = ""; b.disabled = fin || G.checked;
+      b.setAttribute("aria-pressed", G.acct === k ? "true" : "false");
+      if (G.checked) { if (k === it.a) b.className = "right"; else if (k === G.acct) b.className = "wrong"; }
+    });
+    [1, -1].forEach(function (s) {
+      var b = signBtns[s];
+      b.className = ""; b.disabled = fin || G.checked;
+      b.setAttribute("aria-pressed", G.sign === s ? "true" : "false");
+      if (G.checked) { if (s === it.s) b.className = "right"; else if (s === G.sign) b.className = "wrong"; }
+    });
+    elCheck.disabled = fin || G.checked || G.acct === null || G.sign === null;
+    document.getElementById("g-next").disabled = fin;
+    // bins
+    var bins = document.getElementById("g-bins"); bins.innerHTML = "";
+    Object.keys(BIN).forEach(function (k) {
+      var d = document.createElement("div"); d.className = "bin";
+      var h = document.createElement("h4"); h.textContent = BIN[k]; d.appendChild(h);
+      var list = G.sorted.filter(function (i) { return ITEMS[i].a === k; });
+      if (!list.length) { var n = document.createElement("span"); n.className = "none"; n.textContent = "Nothing yet"; d.appendChild(n); }
+      else {
+        var ul = document.createElement("ul");
+        list.forEach(function (i) {
+          var li = document.createElement("li");
+          var sg = document.createElement("span"); sg.className = ITEMS[i].s > 0 ? "cr" : "db"; sg.textContent = ITEMS[i].s > 0 ? "+ " : "− ";
+          li.appendChild(sg); li.appendChild(document.createTextNode(ITEMS[i].t));
+          ul.appendChild(li);
+        });
+        d.appendChild(ul);
+      }
+      bins.appendChild(d);
+    });
+  }
+
+  function setFb(html, cls) { elFb.className = "fb" + (cls ? " " + cls : ""); elFb.innerHTML = html; }
+  var START_FB = "Read the transaction, pick an account, pick credit or debit, then check. You get the reason either way.";
+
+  elCheck.addEventListener("click", function () {
+    var it = cur(); G.checked = true; G.done++;
+    var okA = G.acct === it.a, okS = G.sign === it.s;
+    var html;
+    if (okA && okS) { G.right++; G.sorted.push(order[G.pos]); html = "<b style='color:var(--good)'>Correct.</b> "; }
+    else {
+      var miss = [];
+      if (!okA) miss.push("the account is <b>" + ACC[it.a].toLowerCase().replace("current account:", "current account,") + "</b>");
+      if (!okS) miss.push("the entry is a <b>" + (it.s > 0 ? "credit (+)" : "debit (−)") + "</b>");
+      html = "<b style='color:var(--bad)'>Not quite.</b> Here " + miss.join(" and ") + ". ";
+    }
+    setFb(html + it.w, okA && okS ? "ok" : "no");
+    drawGame();
+    document.getElementById("g-next").focus();
+  });
+  document.getElementById("g-next").addEventListener("click", function () {
+    G.pos++; G.acct = null; G.sign = null; G.checked = false;
+    setFb(finished() ? "Final score: " + G.right + " of " + G.done + " fully correct. Reshuffle to try a new order." : START_FB);
+    drawGame();
+  });
+  document.getElementById("g-shuffle").addEventListener("click", function () {
+    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+    G = { pos: 0, acct: null, sign: null, checked: false, right: 0, done: 0, sorted: [] };
+    setFb(START_FB); drawGame();
+  });
+  setFb(START_FB);
+  drawGame();
+
+  // ---------- B. Ledger ----------
+  // Each transaction is recorded twice. Keys: trade, inc (investment income), tr (transfers),
+  // pfa (private capital and financial account), ofr (official reserve transactions, part of the financial account).
+  var KEYNAME = { trade: "CA trade", inc: "CA income", tr: "CA transfers", pfa: "Financial", ofr: "Financial (official reserves)" };
+  var TX = [
+    { t: "Americans import $80B of cars and phones. The foreign makers use the dollars to buy U.S. stocks and bonds.", e: [["trade", -80], ["pfa", 80]] },
+    { t: "U.S. firms export $50B of aircraft and soybeans. They are paid in foreign currency and keep it in foreign bank accounts.", e: [["trade", 50], ["pfa", -50]] },
+    { t: "Foreign tourists and students spend $30B on U.S. services. U.S. hotels and colleges hold the foreign currency in accounts abroad.", e: [["trade", 30], ["pfa", -30]] },
+    { t: "U.S. firms earn $20B of profits from factories abroad and reinvest them in those factories.", e: [["inc", 20], ["pfa", -20]] },
+    { t: "The U.S. pays $15B of interest to foreign bondholders, who use it to buy more U.S. Treasury bonds.", e: [["inc", -15], ["pfa", 15]] },
+    { t: "Workers in the U.S. send $10B home to families abroad. The families' banks hold the dollars as U.S. bank deposits.", e: [["tr", -10], ["pfa", 10]] },
+    { t: "Americans buy $25B of electronics from China. China's central bank takes the dollars and buys U.S. Treasury bonds for its reserves.", e: [["trade", -25], ["ofr", 25]] },
+    { t: "An American buys $40B of shares in a German company. The German sellers deposit the dollars in a U.S. bank.", e: [["pfa", -40], ["pfa", 40]] }
+  ];
+  var BASE = [0, 1, 3, 4, 5, 6];
+  var pick = BASE.slice();
+
+  function sgn(v) { return v > 0 ? "+" + v : v < 0 ? "−" + Math.abs(v) : "0"; }
+  function money(v) { return v > 0 ? "+$" + v + "B" : v < 0 ? "−$" + Math.abs(v) + "B" : "$0"; }
+  function bil(v) { return "$" + Math.abs(v) + " billion"; }
+
+  var list = document.getElementById("txlist"), boxes = [];
+  TX.forEach(function (x, i) {
+    var lab = document.createElement("label"); lab.className = "tx"; lab.setAttribute("for", "tx-" + i);
+    var cb = document.createElement("input"); cb.type = "checkbox"; cb.id = "tx-" + i;
+    cb.addEventListener("change", function () {
+      pick = boxes.map(function (b, j) { return b.checked ? j : -1; }).filter(function (j) { return j >= 0; });
+      render();
+    });
+    var sp = document.createElement("span"); sp.textContent = x.t;
+    var ents = document.createElement("span"); ents.className = "ents";
+    ents.innerHTML = x.e.map(function (en) { return '<span class="' + (en[1] > 0 ? "cr" : "db") + '">' + KEYNAME[en[0]] + " " + sgn(en[1]) + "</span>"; }).join("");
+    lab.appendChild(cb); lab.appendChild(sp); lab.appendChild(ents);
+    list.appendChild(lab); boxes.push(cb);
+  });
+
+  function totals(ix) {
+    var t = { trade: 0, inc: 0, tr: 0, pfa: 0, ofr: 0 };
+    ix.forEach(function (i) { TX[i].e.forEach(function (en) { t[en[0]] += en[1]; }); });
+    t.ca = t.trade + t.inc + t.tr; t.fa = t.pfa + t.ofr; t.sum = t.ca + t.fa;
+    return t;
+  }
+
+  var svg = document.getElementById("bop");
+  function drawChart(t) {
+    var vals = [
+      ["Trade", t.trade, "var(--accent)", .45], ["Income", t.inc, "var(--accent)", .45], ["Transfers", t.tr, "var(--accent)", .45], ["Current", t.ca, "var(--accent)", .9],
+      ["Private", t.pfa, "var(--srpc)", .45], ["Reserves", t.ofr, "var(--srpc)", .45], ["Financial", t.fa, "var(--srpc)", .9], ["Sum", t.sum, "var(--lrpc)", .9]
+    ];
+    var mx = Math.max.apply(null, vals.map(function (v) { return Math.abs(v[1]); }));
+    var lim = Math.max(50, Math.ceil(mx * 1.3 / 50) * 50);
+    var F = Lab.frame(svg, { x: [0, 8], y: [-lim, lim], width: 520, height: 340, xLabel: "Balance of payments entry", yLabel: "Billions of dollars",
+      yTicks: [-lim, -lim / 2, 0, lim / 2, lim], fmtY: sgn });
+    Lab.line(F, [[4, -lim], [4, lim]], "var(--rule)", 1.5, "4 4");
+    Lab.tag(F, 0.12, lim * 0.9, "Current account", "var(--accent)");
+    Lab.tag(F, 4.12, lim * 0.9, "Capital and financial", "var(--srpc)");
+    Lab.hline(F, 0, "var(--ink)", 1.5);
+    vals.forEach(function (v, i) {
+      if (v[1] !== 0) Lab.rect(F, i + 0.16, 0, i + 0.84, v[1], v[2], v[3]);
+      var y = v[1] >= 0 ? v[1] + lim * 0.04 : v[1] - lim * 0.1;
+      Lab.tag(F, i + 0.5, y, sgn(v[1]), v[1] === 0 ? "var(--muted)" : v[2], "middle");
+      Lab.el("text", { x: F.sx(i + 0.5), y: F.H - F.M.b + 16, "text-anchor": "middle", style: i === 3 || i === 6 || i === 7 ? "font-weight:600; fill:var(--ink)" : null }, svg, v[0]);
+    });
+  }
+
+  function story(t, ix) {
+    if (!ix.length) return "<p><b>No transactions are selected.</b> Every balance is zero. Check a few transactions, or pick a scenario, to see how each one lands in both accounts.</p>";
+    var p = [];
+    var bt = t.trade;
+    p.push("<p><b>Balance of trade: " + money(bt) + ".</b> " + (bt < 0 ? "The U.S. imports more goods and services than it exports, so it has a <b>trade deficit</b> of " + bil(bt) + "."
+      : bt > 0 ? "The U.S. exports more goods and services than it imports, so it has a <b>trade surplus</b> of " + bil(bt) + "."
+      : "Exports and imports of goods and services are equal, so trade is balanced.") + "</p>");
+    var caTxt = "<p><b>Current account: " + money(t.ca) + "</b> = balance of trade " + sgn(t.trade) + " + net investment income " + sgn(t.inc) + " + net transfers " + sgn(t.tr) + ". ";
+    if (t.inc + t.tr !== 0) caTxt += "The current account differs from the balance of trade because investment income and transfers also count. ";
+    else if (t.ca !== 0) caTxt += "Here income and transfers net to zero, so the current account equals the balance of trade. ";
+    p.push(caTxt + "</p>");
+    var faTxt = "<p><b>Capital and financial account: " + money(t.fa) + "</b>";
+    if (t.ofr !== 0) faTxt += " (private flows " + sgn(t.pfa) + " plus official reserve transactions " + sgn(t.ofr) + ")";
+    faTxt += ". ";
+    if (t.ca < 0) faTxt += "The current account deficit of " + bil(t.ca) + " is matched by a financial account surplus of " + bil(t.fa) + ". Foreigners acquired " + bil(t.fa) + " more in U.S. assets than Americans acquired in foreign assets. That inflow of foreign financial capital is how the U.S. pays for buying more from the world than it sells.";
+    else if (t.ca > 0) faTxt += "The current account surplus of " + bil(t.ca) + " is matched by a financial account deficit of " + bil(t.fa) + ". Americans used the extra earnings to acquire " + bil(t.fa) + " more in foreign assets than foreigners acquired in U.S. assets: a net financial outflow.";
+    else faTxt += "The current account is balanced, so the financial account is too. Any asset purchases here are paid for with other assets, like a bank deposit traded for shares.";
+    p.push(faTxt + "</p>");
+    var notes = [];
+    if (ix.indexOf(6) >= 0) notes.push("China's central bank buying Treasury bonds is an <b>official reserve transaction</b>. It is a credit in the U.S. capital and financial account, just like a private purchase of U.S. bonds.");
+    if (ix.indexOf(7) >= 0) notes.push("The share purchase in Germany is a debit and the German sellers' new U.S. deposit is a credit. Both sides are in the financial account, so it changes neither balance.");
+    if (notes.length) p.push("<ul>" + notes.map(function (n) { return "<li>" + n + "</li>"; }).join("") + "</ul>");
+    p.push("<p><b>Sum: " + money(t.sum) + ".</b> Every transaction has a payment side, so each one adds the same amount to one account that it subtracts from the other. An AP answer: a current account deficit must be offset by a capital and financial account surplus of equal size.</p>");
+    return p.join("");
+  }
+
+  function render() {
+    boxes.forEach(function (b, i) { b.checked = pick.indexOf(i) >= 0; });
+    var t = totals(pick);
+    drawChart(t);
+    document.getElementById("r-bt").innerHTML = money(t.trade) + (t.trade < 0 ? ' <span class="pill infl">deficit</span>' : t.trade > 0 ? ' <span class="pill lr">surplus</span>' : "");
+    document.getElementById("r-ca").innerHTML = money(t.ca) + (t.ca < 0 ? ' <span class="pill infl">deficit</span>' : t.ca > 0 ? ' <span class="pill lr">surplus</span>' : "");
+    document.getElementById("r-fa").innerHTML = money(t.fa) + (t.fa < 0 ? ' <span class="pill infl">deficit</span>' : t.fa > 0 ? ' <span class="pill lr">surplus</span>' : "");
+    document.getElementById("r-sum").textContent = money(t.sum);
+    document.getElementById("story").innerHTML = story(t, pick);
+  }
+
+  var scen = [
+    ["Current account deficit", BASE],
+    ["Export-led surplus", [1, 2, 3]],
+    ["Official reserves only", [6]],
+    ["Pure asset swap", [7]],
+    ["Select all", [0, 1, 2, 3, 4, 5, 6, 7]],
+    ["Clear all", []]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { pick = x[1].slice(); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "Which of the following is recorded as a credit in the U.S. current account?", o: ["An American buys shares of a Canadian bank", "A U.S. citizen sends money to a relative in Peru", "A U.S. firm receives dividends from its subsidiary in Canada", "A U.S. firm builds a warehouse in Mexico"], c: 2, w: "Dividends are investment income flowing into the U.S., a current account credit. Buying shares and building a warehouse abroad are financial account debits. Sending money to a relative is a current account transfer, but it is a debit." },
+    { s: "A U.S. resident buys a bond issued by a Japanese corporation. How is this recorded in the U.S. balance of payments?", o: ["A debit in the capital and financial account", "A credit in the capital and financial account", "A debit in the current account", "A credit in the current account"], c: 0, w: "The American acquires a foreign asset and payment leaves the U.S., so it is a financial outflow: a debit in the capital and financial account. The interest the bond pays later will be a current account credit, but the purchase itself is not." },
+    { s: "Country Z has exports of goods and services of $300 billion, imports of goods and services of $360 billion, net investment income of +$25 billion, and net transfers of −$15 billion. What is Country Z's current account balance?", o: ["−$60 billion", "+$10 billion", "−$75 billion", "−$50 billion"], c: 3, w: "Balance of trade = 300 − 360 = −$60 billion. Current account = −60 + 25 − 15 = −$50 billion. Choice A is only the balance of trade; the current account also includes income and transfers." },
+    { s: "A country has a current account deficit of $80 billion. Ignoring any statistical discrepancy, its capital and financial account balance must be", o: ["a deficit of $80 billion", "a surplus of $80 billion", "zero", "a surplus of $160 billion"], c: 1, w: "The current account and the capital and financial account sum to zero. A −$80 billion current account requires a +$80 billion financial account: foreigners acquired $80 billion more in the country's assets than its residents acquired abroad." },
+    { s: "Country M has a current account balance of −$40 billion. Private purchases and sales of assets give it a financial account balance of +$25 billion before official reserve transactions. Ignoring statistical discrepancy, what must the balance on official reserve transactions be?", o: ["−$15 billion", "−$65 billion", "+$65 billion", "+$15 billion"], c: 3, w: "Official reserves are part of the financial account, and everything must sum to zero: −40 + 25 + R = 0, so R = +$15 billion. Choice A has the right size but the wrong sign." },
+    { s: "Which of the following is included in the current account but NOT in the balance of trade?", o: ["Exports of airplanes", "Imports of clothing", "Interest paid to foreign holders of U.S. bonds", "Foreign tourists' spending at U.S. hotels"], c: 2, w: "The balance of trade covers exports and imports of goods and services, which includes airplanes, clothing, and tourist services. Interest paid to foreigners is investment income, which is in the current account but outside the balance of trade." },
+    { s: "A U.S. trade deficit means that", o: ["the value of U.S. imports of goods and services is greater than the value of U.S. exports", "the federal government spends more than it collects in taxes", "foreigners buy more U.S. assets than Americans buy foreign assets", "the U.S. capital and financial account is in deficit"], c: 0, w: "A trade deficit is a negative balance of trade: imports exceed exports. Choice B describes a budget deficit. Choice C describes a financial account surplus, which usually accompanies a current account deficit but is not the definition of a trade deficit." },
+    { s: "A tourist from Brazil pays for a hotel stay in Miami. In the U.S. balance of payments, this is", o: ["a debit in the current account, because the tourist is foreign", "a credit in the current account, because it is an export of a service", "a credit in the capital and financial account, because Brazilian money enters the U.S.", "not recorded, because no good crosses the border"], c: 1, w: "Selling a service to a foreign resident is a U.S. export, even when it happens inside the U.S. Payment comes in, so it is a current account credit. No asset changes hands, so it does not belong in the financial account." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("6.1");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [6], topic: "6.1", compact: true, storageKey: "topic-6.1" });</script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Money Market Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 6px 14px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: end; }
+.side { display: grid; gap: 14px; align-content: start; }
+.side .calc { margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 4 · Topic 4.5</span>
+  <h1>The Money Market Study Lab</h1>
+  <p class="lede">The money market is where the demand for money meets the supply of money set by the central bank, and together they determine the nominal interest rate. Shift money demand with the price level, real GDP, and payment technology, shift money supply with central bank policy, and watch the interest rate and bond prices respond. Then push the rate away from equilibrium and see how bond buying and selling pulls it back.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Money market graph</h2>
+    <p>The market starts in equilibrium at a 5.0% nominal interest rate and $500 billion of money. Dashed grey lines show the starting position once something moves.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Money market <small>nominal interest rate vs. quantity of money</small></h3>
+      <svg class="chart" id="mm" viewBox="0 0 440 330" role="img" aria-label="Money market graph with downward-sloping money demand and vertical money supply"></svg>
+    </div>
+    <div class="card graph-card side">
+      <h3>The bond price link <small>a bond that pays $1,000 one year from now</small></h3>
+      <div class="calc" id="bond-calc"></div>
+      <p style="margin:0; font-size:.9rem;">A bond's payment is fixed. When the interest rate rises, buyers will pay less today for that same $1,000, so the bond's price falls. Interest rates and bond prices always move in opposite directions.</p>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Money demand (MD)</span><span class="l-srpc">Money supply (MS)</span><span class="l-c4">Rate out of equilibrium</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div>
+      <div class="tag" style="margin-bottom:8px;">Try a scenario</div>
+      <div class="scenarios" id="scenarios"></div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <label for="s-pl">Price level <output id="o-pl"></output></label>
+        <input type="range" id="s-pl" min="-1" max="1" step="0.25">
+        <span class="hint">Higher prices: more money needed for purchases</span>
+      </div>
+      <div class="ctl">
+        <label for="s-y">Real GDP <output id="o-y"></output></label>
+        <input type="range" id="s-y" min="-1" max="1" step="0.25">
+        <span class="hint">More output: more transactions</span>
+      </div>
+      <div class="ctl">
+        <label for="s-tech">Use of digital payments <output id="o-tech"></output></label>
+        <input type="range" id="s-tech" min="-1" max="1" step="0.25">
+        <span class="hint">Right = people keep less money on hand</span>
+      </div>
+      <div class="ctl">
+        <label for="s-ms">Money supply <output id="o-ms"></output></label>
+        <input type="range" id="s-ms" min="-2" max="2" step="0.25">
+        <span class="hint">Set by the central bank</span>
+      </div>
+    </div>
+    <div class="toggles">
+      <div style="display:grid; gap:6px;">
+        <span style="font-size:.86rem; font-weight:500;">Where is the nominal interest rate right now?</span>
+        <div class="seg" role="group" aria-label="Interest rate relative to equilibrium">
+          <button type="button" id="g-eq" aria-pressed="true">At equilibrium</button>
+          <button type="button" id="g-up" aria-pressed="false">Above equilibrium</button>
+          <button type="button" id="g-dn" aria-pressed="false">Below equilibrium</button>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="primary" type="button" id="btn-adjust">Let the market adjust</button>
+        <button type="button" id="btn-reset">Reset to start</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Nominal interest rate</div><div class="v" id="r-i">5.0%</div></div>
+    <div class="stat"><div class="k">Quantity of money</div><div class="v" id="r-q">$500B</div></div>
+    <div class="stat"><div class="k">Interest rate vs. start</div><div class="v" id="r-dir">No change</div></div>
+    <div class="stat"><div class="k">Bond prices</div><div class="v" id="r-b">$952</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">The market</span><h3>Money market</h3><p>Money demand (MD) and money supply (MS) meet at the equilibrium nominal interest rate. The vertical axis is the <b>nominal</b> interest rate because the cost of holding money is the interest you give up, and that is a nominal amount.</p></div>
+    <div class="card"><span class="tag">For spending</span><h3>Transaction demand for money</h3><p>People and firms hold money to buy things. When the price level rises, each purchase takes more dollars. When real GDP rises, there are more purchases. Either change raises money demand at every interest rate, so MD shifts right.</p></div>
+    <div class="card"><span class="tag">For storing wealth</span><h3>Asset demand for money</h3><p>People can hold wealth as money, which earns little or no interest, or as bonds, which pay interest. A higher nominal interest rate makes bonds more attractive, so people hold less money as an asset.</p></div>
+    <div class="card"><span class="tag">Downward slope</span><h3>Why MD slopes down</h3><p>The nominal interest rate is the opportunity cost of holding money. When the rate rises, holding money costs more, so the quantity of money demanded falls. A change in the interest rate is a movement along MD, not a shift.</p></div>
+    <div class="card"><span class="tag">Vertical MS</span><h3>The central bank sets the money supply</h3><p>MS is vertical because the quantity of money does not depend on the interest rate. In the limited-reserves model, buying bonds (open market purchases), lowering the discount rate, or lowering the reserve requirement shifts MS right. Topic 4.6 adds the ample-reserves tools, where the central bank steers rates with administered rates such as interest on reserves.</p></div>
+    <div class="card"><span class="tag">Inverse link</span><h3>Bonds pull the rate to equilibrium</h3><p>Bond prices and interest rates move in opposite directions. Above equilibrium, people hold more money than they want and buy bonds, so bond prices rise and the rate falls. Below equilibrium, they sell bonds for cash, so bond prices fall and the rate rises.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Money market cheat sheet</h2>
+    <p>Each row is one shift. Memorize the curve that moves, then the rest follows from the graph.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Curve that shifts</th><th>Nominal interest rate</th><th>Quantity of money</th><th>Bond prices</th></tr></thead>
+    <tbody>
+      <tr><td>Price level rises</td><td><b>MD right</b></td><td>↑</td><td>No change</td><td>↓</td></tr>
+      <tr><td>Real GDP rises (expansion)</td><td><b>MD right</b></td><td>↑</td><td>No change</td><td>↓</td></tr>
+      <tr><td>Real GDP falls (recession)</td><td><b>MD left</b></td><td>↓</td><td>No change</td><td>↑</td></tr>
+      <tr><td>More use of digital payments, ATMs, or fast transfers</td><td><b>MD left</b></td><td>↓</td><td>No change</td><td>↑</td></tr>
+      <tr><td>Central bank buys bonds, lowers the discount rate, or lowers the reserve requirement</td><td><span class="shift">MS right</span></td><td>↓</td><td>↑</td><td>↑</td></tr>
+      <tr><td>Central bank sells bonds, raises the discount rate, or raises the reserve requirement</td><td><span class="shift">MS left</span></td><td>↑</td><td>↓</td><td>↓</td></tr>
+      <tr><td>MD right and MS right at the same time</td><td><b>Both</b></td><td>Indeterminate</td><td>↑</td><td>Indeterminate</td></tr>
+      <tr><td>Interest rate rises for any reason</td><td>None (move along MD)</td><td>↑</td><td>Quantity demanded ↓</td><td>↓</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Vertical axis: <b>Nominal interest rate</b>. Horizontal axis: <b>Quantity of money</b>.</li>
+        <li>Draw MS as a <b>vertical</b> line and MD sloping down. Label them MS and MD.</li>
+        <li>Mark the starting rate i₁ on the vertical axis and the starting quantity on the horizontal axis.</li>
+        <li>For a shift, draw MD₂ or MS₂, add an arrow, and mark the new rate i₂ above or below i₁.</li>
+        <li>When only MD shifts, the quantity of money stays the same. Do not mark a new quantity.</li>
+        <li>If asked about bonds, write it out: "The nominal interest rate rises, so the price of previously issued bonds falls."</li>
+        <li>Finish the chain when asked: a lower nominal interest rate raises interest-sensitive spending such as investment, so AD shifts right.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Labeling the vertical axis "real interest rate." That label belongs on the loanable funds graph.</li>
+        <li>Drawing MS sloping up. In the money market it is vertical at the quantity the central bank sets.</li>
+        <li>Shifting MD when the interest rate changes. A rate change moves along MD.</li>
+        <li>Saying the quantity of money rises when MD shifts right. With a vertical MS, only the rate changes.</li>
+        <li>Getting disequilibrium backwards. Above equilibrium there is a surplus of money, so people buy bonds and the rate falls.</li>
+        <li>Saying bond prices and interest rates move together. They always move in opposite directions.</li>
+        <li>Treating "demand for money" as wanting more income. It means wanting to hold wealth as money instead of bonds.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 4.5. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-4.html">Unit 4 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var BASE = { pl: 0, y: 0, tech: 0, ms: 0, gap: 0 };
+  var S = Object.assign({}, BASE);
+  var K = 0.8;               // slope of MD in Lab.market space
+  var stopAnim = null;
+
+  // ---------- Model ----------
+  // Lab.market space: MD is y = 5 - K (x - 5 - ds); MS is vertical at x = 5 + ms.
+  // Nominal interest rate (%) = y. Quantity of money ($ billions) = 100 x.
+  function dShift(s) { return s.pl + s.y - s.tech; }          // more digital payments shifts MD left
+  function eqRate(s) { return 5 + K * (dShift(s) - s.ms); }
+  function qDemanded(s, r) { return 5 + dShift(s) + (5 - r) / K; }
+  function bond(r) { return 1000 / (1 + r / 100); }
+  function model(s) {
+    var ie = eqRate(s), q = 5 + s.ms;
+    var i = Math.max(0.4, Math.min(9.6, ie + s.gap));
+    return { ie: ie, i: i, q: q, qd: qDemanded(s, i), ds: dShift(s) };
+  }
+
+  var f = Lab.fmt;
+  function money(x) { return "$" + f(100 * x, 0) + "B"; }
+  function moneyLong(x) { return "$" + f(100 * x, 0) + " billion"; }
+  function usd(v) { return "$" + v.toFixed(2); }
+
+  // ---------- Graph ----------
+  var svg = document.getElementById("mm");
+  function draw(m, s) {
+    var dMoved = Math.abs(m.ds) > 1e-9, sMoved = Math.abs(s.ms) > 1e-9;
+    var moved = dMoved || sMoved;
+    var sameQ = !sMoved, sameI = Math.abs(m.ie - 5) < 1e-9;
+    Lab.market(svg, {
+      xLabel: "Quantity of money", yLabel: "Nominal interest rate",
+      demand: { shift: m.ds, label: dMoved ? "MD₂" : "MD" },
+      supply: { shift: s.ms, label: sMoved ? "MS₂" : "MS", vertical: true },
+      start: { demand: 0, supply: 0 },
+      slope: K,
+      startLabels: ["Q₁", "i₁"],
+      eqLabels: moved ? [sameQ ? null : "Q₂", sameI ? null : "i₂"] : ["Q₁", "i₁"],
+      extra: function (F) {
+        // ghost labels and the MS shift arrow
+        if (dMoved) {
+          var gx = 1.2, gy = 5 - K * (gx - 5);
+          Lab.tag(F, gx, m.ds > 0 ? gy - 0.7 : gy + 0.45, "MD₁", "var(--muted)", "middle");
+        }
+        if (sMoved) {
+          var right = s.ms > 0;
+          Lab.tag(F, right ? 4.85 : 5.15, 8.7, "MS₁", "var(--muted)", right ? "end" : "start");
+          Lab.arrow(F, 5, 7.8, 5 + s.ms + (right ? -0.12 : 0.12), 7.8, "var(--muted)");
+        }
+        // disequilibrium: rate held above or below equilibrium
+        if (Math.abs(s.gap) > 0.02) {
+          var r = m.i, qs = m.q, qd = Math.max(0, Math.min(10, m.qd));
+          Lab.hline(F, r, "var(--c4)", 2, "5 4");
+          Lab.line(F, [[Math.min(qd, qs), r], [Math.max(qd, qs), r]], "var(--c4)", 6);
+          Lab.dot(F, qd, r, "var(--c4)", false);
+          Lab.dot(F, qs, r, "var(--c4)", false);
+          var above = s.gap > 0;
+          Lab.tag(F, qd < qs ? qs - 0.25 : qs + 0.25, above ? r + 0.6 : r - 0.95, above ? "surplus of money" : "shortage of money", "var(--c4)", qd < qs ? "end" : "start");
+          Lab.tag(F, 0.15, r + 0.3, "i = " + f(r) + "%", "var(--c4)");
+        }
+      }
+    });
+  }
+
+  function bondCalc(m) {
+    var b0 = bond(5), b = bond(m.i);
+    var dir = Math.abs(b - b0) < 0.005 ? "unchanged" : b > b0 ? "up " + usd(b - b0) : "down " + usd(b0 - b);
+    document.getElementById("bond-calc").innerHTML =
+      '<div><span class="formula">Bond price = $1,000 ÷ (1 + i)</span></div>' +
+      '<div class="row"><span>Start: i = 5.0%, $1,000 ÷ 1.050</span><span>' + usd(b0) + "</span></div>" +
+      '<div class="row"><span>Now: i = ' + f(m.i) + "%, $1,000 ÷ " + (1 + m.i / 100).toFixed(3) + "</span><span>" + usd(b) + "</span></div>" +
+      '<div class="row"><span>Change in bond price</span><span>' + dir + "</span></div>";
+  }
+
+  // ---------- Story ----------
+  function story(m, s) {
+    var lines = [];
+    if (s.pl > 0) lines.push("The price level rises. Each purchase takes more dollars, so the transaction demand for money rises and MD shifts right.");
+    if (s.pl < 0) lines.push("The price level falls. Each purchase takes fewer dollars, so the transaction demand for money falls and MD shifts left.");
+    if (s.y > 0) lines.push("Real GDP rises. People and firms make more purchases, so they hold more money at every interest rate and MD shifts right.");
+    if (s.y < 0) lines.push("Real GDP falls. There are fewer purchases to make, so people hold less money at every interest rate and MD shifts left.");
+    if (s.tech > 0) lines.push("More people pay with digital payments and fast transfers. They can keep wealth in interest-earning assets until the moment they pay, so they hold less money at every interest rate. MD shifts left.");
+    if (s.tech < 0) lines.push("People rely more on cash and slower payment methods, so they need to keep more money on hand. MD shifts right.");
+    if (s.ms > 0) lines.push("The central bank increases the money supply, for example by buying bonds in open market operations. MS shifts right to " + moneyLong(m.q) + ".");
+    if (s.ms < 0) lines.push("The central bank decreases the money supply, for example by selling bonds in open market operations. MS shifts left to " + moneyLong(m.q) + ".");
+    if (lines.length > 1 && Math.abs(m.ds) < 1e-9 && (s.pl || s.y || s.tech)) lines.push("The changes in money demand cancel out, so MD ends up where it started.");
+
+    var html;
+    if (!lines.length) {
+      html = "<p><b>" + (Math.abs(s.gap) > 0.02 ? "The curves are at their starting positions." : "The money market is in equilibrium.") + "</b> MD crosses the vertical MS at a nominal interest rate of 5.0% and a quantity of money of $500 billion. Pick a scenario or move a slider to shift a curve.</p>";
+    } else {
+      html = "<p><b>What changed:</b></p><ul>" + lines.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    }
+
+    var dMoved = Math.abs(m.ds) > 1e-9, sMoved = Math.abs(s.ms) > 1e-9;
+    var ie = m.ie, rTxt;
+    if (Math.abs(ie - 5) < 1e-9) rTxt = "stays at <b>5.0%</b>";
+    else rTxt = (ie > 5 ? "rises" : "falls") + " from 5.0% to <b>" + f(ie) + "%</b>";
+    if (dMoved && !sMoved) {
+      html += "<p>The equilibrium nominal interest rate " + rTxt + ". Because MS is vertical, the quantity of money stays at $500 billion. Only the interest rate adjusts.</p>";
+    } else if (sMoved && !dMoved) {
+      html += "<p>The equilibrium nominal interest rate " + rTxt + ", and the quantity of money is now " + moneyLong(m.q) + ". The market moves along MD: " + (s.ms > 0 ? "people will only hold the extra money at a lower interest rate." : "with less money to go around, the rate rises until people want to hold only " + moneyLong(m.q) + ".") + "</p>";
+    } else if (sMoved && dMoved) {
+      var same = (m.ds > 0) === (s.ms > 0);
+      html += "<p><b>Both curves moved.</b> The quantity of money is set by MS alone, so it is " + moneyLong(m.q) + ". ";
+      if (same) html += "The two shifts push the rate in opposite directions. Here the equilibrium rate " + rTxt + ", but if you only know the directions of the shifts, the change in the nominal interest rate is <b>indeterminate</b>. If the central bank shifts MS by exactly as much as MD, it holds the rate steady.</p>";
+      else html += "Both shifts push the rate the same way, so the direction is certain: the equilibrium rate " + rTxt + ".</p>";
+    }
+
+    if (Math.abs(ie - 5) > 1e-9) {
+      html += "<p>Bond prices move opposite to the interest rate. " + (ie > 5 ? "A higher rate makes previously issued bonds with fixed payments less attractive, so bond prices <b>fall</b>." : "A lower rate makes previously issued bonds with fixed payments more attractive, so bond prices <b>rise</b>.") + "</p>";
+      html += "<p><b>AP answer:</b> " + (dMoved && !sMoved ? "Money demand " + (m.ds > 0 ? "increases" : "decreases") + ", so the nominal interest rate " + (ie > 5 ? "increases" : "decreases") + " and the quantity of money is unchanged." :
+        sMoved && !dMoved ? "The money supply " + (s.ms > 0 ? "increases" : "decreases") + ", so the nominal interest rate " + (ie > 5 ? "increases" : "decreases") + " and the quantity of money " + (s.ms > 0 ? "increases" : "decreases") + "." :
+        "The quantity of money " + (s.ms > 0 ? "increases" : "decreases") + "; the nominal interest rate " + (ie > 5 ? "increases" : "decreases") + " in this example.") + "</p>";
+    }
+
+    if (Math.abs(s.gap) > 0.02) {
+      var qd = moneyLong(m.qd), qs = moneyLong(m.q), eTxt = f(ie) + "%";
+      if (s.gap > 0) {
+        html += "<p><b>Disequilibrium:</b> the nominal interest rate is " + f(m.i) + "%, above the equilibrium rate of " + eTxt + ". At this rate the quantity of money demanded (" + qd + ") is less than the quantity supplied (" + qs + "). People hold more money than they want, so they use the extra money to buy bonds. Bond demand rises, bond prices rise, and higher bond prices mean lower interest rates. The rate falls until it reaches " + eTxt + ". Press <b>Let the market adjust</b> to watch.</p>";
+      } else {
+        html += "<p><b>Disequilibrium:</b> the nominal interest rate is " + f(m.i) + "%, below the equilibrium rate of " + eTxt + ". At this rate the quantity of money demanded (" + qd + ") is more than the quantity supplied (" + qs + "). People want to hold more money than they have, so they sell bonds to get cash. Bond prices fall, and lower bond prices mean higher interest rates. The rate rises until it reaches " + eTxt + ". Press <b>Let the market adjust</b> to watch.</p>";
+      }
+    }
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elPL = document.getElementById("s-pl"), elY = document.getElementById("s-y"), elT = document.getElementById("s-tech"), elMS = document.getElementById("s-ms");
+  var gEq = document.getElementById("g-eq"), gUp = document.getElementById("g-up"), gDn = document.getElementById("g-dn");
+  function word(v, up, down) { return v === 0 ? "start" : (v > 0 ? up : down) + " " + Math.abs(v); }
+  function render() {
+    var m = model(S);
+    elPL.value = S.pl; elY.value = S.y; elT.value = S.tech; elMS.value = S.ms;
+    document.getElementById("o-pl").textContent = word(S.pl, "higher", "lower");
+    document.getElementById("o-y").textContent = word(S.y, "higher", "lower");
+    document.getElementById("o-tech").textContent = word(S.tech, "more", "less");
+    document.getElementById("o-ms").textContent = moneyLong(m.q);
+    gEq.setAttribute("aria-pressed", Math.abs(S.gap) <= 0.02);
+    gUp.setAttribute("aria-pressed", S.gap > 0.02);
+    gDn.setAttribute("aria-pressed", S.gap < -0.02);
+    draw(m, S);
+    bondCalc(m);
+    document.getElementById("r-i").textContent = f(m.i) + "%";
+    document.getElementById("r-q").textContent = money(m.q);
+    var d = m.i - 5;
+    document.getElementById("r-dir").innerHTML = Math.abs(d) < 0.05 ? "No change" : d > 0 ? '<span class="pill infl">↑ ' + f(d) + ' pts</span>' : '<span class="pill lr">↓ ' + f(-d) + ' pts</span>';
+    var b = bond(m.i), b0 = bond(5);
+    document.getElementById("r-b").textContent = "$" + f(b, 0) + (Math.abs(b - b0) < 0.5 ? "" : b > b0 ? " ↑" : " ↓");
+    document.getElementById("story").innerHTML = story(m, S);
+  }
+  function halt() { if (stopAnim) { stopAnim(); stopAnim = null; } }
+  function bind(el, key) { el.addEventListener("input", function () { halt(); S[key] = parseFloat(el.value); render(); }); }
+  bind(elPL, "pl"); bind(elY, "y"); bind(elT, "tech"); bind(elMS, "ms");
+  gEq.addEventListener("click", function () { halt(); S.gap = 0; render(); });
+  gUp.addEventListener("click", function () { halt(); S.gap = 1.5; render(); });
+  gDn.addEventListener("click", function () { halt(); S.gap = -1.5; render(); });
+  document.getElementById("btn-adjust").addEventListener("click", function () {
+    halt();
+    var g0 = S.gap;
+    if (Math.abs(g0) <= 0.02) { S.gap = 1.5; g0 = 1.5; }
+    stopAnim = Lab.animate(1600, function (t) { S.gap = g0 * (1 - t); render(); }, function () { S.gap = 0; stopAnim = null; render(); });
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () { halt(); S = Object.assign({}, BASE); render(); });
+
+  var scen = [
+    ["Price level rises", { pl: 1 }],
+    ["Real GDP rises", { y: 1 }],
+    ["Shift to digital payments", { tech: 1 }],
+    ["Central bank increases MS", { ms: 1.5 }],
+    ["Central bank decreases MS", { ms: -1.5 }],
+    ["Real GDP rises, central bank holds the rate", { y: 1, ms: 1 }],
+    ["Rate stuck above equilibrium", { gap: 1.5 }]
+  ];
+  var sc = document.getElementById("scenarios");
+  scen.forEach(function (x) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x[0];
+    b.addEventListener("click", function () { halt(); S = Object.assign({}, BASE, x[1]); render(); });
+    sc.appendChild(b);
+  });
+  render();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "In the money market, an increase in the price level, all else equal, will cause which of the following?", o: ["Money supply increases and the nominal interest rate falls", "Money demand decreases and the nominal interest rate falls", "Money demand increases and the nominal interest rate rises", "Money supply decreases and the nominal interest rate rises"], c: 2, w: "A higher price level means each purchase takes more dollars, so the transaction demand for money rises. MD shifts right along a vertical MS, so the nominal interest rate rises. The price level does not move the money supply; the central bank sets that." },
+    { s: "The money demand curve slopes downward because a higher nominal interest rate:", o: ["Raises the opportunity cost of holding money", "Increases the purchasing power of money", "Causes the central bank to reduce the money supply", "Raises the price level"], c: 0, w: "The nominal interest rate is what you give up by holding money instead of interest-earning assets such as bonds. When it rises, holding money costs more, so the quantity of money demanded falls. That is a movement along MD." },
+    { s: "Suppose the nominal interest rate is above the equilibrium rate in the money market. Which of the following describes how the market returns to equilibrium?", o: ["People want more money than exists, sell bonds, bond prices fall, and the interest rate rises", "The central bank must sell bonds to lower the interest rate", "The money demand curve shifts right until it meets the money supply", "People hold more money than they want, buy bonds, bond prices rise, and the interest rate falls"], c: 3, w: "Above equilibrium, the quantity of money supplied exceeds the quantity demanded. People use the extra money to buy bonds, which raises bond prices and lowers interest rates until the market clears. Option A describes a rate below equilibrium." },
+    { s: "The money supply is fixed at $500 billion. Money demand is: at 4%, $600 billion; at 5%, $550 billion; at 6%, $500 billion; at 7%, $450 billion. If the central bank increases the money supply by $50 billion, the new equilibrium nominal interest rate is:", o: ["4%", "5%", "6%", "7%"], c: 1, w: "The starting equilibrium is 6%, where the quantity demanded equals $500 billion. After the increase, MS is $550 billion, and the quantity demanded equals $550 billion at 5%. The rate falls by one percentage point." },
+    { s: "A bond pays $1,060 one year from now. If the market interest rate rises from 6% to 10%, the price of this bond changes from $1,000 to approximately:", o: ["$1,000, because the payment is fixed", "$1,060", "$963.64", "$1,040.00"], c: 2, w: "Bond price = $1,060 ÷ (1 + 0.10) = $963.64. The payment is fixed, so a higher interest rate lowers what buyers will pay for it today. Bond prices and interest rates move in opposite directions." },
+    { s: "More households start using payment apps that let them keep their money in interest-earning accounts until the moment they pay. In the money market, what happens to the nominal interest rate and the quantity of money?", o: ["The rate rises and the quantity of money is unchanged", "The rate falls and the quantity of money is unchanged", "The rate falls and the quantity of money falls", "The rate is unchanged and the quantity of money falls"], c: 1, w: "People hold less money at every interest rate, so MD shifts left. With a vertical MS, the quantity of money stays where the central bank set it and only the nominal interest rate falls." },
+    { s: "Which of the following best describes the asset demand for money?", o: ["Money held as a store of value instead of bonds, which falls as the nominal interest rate rises", "Money held to buy goods and services, which rises with nominal GDP", "Money the central bank holds as reserves", "Money that banks are required to hold against deposits"], c: 0, w: "Asset demand is money held as a way to store wealth. Because bonds pay interest and money does not, a higher nominal interest rate makes people hold less money as an asset. Option B describes the transaction demand for money." },
+    { s: "Real GDP increases. If the central bank wants to keep the nominal interest rate from changing, it should:", o: ["Sell bonds to decrease the money supply", "Raise the reserve requirement", "Do nothing, because real GDP does not affect the money market", "Buy bonds to increase the money supply"], c: 3, w: "Higher real GDP raises the transaction demand for money, so MD shifts right and would push the rate up. Buying bonds shifts MS right by the same amount, which keeps the rate steady while the quantity of money rises." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("4.5");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [4], topic: "4.5", compact: true, storageKey: "topic-4.5" });</script>
+</body>
+</html>

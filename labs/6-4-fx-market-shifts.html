@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shifts in the Foreign Exchange Market Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/lab.css">
+<style>
+.scenarios button[aria-pressed="true"] { background: var(--accent); color: var(--surface); border-color: var(--accent); font-weight: 600; }
+.sc-group { display: grid; gap: 8px; }
+.chain { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-size: .92rem; }
+.chain li::marker { color: var(--accent); font-weight: 600; }
+.chain li.end { font-weight: 600; }
+.mini-cap { margin: 0; font-size: .84rem; color: var(--muted); }
+.side { display: grid; gap: 10px; align-content: start; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topnav" id="topnav"></div>
+
+<header>
+  <span class="kicker">AP Macroeconomics · Unit 6 · Topic 6.4</span>
+  <h1>Shifts in the Foreign Exchange Market Study Lab</h1>
+  <p class="lede">The value of the dollar moves when something changes how many dollars foreigners want to buy or how many dollars Americans want to sell. Relative interest rates, relative price levels, relative incomes, tastes, expectations, and government policy all shift those curves. Pick an event, watch which curve shifts in the market for dollars, and follow the chain from the cause to appreciation or depreciation.</p>
+</header>
+
+<!-- LAB -->
+<section aria-labelledby="lab-h">
+  <div class="sec-head">
+    <h2 id="lab-h">1. Shifting the market for dollars</h2>
+    <p>The market starts at €0.90 per dollar. Dashed grey lines show the starting curves. Solid lines show the market after the event.</p>
+  </div>
+
+  <div class="lab">
+    <div class="card graph-card">
+      <h3>Market for U.S. dollars <small>price of the dollar in euros</small></h3>
+      <svg class="chart" id="fx" role="img" aria-label="Foreign exchange market for U.S. dollars"></svg>
+    </div>
+    <div class="card graph-card">
+      <h3>The chain <small id="mini-title">from cause to exchange rate</small></h3>
+      <div class="side">
+        <svg class="chart" id="mini" role="img" aria-label="Interest rate link in the chain"></svg>
+        <p class="mini-cap" id="mini-cap"></p>
+        <ol class="chain" id="chain"></ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab-bar">
+    <div class="legend"><span class="l-ad">Demand for dollars (D$)</span><span class="l-srpc">Supply of dollars (S$)</span><span class="l-ghost">Starting position</span></div>
+  </div>
+
+  <div class="card" style="display:grid; gap:16px;">
+    <div class="sc-group">
+      <div class="tag">Economic conditions</div>
+      <div class="scenarios" id="sc-cond"></div>
+    </div>
+    <div class="sc-group">
+      <div class="tag">Policies</div>
+      <div class="scenarios" id="sc-pol"></div>
+    </div>
+    <div class="controls" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+      <div class="ctl">
+        <label for="s-dd">Demand for dollars <output id="o-dd"></output></label>
+        <input type="range" id="s-dd" min="-3" max="3" step="0.5">
+        <span class="hint">Foreigners buying U.S. goods, services, and assets</span>
+      </div>
+      <div class="ctl">
+        <label for="s-sd">Supply of dollars <output id="o-sd"></output></label>
+        <input type="range" id="s-sd" min="-3" max="3" step="0.5">
+        <span class="hint">Americans buying foreign goods, services, and assets</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="btn-reset" type="button">Reset to start</button>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="stat"><div class="k">Euros per dollar</div><div class="v" id="r-e">€0.90</div></div>
+    <div class="stat"><div class="k">Dollars per euro</div><div class="v" id="r-inv">$1.11</div></div>
+    <div class="stat"><div class="k">U.S. dollar</div><div class="v" id="r-usd">No change</div></div>
+    <div class="stat"><div class="k">Quantity of dollars</div><div class="v" id="r-q">No change</div></div>
+  </div>
+
+  <div class="story" id="story" aria-live="polite"></div>
+</section>
+
+<!-- CONCEPTS -->
+<section aria-labelledby="con-h">
+  <div class="sec-head"><h2 id="con-h">2. Key ideas</h2></div>
+  <div class="concepts">
+    <div class="card"><span class="tag">Two sides</span><h3>Who buys and who sells dollars</h3><p>Foreigners <b>demand</b> dollars to buy U.S. exports, U.S. stocks and bonds, and U.S. real assets. Americans <b>supply</b> dollars when they trade them for foreign currency to buy imports and foreign assets. Ask who is trading and which way, then shift that curve.</p></div>
+    <div class="card"><span class="tag">Capital flows</span><h3>Relative interest rates</h3><p>A higher U.S. real interest rate relative to rates abroad makes U.S. financial assets more attractive. Foreign financial capital flows in, demand for dollars rises, and the dollar appreciates. A lower relative rate does the reverse.</p></div>
+    <div class="card"><span class="tag">Trade flows</span><h3>Relative prices and incomes</h3><p>Higher U.S. inflation relative to abroad makes U.S. goods pricier, so demand for dollars falls and supply rises: the dollar depreciates. Higher U.S. income means more imports, so supply of dollars rises and the dollar depreciates. Higher foreign income means more U.S. exports and a stronger dollar.</p></div>
+    <div class="card"><span class="tag">Demand side</span><h3>Tastes, expectations, speculation</h3><p>If foreigners come to prefer U.S. goods, demand for dollars rises. If traders expect the dollar to appreciate later, speculators buy dollars now, which raises demand and appreciates the dollar today.</p></div>
+    <div class="card"><span class="tag">Policy</span><h3>Monetary and fiscal policy</h3><p>Contractionary monetary policy and deficit-financed expansionary fiscal policy both raise the U.S. real interest rate, attract foreign financial capital, and appreciate the dollar. Expansionary monetary policy lowers the interest rate and depreciates the dollar.</p></div>
+    <div class="card"><span class="tag">Mirror image</span><h3>One rises, the other falls</h3><p>If the dollar appreciates against the euro, the euro depreciates against the dollar. In the market for euros, an increase in demand for dollars shows up as an increase in the <b>supply of euros</b>, because Europeans sell euros to get dollars.</p></div>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section aria-labelledby="tbl-h">
+  <div class="sec-head">
+    <h2 id="tbl-h">3. Foreign exchange cheat sheet</h2>
+    <p>Each row follows the AP chain: event, who buys or sells dollars, which curve shifts, and what happens to the dollar.</p>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event (U.S. relative to Europe)</th><th>Who buys or sells dollars</th><th>Market for dollars</th><th>U.S. dollar</th><th>Euro</th></tr></thead>
+    <tbody>
+      <tr><td>U.S. real interest rate rises</td><td>Foreigners buy more U.S. financial assets</td><td><b>Demand right</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>U.S. price level rises faster than abroad</td><td>Foreigners buy fewer U.S. goods; Americans buy more imports</td><td><b>Demand left</b>, <span class="shift">supply right</span></td><td>Depreciates</td><td>Appreciates</td></tr>
+      <tr><td>U.S. income rises</td><td>Americans buy more imports</td><td><span class="shift">Supply right</span></td><td>Depreciates</td><td>Appreciates</td></tr>
+      <tr><td>European income rises</td><td>Europeans buy more U.S. exports</td><td><b>Demand right</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>Foreign tastes shift toward U.S. goods</td><td>Foreigners buy more U.S. exports</td><td><b>Demand right</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>Traders expect the dollar to appreciate</td><td>Speculators buy dollars now</td><td><b>Demand right</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>Contractionary monetary policy (Fed sells bonds or raises its policy rate)</td><td>Interest rate rises; foreigners buy U.S. bonds</td><td><b>Demand right</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>Expansionary monetary policy (Fed buys bonds or lowers its policy rate)</td><td>Interest rate falls; foreigners buy fewer U.S. bonds</td><td><b>Demand left</b></td><td>Depreciates</td><td>Appreciates</td></tr>
+      <tr><td>Expansionary fiscal policy with deficit borrowing</td><td>Real interest rate rises; foreigners buy U.S. bonds</td><td><b>Demand right</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>U.S. tariff or import quota</td><td>Americans buy fewer imports</td><td><span class="shift">Supply left</span></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>Central bank sells foreign reserves to buy dollars</td><td>Central bank buys dollars</td><td><b>Demand right</b></td><td>Appreciates</td><td>Depreciates</td></tr>
+      <tr><td>Central bank sells dollars to buy foreign reserves</td><td>Central bank sells dollars</td><td><span class="shift">Supply right</span></td><td>Depreciates</td><td>Appreciates</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FRQ + MISTAKES -->
+<section aria-labelledby="frq-h">
+  <div class="sec-head"><h2 id="frq-h">4. Drawing it on the FRQ</h2></div>
+  <div class="two">
+    <div class="card">
+      <h3>Labels that earn points</h3>
+      <ul>
+        <li>Title the graph <b>Market for U.S. dollars</b>. Horizontal axis: <b>Quantity of dollars</b>. Vertical axis: the price of the dollar in the other currency, such as <b>Euros per dollar</b>.</li>
+        <li>Label the curves D$ and S$. Draw the new curve, label it D$₂ or S$₂, and add an arrow for the direction of the shift.</li>
+        <li>Mark the starting exchange rate e₁ and the new rate e₂ on the vertical axis. A higher e₂ means the dollar appreciated.</li>
+        <li>Write the chain in words: "The U.S. real interest rate rises, so foreigners demand more U.S. financial assets, so demand for dollars increases and the dollar appreciates."</li>
+        <li>If asked about the other currency, say it does the opposite. If asked to graph it, the euro market uses "Dollars per euro" on the vertical axis.</li>
+        <li>Linked questions often start in the money market or loanable funds market. Show the interest rate change there first, then carry it to the foreign exchange market.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      <ul>
+        <li>Labeling the vertical axis "Price" or "Exchange rate" with no currency. Graders want the price of one currency in the other, such as euros per dollar.</li>
+        <li>Saying higher U.S. income makes the dollar stronger. Higher U.S. income raises U.S. imports, so Americans supply more dollars and the dollar <b>depreciates</b>.</li>
+        <li>Shifting a curve because the exchange rate changed. A change in the exchange rate is a movement along the curves. Only a determinant shifts them.</li>
+        <li>Mixing up the two markets. More demand for dollars from Europeans means more <b>supply of euros</b> in the euro market, not more demand for euros.</li>
+        <li>Calling quantity certain when both curves shift. With demand left and supply right, the dollar surely depreciates, but the change in quantity of dollars is indeterminate.</li>
+        <li>Saying expansionary monetary policy appreciates the dollar. It lowers the interest rate, so financial capital flows out and the dollar depreciates.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="quiz-h">
+  <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section aria-labelledby="terms-h">
+  <div class="sec-head">
+    <h2 id="terms-h">6. Key terms</h2>
+    <p>The vocabulary for topic 6.4. Read the list, flip through flashcards, or quiz yourself. For every term in the unit, see the <a href="../terms/unit-6.html">Unit 6 terminology guide</a>.</p>
+  </div>
+  <div id="key-terms"></div>
+</section>
+
+<div class="pager" id="pager"></div>
+
+</div>
+
+<script src="../assets/glossary/unit-1.js"></script>
+<script src="../assets/glossary/unit-2.js"></script>
+<script src="../assets/glossary/unit-3.js"></script>
+<script src="../assets/glossary/unit-4.js"></script>
+<script src="../assets/glossary/unit-5.js"></script>
+<script src="../assets/glossary/unit-6.js"></script>
+<script src="../assets/glossary.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  var K = 0.8;            // slope used by Lab.market
+  var EUR = 0.18;         // euros per dollar for each unit on the 0..10 vertical scale (5 = €0.90)
+
+  // ---------- Scenarios ----------
+  // d, s: shifts of demand for and supply of dollars. mini: the interest-rate market in the chain panel.
+  // mini.type "mm" = money market (MS shift), "lf" = loanable funds (demand shift), null = no interest-rate link.
+  var SC = [
+    { g: "cond", name: "U.S. real interest rate rises", det: "Relative interest rates", d: 2, s: 0,
+      mini: { type: "lf", d: 1.5 },
+      cap: "Something raises the U.S. real interest rate relative to rates abroad. Here, stronger demand for loanable funds does it.",
+      chain: ["The U.S. real interest rate rises relative to rates in Europe.", "U.S. bonds and other financial assets now earn a higher return than European assets.", "Foreign savers buy dollars to buy U.S. assets. Financial capital flows into the U.S.", "Demand for dollars shifts right (D$₁ to D$₂).", "The dollar appreciates. The euro depreciates."],
+      note: "Americans also keep more of their saving at home, so some textbooks also shift the supply of dollars left. That also raises the price of the dollar, so the answer does not change." },
+    { g: "cond", name: "U.S. inflation higher than abroad", det: "Relative price levels", d: -1.5, s: 1, mini: null,
+      cap: "This event works through trade in goods and services. The chain does not need an interest-rate step.",
+      chain: ["The U.S. price level rises faster than the price level in Europe.", "U.S. goods become more expensive relative to European goods.", "Europeans buy fewer U.S. exports, so they buy fewer dollars. Americans buy more imports, so they sell more dollars.", "Demand for dollars shifts left and supply of dollars shifts right.", "Both shifts lower the price of the dollar: the dollar depreciates and the euro appreciates."],
+      note: "Both curves shift, so the change in the quantity of dollars is indeterminate. The graph shows one possible case. The direction of the exchange rate is certain because both shifts push it down." },
+    { g: "cond", name: "U.S. income rises", det: "Relative income", d: 0, s: 2, mini: null,
+      cap: "This event works through U.S. imports. The chain does not need an interest-rate step.",
+      chain: ["U.S. real GDP and income rise relative to Europe.", "Americans buy more of everything, including European imports.", "To pay for imports, Americans sell dollars for euros.", "Supply of dollars shifts right (S$₁ to S$₂).", "The dollar depreciates. The euro appreciates."],
+      note: "This is the one students miss most: faster income growth at home weakens the home currency." },
+    { g: "cond", name: "Foreign income rises", det: "Relative income", d: 2, s: 0, mini: null,
+      cap: "This event works through U.S. exports. The chain does not need an interest-rate step.",
+      chain: ["Incomes in Europe rise.", "Europeans buy more goods, including U.S. exports.", "To pay for U.S. goods, Europeans buy dollars with euros.", "Demand for dollars shifts right (D$₁ to D$₂).", "The dollar appreciates. The euro depreciates."],
+      note: "" },
+    { g: "cond", name: "Foreign tastes shift toward U.S. goods", det: "Tastes and preferences", d: 2, s: 0, mini: null,
+      cap: "This event works through U.S. exports. The chain does not need an interest-rate step.",
+      chain: ["European buyers come to prefer U.S. products, such as U.S. films or phones.", "Europeans buy more U.S. exports.", "To pay for them, Europeans buy dollars with euros.", "Demand for dollars shifts right (D$₁ to D$₂).", "The dollar appreciates. The euro depreciates."],
+      note: "" },
+    { g: "cond", name: "Traders expect the dollar to appreciate", det: "Expectations and speculation", d: 2, s: 0, mini: null,
+      cap: "This event works through currency speculation. The chain does not need an interest-rate step.",
+      chain: ["Traders expect the dollar to be worth more next month.", "Speculators want to buy dollars now and sell them later at the higher price.", "Speculators buy dollars today.", "Demand for dollars shifts right (D$₁ to D$₂).", "The dollar appreciates today. The expectation helps cause the change it predicted."],
+      note: "People who already hold dollars may also wait to sell, which shifts supply left. That also appreciates the dollar." },
+    { g: "pol", name: "Contractionary monetary policy", det: "Monetary policy", d: 2, s: 0,
+      mini: { type: "mm", s: -1.5 },
+      cap: "Money market: the Fed sells bonds, so the money supply falls and the nominal interest rate rises. With ample reserves, the Fed gets the same result by raising the interest rate on reserves.",
+      chain: ["The Fed sells bonds on the open market or raises its administered rates (interest on reserves).", "The nominal interest rate rises. Prices are sticky in the short run, so the real interest rate rises too.", "U.S. bonds pay more than European bonds, so foreign savers buy dollars to buy them.", "Demand for dollars shifts right (D$₁ to D$₂).", "The dollar appreciates. The euro depreciates."],
+      note: "Some textbooks also show Americans buying fewer foreign assets, a leftward shift of supply. Either way the dollar appreciates." },
+    { g: "pol", name: "Expansionary monetary policy", det: "Monetary policy", d: -2, s: 0,
+      mini: { type: "mm", s: 1.5 },
+      cap: "Money market: the Fed buys bonds, so the money supply rises and the nominal interest rate falls. With ample reserves, the Fed gets the same result by lowering the interest rate on reserves.",
+      chain: ["The Fed buys bonds on the open market or lowers its administered rates (interest on reserves).", "The nominal interest rate falls. With sticky prices, the real interest rate falls too.", "U.S. bonds pay less, so foreign savers buy fewer dollars and fewer U.S. assets.", "Demand for dollars shifts left (D$₁ to D$₂).", "The dollar depreciates. The euro appreciates."],
+      note: "You can also show Americans moving saving abroad, a rightward shift of the supply of dollars. Both lower the price of the dollar." },
+    { g: "pol", name: "Expansionary fiscal policy with deficit borrowing", det: "Fiscal policy", d: 2, s: 0,
+      mini: { type: "lf", d: 1.5 },
+      cap: "Loanable funds: the government borrows to cover its deficit, so demand for loanable funds rises and the real interest rate rises.",
+      chain: ["The government raises spending or cuts taxes and borrows to cover the larger deficit.", "Government borrowing raises demand for loanable funds, so the U.S. real interest rate rises.", "Foreign savers buy dollars to buy the higher-yielding U.S. bonds.", "Demand for dollars shifts right (D$₁ to D$₂).", "The dollar appreciates. The euro depreciates."],
+      note: "This is the international side of crowding out. The stronger dollar makes U.S. exports pricier, which topic 6.5 picks up." },
+    { g: "pol", name: "U.S. tariff or import quota", det: "Trade barriers", d: 0, s: -2, mini: null,
+      cap: "This policy works through U.S. imports. The chain does not need an interest-rate step.",
+      chain: ["The U.S. puts a tariff or a quota on imported goods.", "Americans buy fewer imports.", "Americans sell fewer dollars for euros.", "Supply of dollars shifts left (S$₁ to S$₂).", "The dollar appreciates. The euro depreciates."],
+      note: "A tariff on U.S. goods imposed by Europe would do the reverse: Europeans buy fewer U.S. exports, demand for dollars falls, and the dollar depreciates." },
+    { g: "pol", name: "Central bank buys dollars", det: "Currency intervention", d: 2, s: 0, mini: null,
+      cap: "The central bank trades currencies directly in the foreign exchange market. No interest-rate step is needed.",
+      chain: ["The U.S. central bank wants a stronger dollar.", "It sells some of its euro reserves.", "It uses the euros to buy dollars.", "Demand for dollars shifts right (D$₁ to D$₂).", "The dollar appreciates. The euro depreciates."],
+      note: "A country can only keep doing this while it has foreign currency reserves to sell." },
+    { g: "pol", name: "Central bank sells dollars", det: "Currency intervention", d: 0, s: 2, mini: null,
+      cap: "The central bank trades currencies directly in the foreign exchange market. No interest-rate step is needed.",
+      chain: ["The U.S. central bank wants a weaker dollar.", "It creates and sells dollars.", "It uses the dollars to buy euros, which it adds to its reserves.", "Supply of dollars shifts right (S$₁ to S$₂).", "The dollar depreciates. The euro appreciates."],
+      note: "Countries sometimes do this to make their exports cheaper to foreign buyers." }
+  ];
+
+  var BASE = { d: 0, s: 0, sc: -1 };
+  var S = { d: SC[0].d, s: SC[0].s, sc: 0 };   // the page opens on the first scenario
+  var shown = { d: 0, s: 0, md: 0, ms: 0 };
+  var stop = function () {};
+
+  // ---------- Model ----------
+  // Lab.market: demand y = 5 - K(x - 5 - d), supply y = 5 + K(x - 5 - s).
+  function eq(d, s) { return { x: 5 + (d + s) / 2, y: 5 + K * (d - s) / 2 }; }
+  function sign(v) { return v > 1e-9 ? 1 : v < -1e-9 ? -1 : 0; }
+  // Qualitative AP direction from the shifts alone.
+  function dirs(d, s) {
+    var pd = sign(d), ps = -sign(s);      // demand right raises the price; supply right lowers it
+    var qd = sign(d), qs = sign(s);       // both rightward shifts raise quantity
+    function combine(a, b) { if (a === 0) return b; if (b === 0 || a === b) return a; return "?"; }
+    return { e: combine(pd, ps), q: combine(qd, qs) };
+  }
+  function euros(y) { return y * EUR; }
+
+  // ---------- Graphs ----------
+  var svgFX = document.getElementById("fx"), svgMini = document.getElementById("mini");
+  function drawFX(d, s) {
+    var moved = Math.abs(d) > 1e-6 || Math.abs(s) > 1e-6;
+    var e0 = eq(0, 0), e1 = eq(d, s);
+    var showQ2 = Math.abs(e1.x - e0.x) > 0.35, showE2 = Math.abs(e1.y - e0.y) > 0.3;
+    Lab.market(svgFX, {
+      xLabel: "Quantity of dollars", yLabel: "Euros per dollar",
+      demand: { shift: d, label: Math.abs(d) > 1e-6 ? "D$₂" : "D$₁" },
+      supply: { shift: s, label: Math.abs(s) > 1e-6 ? "S$₂" : "S$₁" },
+      start: { demand: 0, supply: 0 }, slope: K,
+      eqLabels: moved ? [showQ2 ? "Q₂" : null, showE2 ? "e₂" : null] : ["Q₁", "e₁"],
+      startLabels: ["Q₁", "e₁"],
+      extra: function (F) {
+        if (Math.abs(d) > 0.2) Lab.tag(F, 9.6, 5 - K * 4.6 + 0.3, "D$₁", "var(--muted)", "end");
+        if (Math.abs(s) > 0.2) Lab.tag(F, 9.6, 5 + K * 4.6 - 0.5, "S$₁", "var(--muted)", "end");
+      }
+    });
+  }
+  function drawMini(mini, md, ms) {
+    var type = mini ? mini.type : "lf";
+    var mm = type === "mm";
+    var moved = Math.abs(md) > 1e-6 || Math.abs(ms) > 1e-6;
+    var r = mm ? "i" : "r";
+    Lab.market(svgMini, {
+      xLabel: mm ? "Quantity of money" : "Quantity of loanable funds",
+      yLabel: mm ? "Nominal interest rate" : "Real interest rate",
+      demand: { shift: md, label: mm ? "MD" : (Math.abs(md) > 1e-6 ? "DLF₂" : "DLF₁") },
+      supply: { shift: ms, label: mm ? (Math.abs(ms) > 1e-6 ? "MS₂" : "MS₁") : "SLF", vertical: mm },
+      start: { demand: 0, supply: 0 }, slope: K,
+      eqLabels: moved ? [null, r + "₂"] : [null, r + "₁"], startLabels: [null, r + "₁"]
+    });
+  }
+
+  // ---------- Story ----------
+  var f = Lab.fmt;
+  function eStr(y) { return "€" + euros(y).toFixed(2); }
+  function story(d, s) {
+    var e0 = eq(0, 0), e1 = eq(d, s), dr = dirs(d, s);
+    var html = "";
+    if (S.sc >= 0) {
+      var x = SC[S.sc];
+      html += "<p><b>" + x.name + ".</b> Determinant: " + x.det + ".</p>";
+      html += "<p><b>AP chain:</b> " + x.chain.join(" → ") + "</p>";
+      if (x.note) html += "<p>" + x.note + "</p>";
+    } else if (d === 0 && s === 0) {
+      return "<p><b>The market for dollars is at its starting equilibrium.</b> Foreigners demand dollars to buy U.S. goods and assets. Americans supply dollars to buy foreign goods and assets. The two meet at <b>€0.90 per dollar</b>, which is the same as $1.11 per euro.</p><p>Pick an event above. For each one, ask: who now wants to buy or sell dollars? That tells you which curve shifts.</p>";
+    } else {
+      var parts = [];
+      if (d > 0) parts.push("Demand for dollars shifts right: foreigners want more U.S. goods, services, or assets.");
+      if (d < 0) parts.push("Demand for dollars shifts left: foreigners want fewer U.S. goods, services, or assets.");
+      if (s > 0) parts.push("Supply of dollars shifts right: Americans want more foreign goods, services, or assets.");
+      if (s < 0) parts.push("Supply of dollars shifts left: Americans want fewer foreign goods, services, or assets.");
+      html += "<p><b>Your own shifts.</b></p><ul>" + parts.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul>";
+    }
+    var eTxt;
+    if (dr.e === 1) eTxt = "The price of the dollar rises from " + eStr(e0.y) + " to <b>" + eStr(e1.y) + "</b>. The dollar <b>appreciates</b> and the euro depreciates (a euro now costs $" + (1 / euros(e1.y)).toFixed(2) + " instead of $1.11).";
+    else if (dr.e === -1) eTxt = "The price of the dollar falls from " + eStr(e0.y) + " to <b>" + eStr(e1.y) + "</b>. The dollar <b>depreciates</b> and the euro appreciates (a euro now costs $" + (1 / euros(e1.y)).toFixed(2) + " instead of $1.11).";
+    else if (dr.e === "?") eTxt = "The two shifts push the price of the dollar in opposite directions, so on the AP exam the change in the exchange rate is <b>indeterminate</b>. With these sizes the graph shows " + eStr(e1.y) + " per dollar.";
+    else eTxt = "The exchange rate stays at " + eStr(e1.y) + " per dollar.";
+    var qTxt = dr.q === "?" ? " The change in the quantity of dollars traded is <b>indeterminate</b>."
+      : dr.q === 1 ? " The quantity of dollars traded rises." : dr.q === -1 ? " The quantity of dollars traded falls." : "";
+    html += "<p>" + eTxt + qTxt + "</p>";
+    return html;
+  }
+
+  // ---------- Controls ----------
+  var elD = document.getElementById("s-dd"), elS = document.getElementById("s-sd");
+  function signed(v) { return v === 0 ? "start" : (v > 0 ? "right +" : "left −") + Math.abs(v); }
+  var btns = [];
+  function readouts(d, s) {
+    var e1 = eq(d, s), dr = dirs(d, s);
+    document.getElementById("r-e").textContent = eStr(e1.y);
+    document.getElementById("r-inv").textContent = "$" + (1 / euros(e1.y)).toFixed(2);
+    document.getElementById("r-usd").innerHTML = dr.e === 1 ? '<span class="pill rec">Appreciates</span>' : dr.e === -1 ? '<span class="pill infl">Depreciates</span>' : dr.e === "?" ? '<span class="pill">Indeterminate</span>' : "No change";
+    document.getElementById("r-q").innerHTML = dr.q === 1 ? "Rises" : dr.q === -1 ? "Falls" : dr.q === "?" ? '<span class="pill">Indeterminate</span>' : "No change";
+  }
+  function chainPanel() {
+    var x = S.sc >= 0 ? SC[S.sc] : null, ol = document.getElementById("chain");
+    var steps = x ? x.chain : ["Something changes what foreigners or Americans want to buy.", "Foreigners buy dollars to buy U.S. goods and assets; Americans sell dollars to buy foreign goods and assets.", "The curve for the side that changed shifts.", "The new equilibrium shows whether the dollar appreciates or depreciates."];
+    ol.innerHTML = "";
+    steps.forEach(function (t, i) { var li = document.createElement("li"); li.textContent = t; if (i === steps.length - 1) li.className = "end"; ol.appendChild(li); });
+    var cap = x ? x.cap : "Pick a policy scenario to see how a change in the interest rate starts the chain. Events that work through trade or speculation skip this step.";
+    if (!x && (S.d !== 0 || S.s !== 0)) cap = "Custom shifts: no interest-rate step is modeled.";
+    document.getElementById("mini-cap").textContent = cap;
+    document.getElementById("mini-title").textContent = x && x.mini ? (x.mini.type === "mm" ? "money market first" : "loanable funds first") : "no interest-rate step";
+  }
+  function render(animate) {
+    var x = S.sc >= 0 ? SC[S.sc] : null;
+    var mini = x ? x.mini : null;
+    var tMd = mini && mini.type === "lf" ? mini.d : 0, tMs = mini && mini.type === "mm" ? mini.s : 0;
+    elD.value = S.d; elS.value = S.s;
+    document.getElementById("o-dd").textContent = signed(S.d);
+    document.getElementById("o-sd").textContent = signed(S.s);
+    btns.forEach(function (b, i) { b.setAttribute("aria-pressed", i === S.sc ? "true" : "false"); });
+    readouts(S.d, S.s);
+    document.getElementById("story").innerHTML = story(S.d, S.s);
+    chainPanel();
+    stop();
+    var from = { d: shown.d, s: shown.s, md: shown.md, ms: shown.ms }, to = { d: S.d, s: S.s, md: tMd, ms: tMs };
+    if (from.md !== 0 || from.ms !== 0) {
+      // switching between markets: restart the interest-rate panel from its start
+      var prevType = shown.type;
+      if (prevType !== (mini ? mini.type : "lf")) { from.md = 0; from.ms = 0; }
+    }
+    shown.type = mini ? mini.type : "lf";
+    function frameAt(t) {
+      shown.d = from.d + (to.d - from.d) * t; shown.s = from.s + (to.s - from.s) * t;
+      shown.md = from.md + (to.md - from.md) * t; shown.ms = from.ms + (to.ms - from.ms) * t;
+      drawFX(shown.d, shown.s); drawMini(mini, shown.md, shown.ms);
+    }
+    if (animate) stop = Lab.animate(500, frameAt); else frameAt(1);
+  }
+  elD.addEventListener("input", function () { S.d = parseFloat(elD.value); S.sc = -1; render(false); });
+  elS.addEventListener("input", function () { S.s = parseFloat(elS.value); S.sc = -1; render(false); });
+  document.getElementById("btn-reset").addEventListener("click", function () { S = Object.assign({}, BASE); render(true); });
+  SC.forEach(function (x, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = x.name;
+    b.addEventListener("click", function () { S = { d: x.d, s: x.s, sc: i }; render(true); });
+    document.getElementById(x.g === "cond" ? "sc-cond" : "sc-pol").appendChild(b);
+    btns.push(b);
+  });
+  render(false);
+
+  // ---------- Quiz ----------
+  var Q = [
+    { s: "The Federal Reserve sells government bonds on the open market. Assuming other things are constant, what happens in the foreign exchange market for U.S. dollars?", o: ["Supply of dollars increases and the dollar depreciates", "Demand for dollars decreases and the dollar depreciates", "Demand for dollars increases and the dollar appreciates", "Supply of dollars decreases and the dollar depreciates"], c: 2, w: "Selling bonds reduces the money supply and raises the interest rate. Higher U.S. interest rates attract foreign financial capital, so foreigners demand more dollars and the dollar appreciates. Choice D is a trap: a decrease in the supply of dollars would make the dollar appreciate, not depreciate." },
+    { s: "Real income in the United States rises while real income in Japan stays the same. In the market for U.S. dollars, which of the following is most likely?", o: ["Supply of dollars increases and the dollar depreciates against the yen", "Demand for dollars increases and the dollar appreciates against the yen", "Supply of dollars decreases and the dollar appreciates against the yen", "Demand for dollars decreases and the dollar appreciates against the yen"], c: 0, w: "Higher U.S. income means Americans buy more imports, including Japanese goods. They sell dollars to get yen, so the supply of dollars shifts right and the dollar depreciates. Many students pick B because a growing economy sounds strong, but the trade channel weakens the currency." },
+    { s: "The inflation rate in the United States rises well above the inflation rate in the euro area. Which of the following correctly describes the effect on the two currencies?", o: ["The dollar appreciates and the euro depreciates", "Both the dollar and the euro appreciate", "The dollar depreciates and the euro depreciates", "The dollar depreciates and the euro appreciates"], c: 3, w: "U.S. goods become relatively more expensive. Europeans buy fewer U.S. goods (less demand for dollars) and Americans buy more European goods (more supply of dollars). The dollar depreciates, so the euro must appreciate against it. Two currencies cannot both appreciate against each other." },
+    { s: "On a graph of the market for U.S. dollars with \"Euros per dollar\" on the vertical axis, the demand curve shifts right and the supply curve shifts left. Which of the following must be true?", o: ["The quantity of dollars rises and the exchange rate is indeterminate", "The dollar appreciates and the change in the quantity of dollars is indeterminate", "The dollar depreciates and the quantity of dollars falls", "The dollar appreciates and the quantity of dollars rises"], c: 1, w: "Both shifts raise the price of the dollar, so the dollar must appreciate. Demand right raises quantity while supply left lowers it, so the change in quantity depends on the sizes of the shifts and is indeterminate." },
+    { s: "The exchange rate changes from 0.80 euros per dollar to 1.00 euro per dollar. A German camera costs €50. What happens to its price in dollars?", o: ["It rises from $40.00 to $50.00", "It stays at $50.00 because the euro price did not change", "It falls from $62.50 to $50.00", "It falls from $50.00 to $40.00"], c: 2, w: "Dollar price = euro price ÷ euros per dollar. Before: 50 ÷ 0.80 = $62.50. After: 50 ÷ 1.00 = $50.00. The dollar appreciated, so imports from Germany became cheaper for Americans. Choice A multiplies instead of divides." },
+    { s: "The U.S. government increases spending and finances the resulting budget deficit by borrowing. According to the loanable funds and foreign exchange models, what happens to the U.S. real interest rate and the value of the dollar?", o: ["Real interest rate falls; dollar depreciates", "Real interest rate rises; dollar appreciates", "Real interest rate rises; dollar depreciates", "Real interest rate falls; dollar appreciates"], c: 1, w: "Government borrowing increases demand for loanable funds, so the real interest rate rises. Higher returns on U.S. assets draw in foreign financial capital, which increases demand for dollars and appreciates the dollar." },
+    { s: "Mexico's central bank wants to stop the peso from depreciating against the U.S. dollar. Which action would work?", o: ["Sell pesos and buy U.S. dollars", "Lower interest rates in Mexico", "Increase the money supply in Mexico", "Use its U.S. dollar reserves to buy pesos"], c: 3, w: "Buying pesos with dollar reserves increases demand for pesos, which raises the peso's value. Choices A, B, and C all push the peso down: selling pesos adds supply, and lower Mexican interest rates send financial capital out of Mexico." },
+    { s: "Currency traders come to expect that the U.S. dollar will appreciate against the British pound next month. What happens in the market for dollars today?", o: ["Demand for dollars increases and the dollar appreciates now", "Supply of dollars increases and the dollar depreciates now", "Nothing changes until the appreciation actually happens", "Demand for dollars decreases and the dollar depreciates now"], c: 0, w: "Speculators buy dollars now so they can sell them later at a higher price. That increases demand for dollars today, so the dollar appreciates now. Expectations shift the curve immediately." }
+  ];
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
+  Lab.nav("6.4");
+})();
+</script>
+<script>Glossary.mount(document.getElementById("key-terms"), { units: [6], topic: "6.4", compact: true, storageKey: "topic-6.4" });</script>
+</body>
+</html>
