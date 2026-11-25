@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/lab.css?v=3">
+<link rel="stylesheet" href="../assets/lab.css?v=4">
 <script src="../assets/prefs.js?v=4"></script>
 </head>
 <body>
@@ -165,7 +165,7 @@
 <!-- QUIZ -->
 <section aria-labelledby="quiz-h">
   <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
-    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>Three sets of 8 multiple-choice questions: core ideas, more practice, then harder questions in the style of the AP exam. Pick an answer to see the explanation.</p></div>
     <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset">Start over</button></div>
   </div>
   <div class="quiz" id="quiz"></div>
@@ -190,7 +190,7 @@
 <script src="../assets/glossary/unit-5.js"></script>
 <script src="../assets/glossary/unit-6.js"></script>
 <script src="../assets/glossary.js?v=3"></script>
-<script src="../assets/lab.js?v=3"></script>
+<script src="../assets/lab.js?v=4"></script>
 <script>
 (function () {
   "use strict";
@@ -408,6 +408,7 @@
 
   // ---------- Quiz ----------
   var Q = [
+  [
     { s: "The short-run Phillips curve shows which relationship?", o: ["A direct relationship between inflation and unemployment", "An inverse relationship between inflation and unemployment", "An inverse relationship between the price level and real GDP", "No relationship between inflation and unemployment"], c: 1, w: "In the short run, lower unemployment comes with higher inflation and vice versa, so the SRPC slopes downward. There is no trade-off only in the long run." },
     { s: "The Federal Reserve buys bonds on the open market. In the short run, the economy will:", o: ["Move down and to the right along the SRPC", "Shift the SRPC to the right", "Move up and to the left along the SRPC", "Shift the LRPC to the left"], c: 2, w: "Buying bonds is expansionary monetary policy. AD shifts right, which is a movement along the SRPC to lower unemployment and higher inflation." },
     { s: "A sharp increase in the price of oil will most likely cause:", o: ["A movement up along the SRPC", "A rightward shift of the SRPC", "A leftward shift of the LRPC", "A leftward shift of the SRPC"], c: 1, w: "An oil price spike is a negative supply shock. SRAS shifts left, raising both inflation and unemployment, which shows up as a rightward shift of the SRPC." },
@@ -416,35 +417,29 @@
     { s: "Which of the following would shift the long-run Phillips curve to the left?", o: ["An increase in government spending", "A decrease in expected inflation", "Better job-matching technology that reduces frictional unemployment", "A decrease in the money supply"], c: 2, w: "Lower frictional unemployment lowers the natural rate, shifting the LRPC left (and LRAS right). Spending and money-supply changes are movements along the SRPC; a change in expected inflation shifts the SRPC." },
     { s: "Which of the following would NOT shift the short-run Phillips curve?", o: ["An increase in expected inflation", "A decrease in personal income taxes", "A rise in nominal wages across the economy", "A favorable supply shock"], c: 1, w: "A tax cut shifts AD, and AD changes are movements along the SRPC. Expectations, wages, and supply shocks all shift SRAS, so they shift the SRPC." },
     { s: "Inflation falls from 6% to 2% over two years. This is an example of:", o: ["Deflation", "Disinflation", "Stagflation", "Hyperinflation"], c: 1, w: "Prices are still rising, just more slowly, so this is disinflation. Deflation requires the inflation rate to drop below zero." }
+  ],
+  [
+    { s: "The natural rate of unemployment is 5%. The economy is on its SRPC at 4% unemployment and 3% inflation. Which of the following is true?", o: ["The economy has a recessionary gap", "The economy has an inflationary gap", "The economy is in long-run equilibrium", "The LRPC is located at 4% unemployment"], c: 1, w: "Unemployment below the natural rate means real GDP is above full-employment output, which is an inflationary gap. The LRPC stays at the natural rate of 5%; the economy has simply moved along the SRPC." },
+    { s: "The natural rate of unemployment is 5% and expected inflation is 2%. At what point does the SRPC cross the LRPC?", o: ["Unemployment 5%, inflation 2%", "Unemployment 0%, inflation 2%", "Unemployment 2%, inflation 5%", "Unemployment 5%, inflation 0%"], c: 0, w: "The LRPC is vertical at the natural rate of 5%, and the SRPC crosses it at the expected inflation rate of 2%. Switching the two numbers puts unemployment on the wrong axis." },
+    { s: "Consumer confidence falls sharply and households cut spending. On the Phillips curve graph, what happens in the short run?", o: ["The SRPC shifts right", "The LRPC shifts right", "A movement up and to the left along the SRPC", "A movement down and to the right along the SRPC"], c: 3, w: "Lower confidence shifts AD left, so unemployment rises and inflation falls. A change in AD is a movement along the SRPC, not a shift of either curve." },
+    { s: "Workers and firms come to expect lower inflation than before. Which of the following will happen?", o: ["The SRPC shifts right", "The LRPC shifts left", "The SRPC shifts left", "A movement up along the SRPC"], c: 2, w: "Lower expected inflation means smaller wage demands, so SRAS shifts right and the SRPC shifts left. The LRPC moves only when the natural rate of unemployment changes, which expectations do not do." },
+    { s: "On a correctly labeled Phillips curve graph, the vertical axis shows:", o: ["The inflation rate", "The price level", "The nominal interest rate", "The unemployment rate"], c: 0, w: "The Phillips curve plots the inflation rate against the unemployment rate. The price level belongs on the AD-AS graph, a common labeling mistake on FRQs." },
+    { s: "In an economy, frictional unemployment is 2%, structural unemployment is 2.5%, and cyclical unemployment is 1.5%. What is the natural rate of unemployment?", o: ["1.5%", "4.5%", "6%", "2.5%"], c: 1, w: "The natural rate is frictional plus structural unemployment: 2% + 2.5% = 4.5%. The 6% total includes cyclical unemployment, which is zero at the natural rate." },
+    { s: "New technology leaves many workers with skills that firms no longer need, increasing structural unemployment. What happens to the LRPC and LRAS?", o: ["LRPC shifts left; LRAS shifts left", "LRPC shifts right; LRAS shifts right", "Only the SRPC shifts; LRAS does not change", "LRPC shifts right; LRAS shifts left"], c: 3, w: "More structural unemployment raises the natural rate, so the LRPC shifts right while potential output falls and LRAS shifts left. The two curves move in opposite directions on the page, so moving them the same way is the trap." },
+    { s: "Over one year, inflation rises from 2% to 6% while unemployment rises from 5% to 8%. Which event best explains this?", o: ["Expansionary monetary policy", "A favorable supply shock", "A negative supply shock", "A decrease in aggregate demand"], c: 2, w: "Both inflation and unemployment got worse, which is stagflation. A negative supply shock shifts SRAS left and the SRPC right. Expansionary policy would lower unemployment, and a fall in AD would lower inflation." }
+  ],
+  [
+    { s: "Expected inflation rises at the same time that the government increases its spending. What happens to the unemployment rate and the inflation rate in the short run?", o: ["Indeterminate / Increase", "Decrease / Increase", "Increase / Indeterminate", "Indeterminate / Indeterminate"], c: 0, w: "Higher spending moves the economy up and left along the SRPC, while higher expected inflation shifts the SRPC right. Both raise inflation, but one lowers unemployment and the other raises it, so unemployment is indeterminate." },
+    { s: "The price of a key imported energy input falls sharply. What happens to unemployment, inflation, and the SRPC?", o: ["Decrease / Increase / Movement along", "Increase / Decrease / Shifts right", "Decrease / Decrease / Shifts left", "Decrease / Decrease / Shifts right"], c: 2, w: "Cheaper energy is a favorable supply shock: SRAS shifts right, so output rises and prices rise less. Both unemployment and inflation fall, which is a leftward shift of the SRPC." },
+    { s: "The natural rate of unemployment is 5% and expected inflation is 3%. Expansionary policy moves the economy along the SRPC to 3.5% unemployment and 5% inflation. If inflation stays at 5% and people fully adjust their expectations, where will the economy be in the long run?", o: ["3.5% unemployment and 5% inflation", "5% unemployment and 5% inflation", "5% unemployment and 3% inflation", "6.5% unemployment and 5% inflation"], c: 1, w: "Inflation is above what people expected, so expected inflation rises to 5%, the SRPC shifts right, and unemployment returns to the natural rate of 5% at the higher 5% inflation rate. The economy cannot stay at 3.5% unemployment, because that is below the natural rate and the LRPC has not moved." },
+    { s: "A central bank repeatedly uses expansionary policy to try to hold unemployment below the natural rate. According to the Phillips curve model, what is the long-run result?", o: ["Unemployment stays below the natural rate with stable inflation", "Unemployment returns to the natural rate and inflation keeps rising", "The LRPC shifts left to the central bank's target", "Inflation falls as the SRPC shifts left"], c: 1, w: "Each push lowers unemployment only until expectations catch up and the SRPC shifts right. Unemployment returns to the natural rate each time, but at ever higher inflation. Policy that shifts AD cannot move the LRPC." },
+    { s: "An SRPC passes through three points: A (4% unemployment, 6% inflation), B (5%, 3%) and C (7%, 1%). The natural rate of unemployment is 5%. Which point is a long-run equilibrium, and what is expected inflation?", o: ["Point A; 6%", "Point C; 1%", "Point B; 0%", "Point B; 3%"], c: 3, w: "Long-run equilibrium is where the SRPC crosses the LRPC at the natural rate, which is point B. The SRPC crosses the LRPC at the expected inflation rate, so expected inflation is 3%, not 0%." },
+    { s: "A negative supply shock moves the economy to higher unemployment and higher inflation. The central bank then buys bonds to reduce unemployment. Compared with right after the shock, what happens to unemployment and inflation?", o: ["Decrease / Decrease", "Increase / Increase", "Increase / Decrease", "Decrease / Increase"], c: 3, w: "The shock shifted the SRPC right. Buying bonds shifts AD right, a movement up and to the left along the new SRPC, so unemployment falls but inflation rises even further. Policy that shifts AD cannot lower both at once." },
+    { s: "On a Phillips curve graph, the economy moves from point X to point Y on the same SRPC. At Y, unemployment is higher and inflation is lower. Which event on the AD-AS graph matches this?", o: ["AD shifts left", "SRAS shifts left", "AD shifts right", "LRAS shifts left"], c: 0, w: "A movement along the SRPC comes from a change in AD, and higher unemployment with lower inflation means AD shifted left. An SRAS shift would shift the SRPC itself instead of moving along it." },
+    { s: "Inflation has been 8% and people expect it to continue. The central bank uses contractionary policy to bring inflation down to 2%. What happens to unemployment?", o: ["It falls at first, then rises to the natural rate", "It stays at the natural rate the whole time because the LRPC is vertical", "It rises above the natural rate at first, then returns to it as expected inflation falls", "It rises permanently because the LRPC shifts right"], c: 2, w: "In the short run the economy moves down and to the right along the SRPC, so unemployment rises. As people lower their inflation expectations the SRPC shifts left, and unemployment returns to the natural rate at lower inflation. The LRPC does not move because the natural rate has not changed." }
+  ]
   ];
-  var quiz = document.getElementById("quiz"), answered = 0, right = 0;
-  function buildQuiz() {
-    quiz.innerHTML = ""; answered = 0; right = 0; updScore();
-    Q.forEach(function (q, i) {
-      var card = document.createElement("div"); card.className = "card q";
-      card.innerHTML = '<div class="qn">Question ' + (i + 1) + ' of ' + Q.length + '</div><div class="stem"></div><div class="opts"></div><div class="why" hidden></div>';
-      card.querySelector(".stem").textContent = q.s;
-      var opts = card.querySelector(".opts"), why = card.querySelector(".why");
-      q.o.forEach(function (t, j) {
-        var b = document.createElement("button"); b.className = "opt";
-        b.textContent = String.fromCharCode(65 + j) + ".  " + t;
-        b.addEventListener("click", function () {
-          var all = opts.querySelectorAll("button");
-          all.forEach(function (x) { x.disabled = true; });
-          all[q.c].classList.add("right");
-          if (j !== q.c) b.classList.add("wrong"); else right++;
-          answered++; updScore();
-          why.hidden = false;
-          why.innerHTML = (j === q.c ? "<b style='color:var(--good)'>Correct.</b> " : "<b style='color:var(--bad)'>Not quite.</b> The answer is " + String.fromCharCode(65 + q.c) + ". ") + q.w;
-        });
-        opts.appendChild(b);
-      });
-      quiz.appendChild(card);
-    });
-  }
-  function updScore() { document.getElementById("score").textContent = right + " / " + answered + " correct"; }
-  document.getElementById("quiz-reset").addEventListener("click", buildQuiz);
-  buildQuiz();
+  Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
   Lab.nav("5.2");
 })();
 </script>

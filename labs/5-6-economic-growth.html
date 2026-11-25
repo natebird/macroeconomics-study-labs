@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/lab.css?v=3">
+<link rel="stylesheet" href="../assets/lab.css?v=4">
 <script src="../assets/prefs.js?v=4"></script>
 <style>
 .controls.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -259,7 +259,7 @@
 <!-- QUIZ -->
 <section aria-labelledby="quiz-h">
   <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
-    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">5. Practice questions</h2><p>Three sets of 8 multiple-choice questions: core ideas, more practice, then harder questions in the style of the AP exam. Pick an answer to see the explanation.</p></div>
     <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
   </div>
   <div class="quiz" id="quiz"></div>
@@ -284,7 +284,7 @@
 <script src="../assets/glossary/unit-5.js"></script>
 <script src="../assets/glossary/unit-6.js"></script>
 <script src="../assets/glossary.js?v=3"></script>
-<script src="../assets/lab.js?v=3"></script>
+<script src="../assets/lab.js?v=4"></script>
 <script>
 (function () {
   "use strict";
@@ -525,6 +525,7 @@
 
   // ---------- Quiz ----------
   var Q = [
+  [
     { s: "Which of the following best shows economic growth on a production possibilities curve?", o: ["A movement from a point inside the PPC to a point on the PPC", "A movement along the PPC toward more capital goods", "An outward shift of the PPC", "An inward shift of the PPC"], c: 2, w: "Growth means the economy can produce more of everything, so the whole curve shifts outward. Moving from inside to the curve only uses idle resources." },
     { s: "Economic growth is best measured as the percentage increase in:", o: ["Nominal GDP", "Real GDP per capita", "The price level", "Total employment"], c: 1, w: "Real GDP removes the effect of inflation, and dividing by population shows output per person, which tracks living standards." },
     { s: "Which of the following would most likely increase labor productivity?", o: ["An increase in aggregate demand", "A decrease in the unemployment rate", "More workers completing technical training", "An increase in the price level"], c: 2, w: "Training raises human capital, so each worker produces more per hour. The other choices change spending or employment, not output per worker." },
@@ -533,6 +534,27 @@
     { s: "Country X devotes a larger share of its output to capital goods than Country Y. Compared with Country Y, Country X will most likely have:", o: ["More consumer goods now and a larger PPC shift later", "Fewer consumer goods now and a larger PPC shift later", "Fewer consumer goods now and a smaller PPC shift later", "The same PPC shift, since both have the same resources"], c: 1, w: "Building capital means giving up consumer goods today. The extra capital raises future productive capacity, so the PPC shifts out further." },
     { s: "Holding aggregate demand constant, an improvement in technology will cause:", o: ["LRAS to shift right and the price level to fall", "LRAS to shift left and the price level to rise", "AD to shift right and the price level to rise", "No change in LRAS, since technology affects only the short run"], c: 0, w: "Better technology raises potential output, shifting LRAS (and SRAS) right. With AD unchanged, real GDP rises and the price level falls." },
     { s: "Which of the following would NOT shift the LRAS curve to the right?", o: ["Discovery of new natural resources", "An increase in the stock of physical capital", "An increase in consumer spending", "An increase in the size of the labor force"], c: 2, w: "Consumer spending is part of aggregate demand. It changes output in the short run but does not change the economy's productive capacity." }
+  ],
+  [
+    { s: "Using the rule of 70, how long will it take output per person to double in a country where it rises 3.5% each year?", o: ["10 years", "20 years", "35 years", "2,000 years"], c: 1, w: "Rule of 70: 70 divided by 3.5 = 20 years. 2,000 years comes from dividing 70 by the decimal 0.035 instead of the percent." },
+    { s: "In one year, a country's real GDP grows 5% and its population also grows 5%. About how much did real GDP per capita grow?", o: ["5%", "10%", "0%", "1%"], c: 2, w: "Real GDP per capita growth is about real GDP growth minus population growth: 5 − 5 = 0%. The country produces more in total, but output per person is about the same, so living standards did not rise." },
+    { s: "After a recession, firms rehire idle workers and real GDP rises back to full-employment output. On the AD-AS graph, what happens to LRAS?", o: ["LRAS shifts right because real GDP rose", "LRAS shifts left because unemployment fell", "LRAS shifts right because the labor force grew", "LRAS does not shift; the economy moves back to it"], c: 3, w: "Rehiring idle workers uses existing capacity, so potential output did not change and LRAS stays put. This matches a move from inside the PPC to the curve, which is recovery, not growth." },
+    { s: "A major earthquake destroys many factories, roads, and ports. What happens to the PPC and LRAS?", o: ["The PPC shifts inward and LRAS shifts left", "The PPC shifts outward and LRAS shifts right", "The economy moves inside the PPC and LRAS does not change", "The PPC does not change and AD shifts left"], c: 0, w: "Losing physical capital reduces what the economy can produce even with full employment, so the PPC shifts inward and LRAS shifts left. Moving inside the PPC would mean idle resources, not destroyed ones." },
+    { s: "Last year, 100 workers each worked 10 hours and produced 2,000 units. This year, 110 workers each work 10 hours and produce 2,640 units. By how much did labor productivity change?", o: ["It did not change", "It rose 10%", "It rose 20%", "It rose 32%"], c: 2, w: "Productivity is output per hour: 2,000 / 1,000 = 2 units last year and 2,640 / 1,100 = 2.4 units this year, a 20% rise. 32% is the rise in total output, which includes the extra workers." },
+    { s: "Nominal GDP grows 6%, the price level rises 4%, and population grows 1%. About how much did real GDP per capita grow?", o: ["1%", "2%", "5%", "6%"], c: 0, w: "Real GDP growth ≈ 6 − 4 = 2%, and subtracting population growth gives about 1% per person. 2% stops at real GDP and forgets population, while 6% uses nominal GDP." },
+    { s: "A firm buys new robots for its assembly line. This is an increase in:", o: ["Human capital", "Natural resources", "The labor force", "Physical capital"], c: 3, w: "Machines, tools and buildings used to produce goods are physical capital. Human capital is the skills and knowledge of workers, which buying robots does not change." },
+    { s: "A point outside a country's PPC represents output that is:", o: ["Produced when some resources are idle", "Unattainable with current resources and technology", "Reached whenever the economy is at full employment", "Possible only if the price level falls"], c: 1, w: "The PPC shows the most the economy can produce with its current resources and technology, so points beyond it cannot be reached now. Only growth that shifts the PPC outward could make them possible. Idle resources put the economy inside the curve." }
+  ],
+  [
+    { s: "An improvement in technology shifts LRAS and SRAS right at the same time that aggregate demand increases. What happens to real GDP and the price level?", o: ["Increase / Indeterminate", "Increase / Increase", "Indeterminate / Increase", "Increase / Decrease"], c: 0, w: "Both the supply shift and the AD shift raise real GDP. The supply shift lowers the price level while the AD shift raises it, so without their sizes the price level is indeterminate." },
+    { s: "Countries A and B each start with real GDP per capita of $10,000. Country A grows at 1.75% per year and Country B at 3.5% per year. Using the rule of 70, what is each country's real GDP per capita after about 40 years?", o: ["Country A $17,000; Country B $24,000", "Country A $20,000; Country B $20,000", "Country A $20,000; Country B $40,000", "Country A $40,000; Country B $80,000"], c: 2, w: "A doubles every 70 / 1.75 = 40 years, reaching $20,000. B doubles every 70 / 3.5 = 20 years, so it doubles twice in 40 years, reaching $40,000. The $17,000 and $24,000 figures ignore compounding." },
+    { s: "A country's labor force and population both grow 3% per year, and output per worker grows 2% per year. About how fast do real GDP and real GDP per capita grow?", o: ["About 5%; about 2%", "About 5%; about 5%", "About 6%; about 3%", "About 2%; about −1%"], c: 0, w: "Real GDP growth ≈ labor force growth plus productivity growth = 3 + 2 = 5%. Since population grows 3%, real GDP per capita grows about 5 − 3 = 2%, which matches the productivity gain. Only productivity raises output per person here." },
+    { s: "On a graph, LRAS shifts right from Yf1 to Yf2, and on a second graph the PPC shifts outward. Which event could cause both?", o: ["An increase in consumer confidence", "The central bank buying bonds", "Rehiring workers after a recession", "Discovery of a large natural gas deposit"], c: 3, w: "New natural resources raise the economy's capacity, which shows up as an outward PPC shift and a rightward LRAS shift. Confidence and bond purchases shift AD, and rehiring is a move toward the existing PPC." },
+    { s: "A country's real GDP rises from $2,000 billion to $2,100 billion while its population rises from 50 million to 51 million. About how much did real GDP per capita grow?", o: ["About 2%", "About 3%", "About 5%", "About 7%"], c: 1, w: "Real GDP per capita goes from $40,000 to about $41,176, a rise of about 3%. As a shortcut, 5% real GDP growth minus 2% population growth is about 3%. 5% is total real GDP growth, which ignores population." },
+    { s: "Tax incentives lead households to save more. Through the loanable funds market, what happens to the real interest rate, private investment, and the future position of the PPC?", o: ["Increase / Decrease / Shifts out less", "Decrease / Decrease / No change", "Increase / Increase / Shifts out more", "Decrease / Increase / Shifts out more"], c: 3, w: "More saving shifts the supply of loanable funds right, which lowers the real interest rate. Firms invest more, the capital stock grows faster, and the PPC shifts out further in the future." },
+    { s: "An economy moves from a point inside its PPC to a point on its PPC. On the AD-AS graph, this most likely matches:", o: ["LRAS shifting right as potential output grows", "AD shifting right to close a recessionary gap, with LRAS unchanged", "SRAS shifting left as input costs rise", "AD shifting left as spending falls"], c: 1, w: "Inside the PPC means idle resources, which on AD-AS is a recessionary gap. Closing it by raising AD puts those resources back to work without changing capacity, so LRAS does not move. Shifting LRAS would mean the PPC itself shifted." },
+    { s: "A country's real GDP per capita doubled in about 14 years. Using the rule of 70, what was its approximate annual growth rate?", o: ["0.2%", "2%", "5%", "14%"], c: 2, w: "The rule of 70 gives growth rate ≈ 70 / doubling time = 70 / 14 = 5%. 0.2% comes from dividing 14 by 70 instead." }
+  ]
   ];
   Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
 

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/lab.css?v=3">
+<link rel="stylesheet" href="../assets/lab.css?v=4">
 <script src="../assets/prefs.js?v=4"></script>
 <style>
 .eq-card { display: grid; gap: 12px; align-content: start; }
@@ -201,7 +201,7 @@
 <!-- QUIZ -->
 <section aria-labelledby="quiz-h">
   <div class="sec-head" style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:10px;">
-    <div style="display:grid; gap:6px;"><h2 id="quiz-h">6. Practice questions</h2><p>AP-style multiple choice. Pick an answer to see the explanation.</p></div>
+    <div style="display:grid; gap:6px;"><h2 id="quiz-h">6. Practice questions</h2><p>Three sets of 8 multiple-choice questions: core ideas, more practice, then harder questions in the style of the AP exam. Pick an answer to see the explanation.</p></div>
     <div style="display:flex; gap:10px; align-items:center;"><span class="score" id="score">0 / 0 correct</span><button id="quiz-reset" type="button">Start over</button></div>
   </div>
   <div class="quiz" id="quiz"></div>
@@ -226,7 +226,7 @@
 <script src="../assets/glossary/unit-5.js"></script>
 <script src="../assets/glossary/unit-6.js"></script>
 <script src="../assets/glossary.js?v=3"></script>
-<script src="../assets/lab.js?v=3"></script>
+<script src="../assets/lab.js?v=4"></script>
 <script>
 (function () {
   "use strict";
@@ -369,6 +369,7 @@
 
   // ================= Quiz =================
   var Q = [
+  [
     { s: "According to the quantity theory of money, if velocity and real GDP are constant and the money supply increases by 6%, the price level will:", o: ["Stay the same", "Increase by 6%", "Increase by 3%", "Decrease by 6%"], c: 1, w: "With V and Y fixed, MV = PY means P must rise in the same proportion as M." },
     { s: "The money supply grows 8% per year, velocity is constant, and real GDP grows 3% per year. The approximate inflation rate is:", o: ["11%", "8%", "5%", "3%"], c: 2, w: "%ΔP ≈ %ΔM + %ΔV − %ΔY = 8 + 0 − 3 = 5%." },
     { s: "Long-run monetary neutrality means that a change in the money supply affects:", o: ["Only real variables such as real GDP", "Only nominal variables such as the price level", "Both real and nominal variables permanently", "Neither real nor nominal variables"], c: 1, w: "In the long run, money changes prices and nominal values but not real output, employment, or the real interest rate." },
@@ -377,6 +378,27 @@
     { s: "Which of the following would shift the long-run aggregate supply curve?", o: ["A 10% increase in the money supply", "An increase in velocity", "An improvement in technology", "An increase in the price level"], c: 2, w: "LRAS depends on real resources and technology. Money, velocity, and the price level do not shift LRAS." },
     { s: "Nominal GDP grew by 7% and real GDP grew by 2%. Approximately what was the inflation rate?", o: ["9%", "7%", "5%", "2%"], c: 2, w: "Nominal GDP growth ≈ inflation + real growth, so inflation ≈ 7 − 2 = 5%." },
     { s: "A country experiencing hyperinflation is most likely:", o: ["Growing its money supply far faster than its real output", "Running a large budget surplus", "Experiencing rapid growth in real GDP", "Holding its money supply constant"], c: 0, w: "Hyperinflation happens when a government creates money much faster than output grows, often to pay for spending." }
+  ],
+  [
+    { s: "In Country Z, the money stock rises 5% a year, velocity rises 1% a year, and output rises 2% a year. Using the quantity theory, estimate the inflation rate.", o: ["2%", "4%", "6%", "8%"], c: 1, w: "Using %ΔP ≈ %ΔM + %ΔV − %ΔY gives 5 + 1 − 2 = 4%. Adding all three numbers to get 8% forgets that real GDP growth subtracts from inflation." },
+    { s: "A country's money supply is $400 billion and its nominal GDP is $2,000 billion. What is the velocity of money?", o: ["5", "0.2", "1,600", "2,400"], c: 0, w: "From MV = PY, velocity equals nominal GDP divided by the money supply: 2,000 / 400 = 5. Dividing the other way gives 0.2, and subtracting or adding the two numbers has no meaning in the equation." },
+    { s: "The real interest rate is 3%. Rapid money growth raises expected inflation from 2% to 5%. In the long run, what are the nominal and real interest rates?", o: ["Nominal 5%; real 0%", "Nominal 8%; real 6%", "Nominal 3%; real 3%", "Nominal 8%; real 3%"], c: 3, w: "By the Fisher effect, the nominal rate equals the real rate plus expected inflation, so it rises from 5% to 8%. The real rate is unchanged in the long run because money is neutral." },
+    { s: "Velocity and real GDP are constant. The central bank raises the money supply once by 10% and then holds it steady. In the long run, which of the following is true?", o: ["The price level is about 10% higher, but inflation does not stay elevated", "The inflation rate stays at 10% every year", "Real GDP is about 10% higher", "The price level does not change because money is neutral"], c: 0, w: "A one-time increase in money raises the price level once, by about the same 10%. Only continuing money growth keeps the inflation rate high. Neutrality means real GDP is unchanged, not that prices are unchanged." },
+    { s: "Which of the following is a real variable that is NOT changed by the money supply in the long run?", o: ["Nominal wages", "The price level", "The unemployment rate", "Nominal GDP"], c: 2, w: "Long-run monetary neutrality says money changes only nominal variables such as prices, nominal wages and nominal GDP. The unemployment rate returns to the natural rate whatever the money supply." },
+    { s: "A central bank lets money grow exactly as fast as real output, 3% per year, and velocity holds steady. What inflation rate does the quantity theory predict?", o: ["3%", "6%", "1.5%", "0%"], c: 3, w: "%ΔP ≈ 3 + 0 − 3 = 0%. When money grows at the same rate as real output and velocity is stable, prices are stable. 6% comes from adding real GDP growth instead of subtracting it." },
+    { s: "The money supply is constant, velocity rises 4%, and real GDP rises 1%. What is the approximate inflation rate?", o: ["1%", "4%", "3%", "5%"], c: 2, w: "%ΔP ≈ 0 + 4 − 1 = 3%. Velocity growth adds to inflation, while real GDP growth subtracts. 4% forgets to subtract real GDP growth, and 5% treats it as adding to inflation." },
+    { s: "Why can an increase in the money supply raise real GDP in the short run but not in the long run?", o: ["Prices are flexible in the short run but sticky in the long run", "Nominal wages are sticky in the short run but adjust in the long run", "LRAS shifts right in the short run and back in the long run", "Velocity falls to zero in the short run"], c: 1, w: "With sticky wages, firms can profitably raise output when prices rise. Once wages adjust, SRAS shifts left and output returns to full employment. The first choice reverses the short run and the long run." }
+  ],
+  [
+    { s: "An economy starts in long-run equilibrium and the central bank decreases the money supply. After the economy fully adjusts, how do real GDP, the price level, and nominal wages compare with the original equilibrium?", o: ["Lower / Lower / Same", "Same / Lower / Lower", "Same / Same / Same", "Lower / Same / Lower"], c: 1, w: "In the short run AD shifts left. Over time, nominal wages fall, SRAS shifts right, and real GDP returns to full employment at a lower price level. Real GDP is lower only in the short run." },
+    { s: "In Country A, the money supply grows 10% per year, velocity is constant, and real GDP grows 4% per year. The central bank wants 2% inflation. To what rate should it change money growth?", o: ["Lower money growth to 2%", "Lower money growth to 4%", "Raise money growth to 14%", "Lower money growth to 6%"], c: 3, w: "Current inflation is 10 − 4 = 6%. For 2% inflation, money growth must equal 2 + 4 = 6%. Setting money growth equal to the inflation target, 2%, forgets that real GDP growth absorbs part of the new money." },
+    { s: "The money supply is $300 billion and velocity is 4. Next year the money supply rises to $330 billion, velocity is unchanged, and real GDP grows 4%. What are next year's nominal GDP and the approximate inflation rate?", o: ["$1,320 billion; about 6%", "$1,320 billion; about 10%", "$1,200 billion; about 6%", "$1,320 billion; about 14%"], c: 0, w: "Nominal GDP = MV = 330 times 4 = $1,320 billion. Money grew 10%, so inflation ≈ 10 + 0 − 4 = 6%. 10% would be the answer only if real GDP did not grow." },
+    { s: "Velocity is constant, real GDP grows 3% per year, and the real interest rate is 2%. The central bank raises money growth from 3% to 7% per year, and people come to expect the new inflation rate. In the long run, what is the nominal interest rate, and what happens to the real interest rate?", o: ["4%; the real rate rises", "9%; the real rate is unchanged", "6%; the real rate rises", "6%; the real rate is unchanged"], c: 3, w: "Inflation goes from 3 − 3 = 0% to 7 − 3 = 4%. By the Fisher effect, the nominal rate equals the real rate plus expected inflation, 2 + 4 = 6%, and the real rate stays at 2% because money is neutral in the long run. 9% wrongly uses the 7% money growth as the inflation rate." },
+    { s: "After an increase in the money supply moves the economy to an inflationary gap, SRAS gradually shifts left. Why does SRAS shift left?", o: ["Workers and firms raise nominal wages to catch up with higher prices", "LRAS shifts left because of the extra money", "The central bank reverses its policy", "Velocity falls to zero"], c: 0, w: "Higher prices cut real wages, so workers demand higher nominal wages, raising costs and shifting SRAS left until output is back at full employment. LRAS does not move, because money does not change real resources." },
+    { s: "A government pays for spending by having its central bank create money. The money supply grows 50% in a year, velocity rises 10%, and real GDP falls 2%. What is the approximate inflation rate?", o: ["42%", "58%", "62%", "60%"], c: 2, w: "%ΔP ≈ %ΔM + %ΔV − %ΔY = 50 + 10 − (−2) = 62%. Falling real GDP adds to inflation, because fewer goods are chased by more money. 58% treats the fall in real GDP as a rise." },
+    { s: "A bank lends money at a 6% nominal interest rate, and both sides expect 2% inflation. Actual inflation turns out to be 5%. Who gains from the surprise, and what real interest rate was actually paid?", o: ["The lender; 4%", "The borrower; 1%", "The borrower; 4%", "The lender; 1%"], c: 1, w: "The actual real rate is 6 − 5 = 1%, below the 4% both sides expected. The borrower repays with dollars worth less than expected, so the borrower gains and the lender loses. 4% is the expected real rate, not the one actually paid." },
+    { s: "The central bank increases the money supply when the economy is at full employment. Which correctly describes unemployment in the short run and in the long run?", o: ["Falls in the short run; stays lower in the long run", "Unchanged in the short run; rises in the long run", "Falls in the short run; returns to the natural rate in the long run", "Rises in the short run; falls in the long run"], c: 2, w: "With sticky wages, AD shifting right raises output and lowers unemployment at first. Once wages adjust, output returns to full employment and unemployment returns to the natural rate. Money is neutral in the long run, so the drop cannot last." }
+  ]
   ];
   Lab.quiz(Q, document.getElementById("quiz"), document.getElementById("score"), document.getElementById("quiz-reset"));
   Lab.nav("5.3");

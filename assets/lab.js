@@ -152,15 +152,25 @@
   }
 
   /* quiz(questions, quizEl, scoreEl, resetBtn)
-     questions: [{ s: stem, o: [options], c: correctIndex, w: explanation }] */
+     questions: [{ s: stem, o: [options], c: correctIndex, w: explanation }],
+     or several sets: [[...set 1], [...set 2], [...set 3]]. With sets, a tab bar above the quiz
+     switches between them; each set keeps its own answers and score, and "Start over" resets
+     only the set on screen. */
+  var SET_NAMES = ["Set 1 · Core ideas", "Set 2 · Practice", "Set 3 · AP exam style"];
   function quiz(Q, quizEl, scoreEl, resetBtn) {
-    var answered = 0, right = 0;
-    function upd() { scoreEl.textContent = right + " / " + answered + " correct"; }
-    function build() {
-      quizEl.innerHTML = ""; answered = 0; right = 0; upd();
-      Q.forEach(function (q, i) {
+    var sets = Array.isArray(Q[0]) ? Q : [Q], multi = sets.length > 1, cur = 0;
+    var state = sets.map(function () { return { answered: 0, right: 0, box: null }; });
+    function upd() {
+      var st = state[cur];
+      scoreEl.textContent = (multi ? "Set " + (cur + 1) + ": " : "") + st.right + " / " + st.answered + " correct";
+    }
+    function build(k) {
+      var st = state[k], qs = sets[k];
+      if (!st.box) { st.box = document.createElement("div"); st.box.className = "quiz-set"; quizEl.appendChild(st.box); }
+      st.box.innerHTML = ""; st.answered = 0; st.right = 0;
+      qs.forEach(function (q, i) {
         var card = document.createElement("div"); card.className = "card q";
-        card.innerHTML = '<div class="qn">Question ' + (i + 1) + ' of ' + Q.length + '</div><div class="stem"></div><div class="opts"></div><div class="why" hidden></div>';
+        card.innerHTML = '<div class="qn">Question ' + (i + 1) + ' of ' + qs.length + '</div><div class="stem"></div><div class="opts"></div><div class="why" hidden></div>';
         card.querySelector(".stem").textContent = q.s;
         var opts = card.querySelector(".opts"), why = card.querySelector(".why");
         q.o.forEach(function (t, j) {
@@ -170,18 +180,42 @@
             var all = opts.querySelectorAll("button");
             all.forEach(function (x) { x.disabled = true; });
             all[q.c].classList.add("right");
-            if (j !== q.c) b.classList.add("wrong"); else right++;
-            answered++; upd();
+            if (j !== q.c) b.classList.add("wrong"); else st.right++;
+            st.answered++; upd();
             why.hidden = false;
             why.innerHTML = (j === q.c ? "<b style='color:var(--good)'>Correct.</b> " : "<b style='color:var(--bad)'>Not quite.</b> The answer is " + String.fromCharCode(65 + q.c) + ". ") + q.w;
           });
           opts.appendChild(b);
         });
-        quizEl.appendChild(card);
+        st.box.appendChild(card);
       });
+      if (k === cur) upd();
     }
-    if (resetBtn) resetBtn.addEventListener("click", build);
-    build();
+    var tabs = [];
+    function show(k) {
+      cur = k;
+      state.forEach(function (st, i) { st.box.hidden = i !== k; });
+      tabs.forEach(function (t, i) { t.setAttribute("aria-selected", i === k ? "true" : "false"); t.tabIndex = i === k ? 0 : -1; });
+      upd();
+    }
+    quizEl.innerHTML = "";
+    if (multi) {
+      var bar = document.createElement("div"); bar.className = "quiz-tabs"; bar.setAttribute("role", "tablist"); bar.setAttribute("aria-label", "Question sets");
+      sets.forEach(function (qs, i) {
+        var t = document.createElement("button"); t.type = "button"; t.className = "quiz-tab"; t.setAttribute("role", "tab");
+        t.textContent = SET_NAMES[i] || "Set " + (i + 1);
+        t.addEventListener("click", function () { show(i); });
+        t.addEventListener("keydown", function (e) {
+          var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0; if (!d) return;
+          e.preventDefault(); var n = (cur + d + sets.length) % sets.length; show(n); tabs[n].focus();
+        });
+        tabs.push(t); bar.appendChild(t);
+      });
+      quizEl.parentNode.insertBefore(bar, quizEl);
+    }
+    sets.forEach(function (qs, k) { build(k); });
+    if (resetBtn) resetBtn.addEventListener("click", function () { build(cur); });
+    show(0);
   }
 
   /* nav(currentId) fills #topnav and #pager on a lab page.
